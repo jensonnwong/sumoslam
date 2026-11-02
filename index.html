@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta http-equiv="Content-Security-Policy" content="script-src 'sha256-txTirZUD+4tqpF/37KgZI7jKFSmW6VkWEJ8ZcTIVxok='; object-src 'none'; base-uri 'self'">
+<meta http-equiv="Content-Security-Policy" content="script-src 'sha256-TPsCXbQ8FqYPNoRaPF9XCUHQbUyvzstToonSJx1pvkM='; object-src 'none'; base-uri 'self'">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,interactive-widget=resizes-content">
 <meta name="theme-color" content="#1b2042">
 <meta name="mobile-web-app-capable" content="yes">
@@ -877,7 +877,7 @@ function resetRound(){
   phase = 'countdown'; phaseT = 1.3; banner = { text: cfg.mode === 'rumble' ? 'Royal Rumble!' : score[0] + score[1] > 0 ? `Round ${roundNo}` : 'Ready', t: 1.3, color: '#fff6e6' };
 }
 function startMatch(){
-  audio(); wwEvent('bout_start', { mode: cfg.mode, level: cfg.level, bout_format: cfg.bout, stale_rule: cfg.stale, wrestlers: cfg.mode === 'rumble' ? null : [cfg.p1, cfg.p2], wager: +cfg.wager || 0 });
+  closeSheet(); audio();   // a bout never starts under a leftover card wwEvent('bout_start', { mode: cfg.mode, level: cfg.level, bout_format: cfg.bout, stale_rule: cfg.stale, wrestlers: cfg.mode === 'rumble' ? null : [cfg.p1, cfg.p2], wager: +cfg.wager || 0 });
   if (cfg.mode === 'rumble') {
     const keys = cpuPool(), n = +cfg.rn || 6, lineup = pendingRumble; pendingRumble = null;
     F = [makeFighter(cfg.p1, 0, true)];
@@ -916,7 +916,7 @@ async function wwSeatLogin(name, pin){
   const r = await wwRpc('ww_login', { p_name: name, p_pin: pin });
   if (!r || !r.ok) throw new Error((r && r.error) || 'Could not sign in.');
   const sess = { name: r.name, token: r.token };
-  let d = null; try { d = await wwRpc('sumo_load', { p_name: sess.name, p_token: sess.token }); } catch (e) {}
+  let d = null; try { d = await wwRpc('sumo_load', { p_name: sess.name, p_token: sess.token }, false, 8000); } catch (e) {}
   const col = (d && d.collection) || [], owns = col.map(c => c.wrestler);
   const pd = (d && d.profile && d.profile.data) || {};
   return { name: r.name, tokens: (d && d.tokens) || 0, owns: owns.length ? owns : [...STARTERS], sess, noStarter: !owns.length, rolls: pd.rolls || {}, starter: d && d.profile && d.profile.starter, starterRoll: pd.profile && pd.profile.roll };
@@ -1126,17 +1126,23 @@ function netStartTimers(){
     if (NET.opp && quiet > (NET.match ? 8000 : 12000)) netDrop(`${NET.opp.name} disconnected.`); }, 1000);
 }
 // presence + rematch state, sent every second on the result card (every 2s otherwise), so nothing hangs on one lost message
+const netHello = () => ({ name: NET.me.name, pick: NET.me.pick, roll: netMyRoll(), partner: NET.me.partner || null, role: NET.role, mode: NET.mode });
 function netPg(){ const done = NET.match && phase === 'done';
-  return { name: NET.me.name, pick: NET.me.pick, roll: netMyRoll(), role: NET.role, mode: NET.mode, mid: NET.mid || 0, again: !!(done && NET.meAgain), res: done && NET.role === 'host' ? NET.result : undefined };
+  return { name: NET.me.name, pick: NET.me.pick, roll: netMyRoll(), partner: NET.me.partner || null, lobby: !NET.match, role: NET.role, mode: NET.mode, mid: NET.mid || 0, again: !!(done && NET.meAgain), res: done && NET.role === 'host' ? NET.result : undefined };
 }
+function netToLobby(){   // back to the room's pick screen after a match; the room stays open for both of you
+  if (!NET) return; NET.match = false; NET.meAgain = NET.oppAgain = false; NET.endSheet = false; NET.result = null; clearInterval(NET.goT);
+  closeSheet(); ['#end', '#menuBtn', '#muteBtn'].forEach(q => $(q).hidden = true); phase = 'menu'; F = []; $('#online').hidden = false; renderOnline(); }
 function netOnMsg(ev, d){
   NET.lastRx = performance.now();
+  if (ev === 'lobby') { if (NET.match && phase === 'done') { netToLobby(); SFX.push(); } return; }   // the other player went back to pick
   if (ev === 'pg' && NET.match) {   // during or after a match: recover anything that went missing
+    if (d.lobby && d.mid === NET.mid && phase === 'done') { netToLobby(); return; }   // missed their 'lobby': they're already back at the pick screen
     if (NET.role === 'guest' && d.res && d.mid === NET.mid && phase !== 'done') { NET.result = d.res; netEnd(); }   // missed the result
     if (phase === 'done' && d.again && d.mid === NET.mid && !NET.oppAgain) { NET.oppAgain = true; if (NET.role === 'host' && NET.meAgain) netGo(); else if (NET.endSheet) netEndSheet(); }
     if (NET.role === 'guest' && NET.meAgain && phase === 'done' && d.mid > NET.mid && NET.lastGo && NET.lastGo.mid === d.mid) netGuestStart(NET.lastGo);
     return; }
-  if (ev === 'pg') { if (NET.role === 'guest' && NET_MODES[d.mode]) NET.mode = d.mode; const fresh = !NET.opp; NET.opp = { name: String(d.name || 'Player').slice(0, 16), pick: CHARS[d.pick] ? d.pick : 'taro' }; NET.opp.roll = cleanRoll(d.roll, NET.opp.pick); if (fresh) { SFX.push(); rtSend('pg', { name: NET.me.name, pick: NET.me.pick, roll: netMyRoll(), role: NET.role, mode: NET.mode });
+  if (ev === 'pg') { if (NET.role === 'guest' && NET_MODES[d.mode]) NET.mode = d.mode; const fresh = !NET.opp; NET.opp = { name: String(d.name || 'Player').slice(0, 16), pick: CHARS[d.pick] ? d.pick : 'taro' }; NET.opp.roll = cleanRoll(d.roll, NET.opp.pick); NET.opp.partner = CHARS[d.partner] ? d.partner : null; if (fresh) { SFX.push(); rtSend('pg', netHello());
       if (NET.quick) { clearInterval(NET.qpoll); NET.qpoll = null; if (NET.role === 'host') { NET.autoAt = performance.now() + 3000; clearTimeout(NET.autoT); NET.autoT = setTimeout(() => { if (NET && !NET.match && NET.opp) netGo(); }, 3000); } } }
     if (!NET.match) renderOnline(); return; }
   if (ev === 'bye') { netDrop(`${NET.opp ? NET.opp.name : 'Your opponent'} left the room.`); return; }
@@ -1174,19 +1180,22 @@ function renderOnline(){
   body.innerHTML = (NET.quick ? `<div class="scout" style="align-items:center"><span class="group-label">Quick match</span><div class="ol-code" style="font-size:22px;letter-spacing:.04em">${o ? `vs ${esc(o.name)}` : 'Looking…'}</div><small class="rk-note">${o ? (host ? `Starting in ${secs}… pick your wrestler` : 'Starting in a moment… pick your wrestler') : 'Waiting for someone else to look for a match. Pick your wrestler while you wait.'}</small></div>`
     : `<div class="scout" style="align-items:center"><span class="group-label">Room code</span><div class="ol-code">${NET.code}</div><small class="rk-note">${host ? 'Share this code. It stays open while you wait here.' : `You're in ${o ? esc(o.name) + '’s' : 'the'} room.`}</small></div>`)
     + `
-    <div class="ol-pl"><div class="ol-p me"><canvas data-k="${NET.me.pick}"></canvas><b>${esc(NET.me.name)} (you)</b><small>${CHARS[NET.me.pick].name} ${tierTag(myRoll(NET.me.pick))}</small></div>
-      <div class="ol-p op">${o ? `<canvas data-k="${o.pick}"></canvas><b>${esc(o.name)}</b><small>${CHARS[o.pick].name} ${tierTag(o.roll)}</small>` : (NET.quick ? `<b style="color:var(--muted)">Searching…</b><small>Anyone looking for a match</small>` : `<b style="color:var(--muted)">Waiting for a friend…</b><small>They join with the code</small>`)}</div></div>
-    ${NET.quick ? '' : `<span class="group-label">Match</span>${host ? `<div class="seg" id="olMode">${Object.entries(NET_MODES).map(([k, v]) => `<button data-v="${k}" aria-pressed="${(NET.mode || 'duel') === k}">${v}</button>`).join('')}</div>` : `<p class="ol-wait" style="text-align:left;margin:0">${NET_MODES[NET.mode || 'duel']}${NET.mode === 'tag' ? ' \u00b7 each of you gets a CPU partner' : NET.mode === 'rumble' ? ' \u00b7 the two of you plus 2 CPUs' : ''}</p>`}`}
+    <div class="ol-pl"><div class="ol-p me"><canvas data-k="${NET.me.pick}"></canvas><b>${esc(NET.me.name)} (you)</b><small>${CHARS[NET.me.pick].name} ${tierTag(myRoll(NET.me.pick))}</small>${NET.mode === 'tag' ? `<small class="rk-note">+ ${CHARS[NET.me.partner] ? CHARS[NET.me.partner].name : 'Random'} (CPU)</small>` : ''}</div>
+      <div class="ol-p op">${o ? `<canvas data-k="${o.pick}"></canvas><b>${esc(o.name)}</b><small>${CHARS[o.pick].name} ${tierTag(o.roll)}</small>${NET.mode === 'tag' ? `<small class="rk-note">+ ${CHARS[o.partner] ? CHARS[o.partner].name : 'Random'} (CPU)</small>` : ''}` : (NET.quick ? `<b style="color:var(--muted)">Searching…</b><small>Anyone looking for a match</small>` : `<b style="color:var(--muted)">Waiting for a friend…</b><small>They join with the code</small>`)}</div></div>
+    ${NET.quick ? '' : `<span class="group-label">Match</span>${host ? `<div class="seg" id="olMode">${Object.entries(NET_MODES).map(([k, v]) => `<button data-v="${k}" aria-pressed="${(NET.mode || 'duel') === k}">${v}</button>`).join('')}</div>` : `<p class="ol-wait" style="text-align:left;margin:0">${NET_MODES[NET.mode || 'duel']}${NET.mode === 'tag' ? ' \u00b7 each of you picks a CPU partner' : NET.mode === 'rumble' ? ' \u00b7 the two of you plus 2 CPUs' : ''}</p>`}`}
     <span class="group-label">Your wrestler</span>
-    <div class="ol-pick">${me.owns.filter(k => CHARS[k]).map(k => `<button data-k="${k}" aria-pressed="${k === NET.me.pick}"><canvas data-k="${k}"></canvas>${CHARS[k].name.split(' ').pop()}${tierTag(myRoll(k))}</button>`).join('')}</div>
+    <div class="ol-pick" id="olPick">${me.owns.filter(k => CHARS[k]).map(k => `<button data-k="${k}" aria-pressed="${k === NET.me.pick}"><canvas data-k="${k}"></canvas>${CHARS[k].name.split(' ').pop()}${tierTag(myRoll(k))}</button>`).join('')}</div>
+    ${NET.mode === 'tag' ? `<span class="group-label">Your CPU partner</span>
+    <div class="ol-pick" id="olPartner"><button data-k="__rnd" aria-pressed="${!CHARS[NET.me.partner]}"><span class="rq" style="font:24px Bungee,'Arial Black',sans-serif;color:var(--gold);line-height:36px">?</span>Random</button>${[...new Set([...STARTERS, ...me.owns])].filter(k => CHARS[k]).map(k => `<button data-k="${k}" aria-pressed="${k === NET.me.partner}"><canvas data-k="${k}"></canvas>${CHARS[k].name.split(' ').pop()}</button>`).join('')}</div>` : ''}
     <div class="ol-foot${host && !NET.quick ? ' two' : ''}">${NET.quick ? '' : host ? `<button class="start" id="olGo" ${can ? '' : 'disabled'}>${can ? 'Start the bout' : 'Waiting for a friend…'}</button>` : `<p class="ol-wait">${o ? `Waiting for ${esc(o.name)} to start…` : 'Connecting…'}</p>`}
     <button class="start" id="olLeave" style="background:var(--band);color:var(--paper);box-shadow:none">${NET.quick && !o ? 'Stop looking' : host && !NET.quick ? 'Leave' : 'Leave room'}</button></div>`;
   if (NET.quick && o && NET.autoAt) { clearTimeout(NET.tickT); NET.tickT = setTimeout(() => { if (NET && !NET.match) renderOnline(); }, 500); }
   body.querySelectorAll('.ol-p canvas[data-k]').forEach(cv => netMini(cv, cv.dataset.k, 56));
   body.querySelectorAll('.ol-pick canvas[data-k]').forEach(cv => netMini(cv, cv.dataset.k, 36));
-  body.querySelectorAll('.ol-pick button').forEach(b => b.onclick = () => { NET.me.pick = b.dataset.k; SFX.push(); rtSend('pg', { name: NET.me.name, pick: NET.me.pick, roll: netMyRoll(), role: NET.role, mode: NET.mode }); renderOnline(); });
+  body.querySelectorAll('#olPick button').forEach(b => b.onclick = () => { NET.me.pick = b.dataset.k; SFX.push(); rtSend('pg', netHello()); renderOnline(); });
+  body.querySelectorAll('#olPartner button').forEach(b => b.onclick = () => { NET.me.partner = b.dataset.k === '__rnd' ? null : b.dataset.k; SFX.push(); rtSend('pg', netHello()); renderOnline(); });
   if ($('#olGo')) $('#olGo').onclick = () => netGo();
-  if ($('#olMode')) $('#olMode').onclick = e => { const b = e.target.closest('button'); if (!b) return; NET.mode = b.dataset.v; SFX.push(); rtSend('pg', { name: NET.me.name, pick: NET.me.pick, role: NET.role, mode: NET.mode }); renderOnline(); };
+  if ($('#olMode')) $('#olMode').onclick = e => { const b = e.target.closest('button'); if (!b) return; NET.mode = b.dataset.v; SFX.push(); rtSend('pg', netHello()); renderOnline(); };
   $('#olLeave').onclick = () => { netLeave(); renderOnline(); };
 }
 function netPickDefault(){ return profile && me.owns.includes(profile.starter) ? profile.starter : me.owns[0] || 'taro'; }
@@ -1223,7 +1232,7 @@ async function netOpen(role, code, hostName){
   const { ws, topic } = await rtConnect(code).catch(e => { const err = $('#olErr'); if (err) err.textContent = e.message; throw e; });
   NET = { role, code, ws, topic, me: { name: me.name, pick: netPickDefault() }, opp: null, match: false, t0: performance.now(), rin: { x: 0, y: 0 } };
   if (role === 'guest' && hostName) NET.oppName = hostName;
-  netStartTimers(); rtSend('pg', { name: NET.me.name, pick: NET.me.pick, role }); renderOnline();
+  netStartTimers(); rtSend('pg', netHello()); renderOnline();
 }
 function netLeave(silent){
   if (!NET) return; const n = NET; n.leaving = true; NET = null;
@@ -1246,7 +1255,7 @@ function netGo(){   // host: both picks known -> start, tell the guest
   if (!NET || NET.role !== 'host' || !NET.opp) return;
   NET.meAgain = NET.oppAgain = false; NET.endSheet = false; closeSheet();
   const mode = NET.mode || 'duel', pool = Object.keys(CHARS).filter(k => !CHARS[k].secret), rk = () => pool[Math.floor(rand() * pool.length)];
-  const keys = mode === 'duel' ? [NET.me.pick, NET.opp.pick] : [NET.me.pick, NET.opp.pick, rk(), rk()];
+  const pk = k => CHARS[k] ? k : rk(), keys = mode === 'duel' ? [NET.me.pick, NET.opp.pick] : mode === 'tag' ? [NET.me.pick, NET.opp.pick, pk(NET.me.partner), pk(NET.opp.partner)] : [NET.me.pick, NET.opp.pick, rk(), rk()];
   NET.mid = (NET.mid || 0) + 1; NET.goAck = false;
   const go = { mode, keys, p0: keys[0], p1: keys[1], n0: NET.me.name, n1: NET.opp.name, mid: NET.mid };
   rtSend('go', go); clearInterval(NET.goT); let tries = 0; NET.goT = setInterval(() => { if (!NET || NET.goAck || ++tries > 10) { if (NET) clearInterval(NET.goT); return; } rtSend('go', go); }, 500); /* keep saying go until the guest is in */ netCfg(mode); cfg.p1 = keys[0]; cfg.p2 = keys[1]; NET.match = true; NET.rin = { x: 0, y: 0 }; NET.sendT = 0;
@@ -1345,7 +1354,7 @@ function netEndSheet(){
   const title = m === 'rumble' ? (won ? 'You win the rumble!' : `You placed ${ordinal(NET.rank || 2)}`) : m === 'tag' ? (won ? 'Your team wins!' : `${esc(opp)}\u2019s team wins`) : won ? 'You win!' : `${esc(opp)} wins`;
   const line = m === 'rumble' ? `4 wrestlers \u00b7 you, ${esc(opp)} and 2 CPUs.` : `${sc[0]}\u2013${sc[1]} vs ${esc(opp)}${m === 'tag' ? '\u2019s team' : ''}.`;
   sheet(what, title, `<p>${line}${won ? ' +2 tokens, and it counts on the Ranks board.' : ' It counts on the Ranks board.'}</p>${waiting ? `<p class="hint" style="margin-top:6px">${waiting}</p>` : ''}`,
-    [['Leave', () => { closeSheet(); netLeave(); goHome(); openOnline(); }], [NET.meAgain ? 'Waiting…' : 'Rematch', () => { if (!NET || NET.meAgain) return; NET.meAgain = true; rtSend('again'); if (NET.role === 'host' && NET.oppAgain) netGo(); else netEndSheet(); }, true]]);
+    [['Leave', () => { closeSheet(); netLeave(); goHome(); openOnline(); }], ['Change wrestler', () => { if (!NET) return; rtSend('lobby', { mid: NET.mid || 0 }); netToLobby(); }], [NET.meAgain ? 'Waiting…' : 'Rematch', () => { if (!NET || NET.meAgain) return; NET.meAgain = true; rtSend('again'); if (NET.role === 'host' && NET.oppAgain) netGo(); else netEndSheet(); }, true]]);
 }
 $('#onlineBack').addEventListener('click', () => { if (NET && !NET.match) netLeave(); goHome(); });
 
@@ -2421,11 +2430,11 @@ syncChip();
    tokens and the collection (every change is checked there), and replies reconcile the local copy. ---------- */
 var WW = { url: 'https://bekcyzospcruszqtpcpe.supabase.co', key: 'sb_publishable_eHpZIgofIqg32ncq3B73fw_vXdNbdzY', status: 'idle', sid: Math.random().toString(36).slice(2, 12), q: [], saveT: null, flushT: null, sess: null };
 try { const legacy = /netlify\.app$/.test(location.hostname) ? localStorage.getItem('wwSession') : null; WW.sess = JSON.parse(localStorage.getItem('sumoWwSession') || legacy || 'null'); if (legacy) { localStorage.setItem('sumoWwSession', legacy); localStorage.removeItem('wwSession'); } } catch (e) {}   // game-specific key: other WW games may share this web address (the old key is only carried over on the Netlify site, where sumo had it to itself)
-async function wwRpc(fn, args, keepalive){
-  let r;
-  try { r = await fetch(`${WW.url}/rest/v1/rpc/${fn}`, { method: 'POST', keepalive: !!keepalive, headers: { apikey: WW.key, 'Content-Type': 'application/json' }, body: JSON.stringify(args) }); }
-  catch (e) { WW.status = 'offline'; const err = new Error("Can't reach the WW server. You're playing offline."); err.offline = true; throw err; }
-  let j = null; try { j = await r.json(); } catch (e) {}
+async function wwRpc(fn, args, keepalive, waitMs = 12000){
+  let r; const ac = typeof AbortController === 'function' ? new AbortController() : null, tm = ac ? setTimeout(() => ac.abort(), waitMs) : 0;   // a stalled phone connection gives up instead of hanging
+  try { r = await fetch(`${WW.url}/rest/v1/rpc/${fn}`, { method: 'POST', keepalive: !!keepalive, signal: ac ? ac.signal : undefined, headers: { apikey: WW.key, 'Content-Type': 'application/json' }, body: JSON.stringify(args) }); }
+  catch (e) { clearTimeout(tm); WW.status = 'offline'; const slow = e && e.name === 'AbortError', err = new Error(slow ? 'The WW server is taking too long. Check your signal and try again.' : "Can't reach the WW server. You're playing offline."); err.offline = true; err.slow = slow; throw err; }
+  let j = null; try { j = await r.json(); } catch (e) {} clearTimeout(tm);
   if (!r.ok) { const err = new Error((j && j.message) || `Server error ${r.status}`); err.server = true; throw err; }
   WW.status = 'online'; return j;
 }
@@ -2509,18 +2518,28 @@ function accountSheet(after, mode){   // one card for both: sign in, or create a
   nm.onkeydown = e => { if (e.key === 'Enter') pn.focus(); }; pn.onkeydown = e => { if (e.key === 'Enter') { pn.blur(); go(); } };
   setTimeout(() => nm.focus(), 60);
   const toStarter = name => { closeSheet(); leaveHome(); onb = { step: 1, name, pick: null, level: 'normal', fresh: true }; phase = 'menu'; $('#onb').hidden = false; renderOnb(); };
+  let busy = false;
+  const live = () => !$('#sheet').hidden && $('#siName') === nm && ['menu', 'home', 'splash', 'done'].includes(phase);   // this card is still the one on screen and no bout has started
   async function go(){ nm.blur(); pn.blur(); const err = $('#siErr'), name = nm.value.trim();
+    if (busy) return;
     if (!name || pn.value.length !== 4) { err.textContent = 'Enter your ring name and a 4-digit PIN.'; SFX.bump(); return; }
-    err.textContent = make ? 'Creating…' : 'Signing in…';
+    busy = true; err.textContent = make ? 'Creating…' : 'Signing in…'; const btn = $('#sheetBtns button:last-child'); if (btn) btn.disabled = true;
+    const done = () => { busy = false; if (btn && btn.isConnected) btn.disabled = false; };
     try {
-      if (make) { const r = await wwRpc('ww_create_account', { p_name: name, p_pin: pn.value }); wwSaveSess({ name: r.name, token: r.token }); SFX.go(); toStarter(r.name); return; }
+      if (make) { const r = await wwRpc('ww_create_account', { p_name: name, p_pin: pn.value }); wwSaveSess({ name: r.name, token: r.token }); done(); if (!live()) return; SFX.go(); toStarter(r.name); return; }
       const r = await wwRpc('ww_login', { p_name: name, p_pin: pn.value });
-      if (!r.ok) { err.textContent = r.error; SFX.bump(); return; }
-      wwSaveSess({ name: r.name, token: r.token }); wwApply(await wwRpc('sumo_load', wwAuth()));
-      wwEvent('signed_in', { method: 'pin' }); SFX.go();
+      if (!r.ok) { done(); if (live()) { err.textContent = r.error; SFX.bump(); } return; }
+      wwSaveSess({ name: r.name, token: r.token }); wwEvent('signed_in', { method: 'pin' });
+      err.style.color = '#2f8a52'; err.textContent = `Signed in as ${r.name}. Loading your wrestlers…`;
+      let d = null; for (let k = 0; k < 2 && !d; k++) { try { d = await wwRpc('sumo_load', wwAuth(), false, 8000); } catch (e) {} }   // try twice, then carry on
+      done();
+      if (!live()) { if (d) wwApply(d); else wwRefresh(); return; }   // a late answer after you moved on (cancelled, signed in again, or started a bout): update quietly, never pop a card over the game
+      SFX.go();
+      if (!d) { closeSheet(); syncChip(); clearTimeout(wwRefreshT); wwRefreshT = setTimeout(wwRefresh, 4000); sheetColor = '#2f8a52'; sheet('', 'Signed in', `<p>You're signed in as <b>${esc(r.name)}</b>. Your wrestlers are still loading; they'll appear in a moment.</p>`, [['OK', closeSheet, true]]); return; }
+      wwApply(d);
       if (!profile || !profile.starter) { toStarter(r.name); return; }   // account exists (e.g. a Full Count team) but no Sumo starter yet
       (after || closeSheet)();
-    } catch (e) { err.textContent = e.message; SFX.bump(); } }
+    } catch (e) { done(); if (live()) { err.style.color = ''; err.textContent = e.message; SFX.bump(); } } }
 }
 const esc = t => String(t).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 function deleteAccountSheet(){   // permanent: needs the PIN; also removes a Full Count team with the same name
@@ -2789,6 +2808,7 @@ function pickTarget(f){   // rumble CPUs: nearest wrestler, but jump on anyone n
     if (!f.ai.fooled) return o; const ds = decoys(f); return ds.find(d => d.cl.id === f.ai.pickId) || ds[0] || o; }
   let b = null, bs = Infinity; const R = ring.R;
   for (const o of [...foes(f), ...decoys(f)]) {
+    if (cfg.mode === 'tag' && f.team != null && o.team === f.team) continue;   // 2 v 2: never pick your own teammate to chase
     const ox = o.fade > 0 ? (o.seenX ?? o.x) : o.x, oy = o.fade > 0 ? (o.seenY ?? o.y) : o.y;
     let sc = Math.hypot(ox - f.x, oy - f.y);
     if (Math.hypot(ox, oy) > R - 70) sc -= 70;
