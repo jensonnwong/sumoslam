@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta http-equiv="Content-Security-Policy" content="script-src 'sha256-4gNvcuvsowt5Z1dphhsL9twguiQNxg37w9jPbnhVUcw='; object-src 'none'; base-uri 'self'">
+<meta http-equiv="Content-Security-Policy" content="script-src 'sha256-Wwk+wgVnDutk3qIHWzQ91KIBDvpz2hQiRyCwhbH5Luc='; object-src 'none'; base-uri 'self'">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,interactive-widget=resizes-content">
 <meta name="theme-color" content="#1b2042">
 <meta name="mobile-web-app-capable" content="yes">
@@ -1126,9 +1126,9 @@ function netStartTimers(){
     if (NET.opp && quiet > (NET.match ? 8000 : 12000)) netDrop(`${NET.opp.name} disconnected.`); }, 1000);
 }
 // presence + rematch state, sent every second on the result card (every 2s otherwise), so nothing hangs on one lost message
-const netHello = () => ({ name: NET.me.name, pick: NET.me.pick, roll: netMyRoll(), partner: NET.me.partner || null, role: NET.role, mode: NET.mode });
+const netHello = () => ({ name: NET.me.name, pick: NET.me.pick, roll: netMyRoll(), role: NET.role, mode: NET.mode, tt: NET.tt || 'vs' });
 function netPg(){ const done = NET.match && phase === 'done';
-  return { name: NET.me.name, pick: NET.me.pick, roll: netMyRoll(), partner: NET.me.partner || null, lobby: !NET.match, role: NET.role, mode: NET.mode, mid: NET.mid || 0, again: !!(done && NET.meAgain), res: done && NET.role === 'host' ? NET.result : undefined };
+  return { name: NET.me.name, pick: NET.me.pick, roll: netMyRoll(), tt: NET.tt || 'vs', lobby: !NET.match, role: NET.role, mode: NET.mode, mid: NET.mid || 0, again: !!(done && NET.meAgain), res: done && NET.role === 'host' ? NET.result : undefined };
 }
 function netToLobby(){   // back to the room's pick screen after a match; the room stays open for both of you
   if (!NET) return; NET.match = false; NET.meAgain = NET.oppAgain = false; NET.endSheet = false; NET.result = null; clearInterval(NET.goT);
@@ -1142,7 +1142,7 @@ function netOnMsg(ev, d){
     if (phase === 'done' && d.again && d.mid === NET.mid && !NET.oppAgain) { NET.oppAgain = true; if (NET.role === 'host' && NET.meAgain) netGo(); else if (NET.endSheet) netEndSheet(); }
     if (NET.role === 'guest' && NET.meAgain && phase === 'done' && d.mid > NET.mid && NET.lastGo && NET.lastGo.mid === d.mid) netGuestStart(NET.lastGo);
     return; }
-  if (ev === 'pg') { if (NET.role === 'guest' && NET_MODES[d.mode]) NET.mode = d.mode; const fresh = !NET.opp; NET.opp = { name: String(d.name || 'Player').slice(0, 16), pick: CHARS[d.pick] ? d.pick : 'taro' }; NET.opp.roll = cleanRoll(d.roll, NET.opp.pick); NET.opp.partner = CHARS[d.partner] ? d.partner : null; if (fresh) { SFX.push(); rtSend('pg', netHello());
+  if (ev === 'pg') { if (NET.role === 'guest' && NET_MODES[d.mode]) NET.mode = d.mode; if (NET.role === 'guest' && (d.tt === 'coop' || d.tt === 'vs')) NET.tt = d.tt; const fresh = !NET.opp; NET.opp = { name: String(d.name || 'Player').slice(0, 16), pick: CHARS[d.pick] ? d.pick : 'taro' }; NET.opp.roll = cleanRoll(d.roll, NET.opp.pick); if (fresh) { SFX.push(); rtSend('pg', netHello());
       if (NET.quick) { clearInterval(NET.qpoll); NET.qpoll = null; if (NET.role === 'host') { NET.autoAt = performance.now() + 3000; clearTimeout(NET.autoT); NET.autoT = setTimeout(() => { if (NET && !NET.match && NET.opp) netGo(); }, 3000); } } }
     if (!NET.match) renderOnline(); return; }
   if (ev === 'bye') { netDrop(`${NET.opp ? NET.opp.name : 'Your opponent'} left the room.`); return; }
@@ -1180,20 +1180,19 @@ function renderOnline(){
   body.innerHTML = (NET.quick ? `<div class="scout" style="align-items:center"><span class="group-label">Quick match</span><div class="ol-code" style="font-size:22px;letter-spacing:.04em">${o ? `vs ${esc(o.name)}` : 'Looking…'}</div><small class="rk-note">${o ? (host ? `Starting in ${secs}… pick your wrestler` : 'Starting in a moment… pick your wrestler') : 'Waiting for someone else to look for a match. Pick your wrestler while you wait.'}</small></div>`
     : `<div class="scout" style="align-items:center"><span class="group-label">Room code</span><div class="ol-code">${NET.code}</div><small class="rk-note">${host ? 'Share this code. It stays open while you wait here.' : `You're in ${o ? esc(o.name) + '’s' : 'the'} room.`}</small></div>`)
     + `
-    <div class="ol-pl"><div class="ol-p me"><canvas data-k="${NET.me.pick}"></canvas><b>${esc(NET.me.name)} (you)</b><small>${CHARS[NET.me.pick].name} ${tierTag(myRoll(NET.me.pick))}</small>${NET.mode === 'tag' ? `<small class="rk-note">+ ${CHARS[NET.me.partner] ? CHARS[NET.me.partner].name : 'Random'} (CPU)</small>` : ''}</div>
-      <div class="ol-p op">${o ? `<canvas data-k="${o.pick}"></canvas><b>${esc(o.name)}</b><small>${CHARS[o.pick].name} ${tierTag(o.roll)}</small>${NET.mode === 'tag' ? `<small class="rk-note">+ ${CHARS[o.partner] ? CHARS[o.partner].name : 'Random'} (CPU)</small>` : ''}` : (NET.quick ? `<b style="color:var(--muted)">Searching…</b><small>Anyone looking for a match</small>` : `<b style="color:var(--muted)">Waiting for a friend…</b><small>They join with the code</small>`)}</div></div>
-    ${NET.quick ? '' : `<span class="group-label">Match</span>${host ? `<div class="seg" id="olMode">${Object.entries(NET_MODES).map(([k, v]) => `<button data-v="${k}" aria-pressed="${(NET.mode || 'duel') === k}">${v}</button>`).join('')}</div>` : `<p class="ol-wait" style="text-align:left;margin:0">${NET_MODES[NET.mode || 'duel']}${NET.mode === 'tag' ? ' \u00b7 each of you picks a CPU partner' : NET.mode === 'rumble' ? ' \u00b7 the two of you plus 2 CPUs' : ''}</p>`}`}
+    <div class="ol-pl"><div class="ol-p me"><canvas data-k="${NET.me.pick}"></canvas><b>${esc(NET.me.name)} (you)</b><small>${CHARS[NET.me.pick].name} ${tierTag(myRoll(NET.me.pick))}</small>${NET.mode === 'tag' ? `<small class="rk-note">${NET.tt === 'coop' ? 'Blue team' : 'Blue team + a CPU'}</small>` : ''}</div>
+      <div class="ol-p op">${o ? `<canvas data-k="${o.pick}"></canvas><b>${esc(o.name)}</b><small>${CHARS[o.pick].name} ${tierTag(o.roll)}</small>${NET.mode === 'tag' ? `<small class="rk-note">${NET.tt === 'coop' ? 'Blue team (with you)' : 'Red team + a CPU'}</small>` : ''}` : (NET.quick ? `<b style="color:var(--muted)">Searching…</b><small>Anyone looking for a match</small>` : `<b style="color:var(--muted)">Waiting for a friend…</b><small>They join with the code</small>`)}</div></div>
+    ${NET.quick ? '' : `<span class="group-label">Match</span>${host ? `<div class="seg" id="olMode">${Object.entries(NET_MODES).map(([k, v]) => `<button data-v="${k}" aria-pressed="${(NET.mode || 'duel') === k}">${v}</button>`).join('')}</div>${NET.mode === 'tag' ? `<span class="group-label">${o ? esc(o.name) : 'The other player'} is\u2026</span><div class="seg" id="olTeams"><button data-v="coop" aria-pressed="${NET.tt === 'coop'}">On my team</button><button data-v="vs" aria-pressed="${NET.tt !== 'coop'}">Against me</button></div><p class="rk-note" style="margin:-2px 0 0">${NET.tt === 'coop' ? 'You two team up against 2 random CPUs.' : 'Each of you gets a random CPU partner.'}</p>` : ''}` : `<p class="ol-wait" style="text-align:left;margin:0">${NET_MODES[NET.mode || 'duel']}${NET.mode === 'tag' ? (NET.tt === 'coop' ? ' \u00b7 you two vs 2 CPUs' : ' \u00b7 you vs each other, each with a CPU partner') : NET.mode === 'rumble' ? ' \u00b7 the two of you plus 2 CPUs' : ''}</p>`}`}
     <span class="group-label">Your wrestler</span>
     <div class="ol-pick" id="olPick">${me.owns.filter(k => CHARS[k]).map(k => `<button data-k="${k}" aria-pressed="${k === NET.me.pick}"><canvas data-k="${k}"></canvas>${CHARS[k].name.split(' ').pop()}${tierTag(myRoll(k))}</button>`).join('')}</div>
-    ${NET.mode === 'tag' ? `<span class="group-label">Your CPU partner</span>
-    <div class="ol-pick" id="olPartner"><button data-k="__rnd" aria-pressed="${!CHARS[NET.me.partner]}"><span class="rq" style="font:24px Bungee,'Arial Black',sans-serif;color:var(--gold);line-height:36px">?</span>Random</button>${[...new Set([...STARTERS, ...me.owns])].filter(k => CHARS[k]).map(k => `<button data-k="${k}" aria-pressed="${k === NET.me.partner}"><canvas data-k="${k}"></canvas>${CHARS[k].name.split(' ').pop()}</button>`).join('')}</div>` : ''}
+
     <div class="ol-foot${host && !NET.quick ? ' two' : ''}">${NET.quick ? '' : host ? `<button class="start" id="olGo" ${can ? '' : 'disabled'}>${can ? 'Start the bout' : 'Waiting for a friend…'}</button>` : `<p class="ol-wait">${o ? `Waiting for ${esc(o.name)} to start…` : 'Connecting…'}</p>`}
     <button class="start" id="olLeave" style="background:var(--band);color:var(--paper);box-shadow:none">${NET.quick && !o ? 'Stop looking' : host && !NET.quick ? 'Leave' : 'Leave room'}</button></div>`;
   if (NET.quick && o && NET.autoAt) { clearTimeout(NET.tickT); NET.tickT = setTimeout(() => { if (NET && !NET.match) renderOnline(); }, 500); }
   body.querySelectorAll('.ol-p canvas[data-k]').forEach(cv => netMini(cv, cv.dataset.k, 56));
   body.querySelectorAll('.ol-pick canvas[data-k]').forEach(cv => netMini(cv, cv.dataset.k, 36));
   body.querySelectorAll('#olPick button').forEach(b => b.onclick = () => { NET.me.pick = b.dataset.k; SFX.push(); rtSend('pg', netHello()); renderOnline(); });
-  body.querySelectorAll('#olPartner button').forEach(b => b.onclick = () => { NET.me.partner = b.dataset.k === '__rnd' ? null : b.dataset.k; SFX.push(); rtSend('pg', netHello()); renderOnline(); });
+  if ($('#olTeams')) $('#olTeams').onclick = e => { const b = e.target.closest('button'); if (!b) return; NET.tt = b.dataset.v; SFX.push(); rtSend('pg', netHello()); renderOnline(); };
   if ($('#olGo')) $('#olGo').onclick = () => netGo();
   if ($('#olMode')) $('#olMode').onclick = e => { const b = e.target.closest('button'); if (!b) return; NET.mode = b.dataset.v; SFX.push(); rtSend('pg', netHello()); renderOnline(); };
   $('#olLeave').onclick = () => { netLeave(); renderOnline(); };
@@ -1247,7 +1246,7 @@ function netDrop(msg){
   sheetColor = '#2f62c8'; sheet('Online', 'Match over', `<p>${esc(msg)}${inMatch ? ' The bout doesn’t count.' : ''}</p>`, [['OK', () => { closeSheet(); if (inMatch) { goHome(); openOnline(); } else renderOnline(); }, true]]);
 }
 // ---- match start
-function netCfg(mode){ cfg.mode = mode === 'tag' ? 'tag' : mode === 'rumble' ? 'rumble' : 'cpu'; cfg.tag = 'vs'; cfg.rn = '4'; cfg.rscore = 'last'; cfg.bout = mode === 'rumble' ? '1' : '3'; cfg.stale = 'shrink'; cfg.level = 'normal'; lastFrom = 'online'; rankingMatch = false; storyMatch = null; tourMatch = null; }
+function netCfg(mode, tt){ cfg.mode = mode === 'tag' ? 'tag' : mode === 'rumble' ? 'rumble' : 'cpu'; cfg.tag = tt === 'coop' ? 'coop' : 'vs'; cfg.rn = '4'; cfg.rscore = 'last'; cfg.bout = mode === 'rumble' ? '1' : '3'; cfg.stale = 'shrink'; cfg.level = 'normal'; lastFrom = 'online'; rankingMatch = false; storyMatch = null; tourMatch = null; }
 function netShowArena(){ ['#online', '#homeTop', '#sheet', '#end', '#menu', '#sel', '#vs'].forEach(q => $(q).hidden = true); $('#menuBtn').hidden = false; $('#muteBtn').hidden = false; }
 const NET_MODES = { duel: '1 v 1', tag: '2 v 2', rumble: 'Rumble' };   // online: the two of you, plus CPUs to fill 2 v 2 and a 4-wrestler rumble
 const netSeat = i => i === 0 ? 1 : i === 1 ? 0 : i;   // host seat <-> guest seat (each player is seat 0 on their own phone)
@@ -1255,10 +1254,10 @@ function netGo(){   // host: both picks known -> start, tell the guest
   if (!NET || NET.role !== 'host' || !NET.opp) return;
   NET.meAgain = NET.oppAgain = false; NET.endSheet = false; closeSheet();
   const mode = NET.mode || 'duel', pool = Object.keys(CHARS).filter(k => !CHARS[k].secret), rk = () => pool[Math.floor(rand() * pool.length)];
-  const pk = k => CHARS[k] ? k : rk(), keys = mode === 'duel' ? [NET.me.pick, NET.opp.pick] : mode === 'tag' ? [NET.me.pick, NET.opp.pick, pk(NET.me.partner), pk(NET.opp.partner)] : [NET.me.pick, NET.opp.pick, rk(), rk()];
+  const keys = mode === 'duel' ? [NET.me.pick, NET.opp.pick] : [NET.me.pick, NET.opp.pick, rk(), rk()];   // CPUs: random from the whole roster
   NET.mid = (NET.mid || 0) + 1; NET.goAck = false;
-  const go = { mode, keys, p0: keys[0], p1: keys[1], n0: NET.me.name, n1: NET.opp.name, mid: NET.mid };
-  rtSend('go', go); clearInterval(NET.goT); let tries = 0; NET.goT = setInterval(() => { if (!NET || NET.goAck || ++tries > 10) { if (NET) clearInterval(NET.goT); return; } rtSend('go', go); }, 500); /* keep saying go until the guest is in */ netCfg(mode); cfg.p1 = keys[0]; cfg.p2 = keys[1]; NET.match = true; NET.rin = { x: 0, y: 0 }; NET.sendT = 0;
+  const tt = NET.tt === 'coop' ? 'coop' : 'vs', go = { mode, keys, tt, p0: keys[0], p1: keys[1], n0: NET.me.name, n1: NET.opp.name, mid: NET.mid };
+  rtSend('go', go); clearInterval(NET.goT); let tries = 0; NET.goT = setInterval(() => { if (!NET || NET.goAck || ++tries > 10) { if (NET) clearInterval(NET.goT); return; } rtSend('go', go); }, 500); /* keep saying go until the guest is in */ netCfg(mode, tt); cfg.p1 = keys[0]; cfg.p2 = keys[1]; NET.match = true; NET.rin = { x: 0, y: 0 }; NET.sendT = 0;
   if (mode === 'tag') pendingTag = keys; if (mode === 'rumble') pendingRumble = keys;
   netShowArena(); startMatch(); F[1].human = true; F[1].remote = true; F[0].netName = go.n0; F[1].netName = go.n1;
   wwRpc('sumo_room_ping', { ...wwAuth(), p_code: NET.code, p_status: 'playing' }).catch(() => {});
@@ -1266,10 +1265,10 @@ function netGo(){   // host: both picks known -> start, tell the guest
 function netGuestStart(d){   // guest: build the same wrestlers, yours in seat 0
   if (!NET) return; NET.meAgain = NET.oppAgain = false; NET.result = null; closeSheet();
   const mode = NET_MODES[d.mode] ? d.mode : 'duel', keys = (d.keys || [d.p0, d.p1]).map(k => CHARS[k] ? k : 'taro');
-  netCfg(mode); cfg.p1 = keys[1]; cfg.p2 = keys[0]; NET.match = true; NET.inT = 0; NET.lastIn = ''; NET.mode = mode; NET.mid = d.mid || 0; NET.endSheet = false;
+  const tt = d.tt === 'coop' ? 'coop' : 'vs'; NET.tt = tt; netCfg(mode, tt); cfg.p1 = keys[1]; cfg.p2 = keys[0]; NET.match = true; NET.inT = 0; NET.lastIn = ''; NET.mode = mode; NET.mid = d.mid || 0; NET.endSheet = false;
   netShowArena(); audio();
   F = keys.map((_, i) => makeFighter(keys[netSeat(i)], i, i === 0)); F[0].netName = d.n1; F[1].netName = d.n0;
-  if (mode === 'tag') { const teams = TAG_TEAMS.vs; F.forEach((f, i) => { f.team = teams[netSeat(i)]; }); }
+  if (mode === 'tag') { const teams = TAG_TEAMS[tt]; F.forEach((f, i) => { f.team = teams[netSeat(i)]; }); }
   if (mode === 'rumble') outOrder = [];
   score = [0, 0]; roundNo = 1; MS = null; matchT = 0; resetRound(); NET.lastRx = performance.now();
 }
@@ -1292,7 +1291,8 @@ function netHostTick(rdt){
 // ---- guest: mirror the host's world so you're at the bottom
 const MIRROR_XY = new Set(['x', 'y', 'vx', 'vy', 'fleeX', 'fleeY', 'tx', 'ty', 'px', 'py', 'hx', 'hy', 'dx', 'dy']);
 const MIRROR_ANG = new Set(['face', 'ang', 'aim', 'dir']);
-function mirrorObj(o){ if (!o || typeof o !== 'object') return o; if (Array.isArray(o)) return o.map(mirrorObj); const r = {};
+const netMirror = () => !(cfg.mode === 'tag' && cfg.tag === 'coop');   // teammates share one side of the ring, so a team-up isn't flipped
+function mirrorObj(o){ if (!o || typeof o !== 'object' || !netMirror()) return o; if (Array.isArray(o)) return o.map(mirrorObj); const r = {};
   for (const k in o) { const v = o[k]; r[k] = typeof v === 'number' && MIRROR_XY.has(k) ? -v : typeof v === 'number' && MIRROR_ANG.has(k) ? v + Math.PI : v && typeof v === 'object' ? mirrorObj(v) : v; } return r; }
 function netApply(s){
   const map = s.f.map((_, i) => netSeat(i)), keepTint = cfg.mode === 'cpu';   // host seat 1 is you; 1 v 1 shows you in blue, team modes use the host's colours
@@ -1321,7 +1321,7 @@ function netGuestUpdate(rdt){
   if (shake) shake = Math.max(0, shake - rdt * 30);
   if (phase === 'fight') matchT += rdt;
   // your joystick, flipped into the host's view, sent when it changes (at most ~10 a second) and every 0.4s anyway
-  const inp = humanInput(F[0]), q = v => Math.round(v * 4) / 4, x = -q(inp.x), y = -q(inp.y), key = x + ',' + y;
+  const inp = humanInput(F[0]), q = v => Math.round(v * 4) / 4, fl2 = netMirror() ? -1 : 1, x = fl2 * q(inp.x), y = fl2 * q(inp.y), key = x + ',' + y;
   NET.inT = (NET.inT || 0) - rdt;
   if ((key !== NET.lastIn && NET.inT <= .3) || NET.inT <= 0) { rtSend('in', { x, y, mid: NET.mid || 0 }); NET.lastIn = key; NET.inT = .4; }
 }
@@ -1351,8 +1351,8 @@ function netEndSheet(){
   sheetColor = won ? '#2f8a52' : '#c8352c';
   const waiting = NET.meAgain ? `Waiting for ${esc(opp)}…` : NET.oppAgain ? `${esc(opp)} wants a rematch` : '';
   const m = (NET.result && NET.result.mode) || 'duel', what = m === 'rumble' ? 'Online rumble' : m === 'tag' ? 'Online 2 v 2 \u00b7 best of 3' : 'Online \u00b7 best of 3';
-  const title = m === 'rumble' ? (won ? 'You win the rumble!' : `You placed ${ordinal(NET.rank || 2)}`) : m === 'tag' ? (won ? 'Your team wins!' : `${esc(opp)}\u2019s team wins`) : won ? 'You win!' : `${esc(opp)} wins`;
-  const line = m === 'rumble' ? `4 wrestlers \u00b7 you, ${esc(opp)} and 2 CPUs.` : `${sc[0]}\u2013${sc[1]} vs ${esc(opp)}${m === 'tag' ? '\u2019s team' : ''}.`;
+  const coop = m === 'tag' && NET.tt === 'coop', title = m === 'rumble' ? (won ? 'You win the rumble!' : `You placed ${ordinal(NET.rank || 2)}`) : m === 'tag' ? (won ? 'Your team wins!' : coop ? 'The CPUs win' : `${esc(opp)}\u2019s team wins`) : won ? 'You win!' : `${esc(opp)} wins`;
+  const line = m === 'rumble' ? `4 wrestlers \u00b7 you, ${esc(opp)} and 2 CPUs.` : coop ? `${sc[0]}\u2013${sc[1]} with ${esc(opp)} vs 2 CPUs.` : `${sc[0]}\u2013${sc[1]} vs ${esc(opp)}${m === 'tag' ? '\u2019s team' : ''}.`;
   sheet(what, title, `<p>${line}${won ? ' +2 tokens, and it counts on the Ranks board.' : ' It counts on the Ranks board.'}</p>${waiting ? `<p class="hint" style="margin-top:6px">${waiting}</p>` : ''}`,
     [['Leave', () => { closeSheet(); netLeave(); goHome(); openOnline(); }], ['Change wrestler', () => { if (!NET) return; rtSend('lobby', { mid: NET.mid || 0 }); netToLobby(); }], [NET.meAgain ? 'Waiting…' : 'Rematch', () => { if (!NET || NET.meAgain) return; NET.meAgain = true; rtSend('again'); if (NET.role === 'host' && NET.oppAgain) netGo(); else netEndSheet(); }, true]]);
 }
@@ -2310,16 +2310,13 @@ const tagStep = (p, who, title, tint) => ({ p, who, title, tint, cpu: true, rand
 const stSeat = st => st.cpu ? 'cpu' : st.p === 'p2' ? 1 : 0;
 const stepRnd = st => st.cpu ? (cfg.tagRnd || []).includes(st.p) || !CHARS[cfg[st.p]] : !!st.random;
 function tagLineup(){   // 2 v 2 order: cpu [you, partner, rival, rival] \u00b7 coop [you, P2, rival, rival] \u00b7 vs [blue, red, blue CPU, red CPU]
-  const pool = cpuPool(), rk = () => pool[Math.floor(rand() * pool.length)], rnd = cfg.tagRnd || [];
-  const slot = s => !rnd.includes(s) && CHARS[cfg[s]] ? cfg[s] : rk();
-  return [cfg.p1, cfg.tag === 'cpu' ? slot('t2') : cfg.p2, slot('t3'), slot('t4')]; }
+  const pool = Object.keys(CHARS).filter(k => !CHARS[k].secret), rk = () => pool[Math.floor(rand() * pool.length)];   // CPUs come from the whole roster
+  return [cfg.p1, cfg.tag === 'cpu' ? rk() : cfg.p2, rk(), rk()]; }
 function openSelect(from){
   const steps = from === 'quick' ? [{ p: 'p1', who: 'You', title: 'Pick your wrestler' }]
     : cfg.mode === 'rumble' ? [{ p: 'p1', who: 'You', title: 'Pick your wrestler' }]
-    : cfg.mode === 'tag' && cfg.tag === 'cpu' ? [{ p: 'p1', who: 'You', title: 'Pick your wrestler' }, tagStep('t2', 'CPU partner', 'Pick your <i style="color:#7fb6ff">partner</i>', '#7fb6ff'), tagStep('t3', 'CPU rival 1', 'Pick <i style="color:var(--p2)">rival 1</i>', '#ef4b4b'), tagStep('t4', 'CPU rival 2', 'Pick <i style="color:#ff9f6b">rival 2</i>', '#ff9f6b')]
-    : cfg.mode === 'tag' ? [{ p: 'p1', who: seatName(0), title: `<i style="color:var(--p1)">${seatName(0)}</i>, pick your wrestler` }, { p: 'p2', who: seatName(1), title: `<i style="color:${cfg.tag === 'vs' ? 'var(--p2)' : '#7fb6ff'}">${seatName(1)}</i>, pick your wrestler`, tint: cfg.tag === 'vs' ? '#ef4b4b' : '#7fb6ff' },
-        ...(cfg.tag === 'vs' ? [tagStep('t3', 'Blue CPU partner', 'Pick <i style="color:#7fb6ff">Blue\u2019s CPU partner</i>', '#7fb6ff'), tagStep('t4', 'Red CPU partner', 'Pick <i style="color:#ff9f6b">Red\u2019s CPU partner</i>', '#ff9f6b')]
-          : [tagStep('t3', 'CPU rival 1', 'Pick <i style="color:var(--p2)">rival 1</i>', '#ef4b4b'), tagStep('t4', 'CPU rival 2', 'Pick <i style="color:#ff9f6b">rival 2</i>', '#ff9f6b')])]
+    : cfg.mode === 'tag' && cfg.tag === 'cpu' ? [{ p: 'p1', who: 'You', title: 'Pick your wrestler <small style="color:var(--muted)">\u00b7 your partner and rivals are random</small>' }]
+    : cfg.mode === 'tag' ? [{ p: 'p1', who: seatName(0), title: `<i style="color:var(--p1)">${seatName(0)}</i>, pick your wrestler` }, { p: 'p2', who: seatName(1), title: `<i style="color:${cfg.tag === 'vs' ? 'var(--p2)' : '#7fb6ff'}">${seatName(1)}</i>, pick your wrestler <small style="color:var(--muted)">\u00b7 CPUs are random</small>`, tint: cfg.tag === 'vs' ? '#ef4b4b' : '#7fb6ff' }]
     : cfg.mode === 'h2h' ? [{ p: 'p1', who: seatName(0), title: `<i style="color:var(--p1)">${seatName(0)}</i>, pick your wrestler` }, { p: 'p2', who: seatName(1), title: `<i style="color:var(--p2)">${seatName(1)}</i>, pick your wrestler`, tint: '#ef4b4b' }]
     : [{ p: 'p1', who: 'You', title: 'Pick your wrestler' }, { p: 'p2', who: 'CPU opponent', title: 'Pick your <i style="color:var(--p2)">opponent</i>', tint: '#ef4b4b', random: true }];
   const lvl = { easy: 'Easy', normal: 'Normal', hard: 'Hard' }[cfg.level];
