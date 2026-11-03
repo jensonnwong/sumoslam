@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta http-equiv="Content-Security-Policy" content="script-src 'sha256-Wwk+wgVnDutk3qIHWzQ91KIBDvpz2hQiRyCwhbH5Luc='; object-src 'none'; base-uri 'self'">
+<meta http-equiv="Content-Security-Policy" content="script-src 'sha256-+7YRBV+AciQStRWdlvWQnKrTtu+lbyj+V3FRj6np8yg='; object-src 'none'; base-uri 'self'">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,interactive-widget=resizes-content">
 <meta name="theme-color" content="#1b2042">
 <meta name="mobile-web-app-capable" content="yes">
@@ -1098,6 +1098,7 @@ function applyStarter(f){   // each player's wrestler uses that player's copy; y
 
 /* ---------- Online: room codes over Supabase Realtime (broadcast). The host runs the bout; the guest sends its joystick and button,
    and draws the host's snapshots mirrored so both players see themselves at the bottom. ~15 messages a second per match. ---------- */
+const BUILD = 'Nov 02 21:21';   // stamped with the date and time by the site build, so you can tell which version a phone is running
 let NET = null, netBusy = false;   // netBusy: one Make / Join / Quick at a time (no double-tap rooms)   // { role:'host'|'guest', code, ws, topic, me:{name,pick}, opp:{name,pick}|null, match, rin, ... }
 const RT_URL = () => (window.__WWRT || WW.url.replace(/^http/, 'ws') + '/realtime/v1/websocket') + `?apikey=${encodeURIComponent(WW.key)}&vsn=1.0.0`;
 let rtRef = 0;
@@ -1178,7 +1179,7 @@ function renderOnline(){
   const host = NET.role === 'host', o = NET.opp, can = host && o;
   const secs = NET.autoAt ? Math.max(1, Math.ceil((NET.autoAt - performance.now()) / 1000)) : 3;
   body.innerHTML = (NET.quick ? `<div class="scout" style="align-items:center"><span class="group-label">Quick match</span><div class="ol-code" style="font-size:22px;letter-spacing:.04em">${o ? `vs ${esc(o.name)}` : 'Looking…'}</div><small class="rk-note">${o ? (host ? `Starting in ${secs}… pick your wrestler` : 'Starting in a moment… pick your wrestler') : 'Waiting for someone else to look for a match. Pick your wrestler while you wait.'}</small></div>`
-    : `<div class="scout" style="align-items:center"><span class="group-label">Room code</span><div class="ol-code">${NET.code}</div><small class="rk-note">${host ? 'Share this code. It stays open while you wait here.' : `You're in ${o ? esc(o.name) + '’s' : 'the'} room.`}</small></div>`)
+    : `<div class="scout" style="align-items:center"><span class="group-label">Room code</span><div class="ol-code">${NET.code}</div><small class="rk-note">${host ? 'Share this code. It stays open while you wait here.' : `You're in ${o ? esc(o.name) + '’s' : 'the'} room.`}</small><small class="rk-note" style="opacity:.55;font-size:10px">Build ${BUILD} \u00b7 both phones should match</small></div>`)
     + `
     <div class="ol-pl"><div class="ol-p me"><canvas data-k="${NET.me.pick}"></canvas><b>${esc(NET.me.name)} (you)</b><small>${CHARS[NET.me.pick].name} ${tierTag(myRoll(NET.me.pick))}</small>${NET.mode === 'tag' ? `<small class="rk-note">${NET.tt === 'coop' ? 'Blue team' : 'Blue team + a CPU'}</small>` : ''}</div>
       <div class="ol-p op">${o ? `<canvas data-k="${o.pick}"></canvas><b>${esc(o.name)}</b><small>${CHARS[o.pick].name} ${tierTag(o.roll)}</small>${NET.mode === 'tag' ? `<small class="rk-note">${NET.tt === 'coop' ? 'Blue team (with you)' : 'Red team + a CPU'}</small>` : ''}` : (NET.quick ? `<b style="color:var(--muted)">Searching…</b><small>Anyone looking for a match</small>` : `<b style="color:var(--muted)">Waiting for a friend…</b><small>They join with the code</small>`)}</div></div>
@@ -2605,7 +2606,7 @@ function openStation(id){
            r && r.done ? ['Done', closeSheet, true] : [r && r.level ? 'Continue ranking' : 'Get your ranking', () => { closeSheet(); if (r && r.level) nextRankingBout(); else { leaveHome(); openRankingOffer(); } }, true]]); })()
     : sheet('Guest', 'Me', `<p>Playing as a guest. Sign in to keep your wrestlers, record and tokens, play online, and unlock Story.</p><ul style="margin-top:8px"><li>Bouts played: ${bouts}</li><li>Tokens: 0</li></ul>`, [['Back', closeSheet], ['Sign in / create account', () => accountSheet(() => openStation('me')), true]]);
   if (id === 'settings') {
-    sheet('', 'Settings', `<div class="group"><span class="group-label">Sound</span><div class="seg" id="setSnd"><button data-v="on">On</button><button data-v="off">Off</button></div></div>
+    sheet('', 'Settings', `<p class="hint" style="margin:-4px 0 8px;text-align:right;font-size:11px">Build ${BUILD}</p><div class="group"><span class="group-label">Sound</span><div class="seg" id="setSnd"><button data-v="on">On</button><button data-v="off">Off</button></div></div>
       <div class="group" style="margin-top:8px"><span class="group-label">Look</span><div class="seg" data-key="look2"><button data-val="pixel">Pixel</button><button data-val="smooth">Smooth</button></div></div>
       ${WW.sess ? `<div class="group" style="margin-top:12px;padding-top:10px;border-top:1px dashed rgba(0,0,0,.18)"><span class="group-label">WW account</span><p class="hint" style="margin:4px 0 6px">Signed in as <b>${esc(WW.sess.name)}</b>.</p><button id="delAcct" style="background:none;border:0;padding:2px 0;color:#c8352c;font:inherit;font-weight:700;text-decoration:underline;cursor:pointer">Delete this account…</button></div>` : ''}
       <div class="group" style="margin-top:12px;padding-top:10px;border-top:1px dashed rgba(0,0,0,.18)"><span class="group-label">Testing</span><div id="devBox"></div></div>`, [['Sign out on this device', () => { wwSignOut(); closeSheet(); }], ['Done', closeSheet, true]]);
