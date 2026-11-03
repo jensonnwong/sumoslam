@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta http-equiv="Content-Security-Policy" content="script-src 'sha256-TPsCXbQ8FqYPNoRaPF9XCUHQbUyvzstToonSJx1pvkM='; object-src 'none'; base-uri 'self'">
+<meta http-equiv="Content-Security-Policy" content="script-src 'sha256-4gNvcuvsowt5Z1dphhsL9twguiQNxg37w9jPbnhVUcw='; object-src 'none'; base-uri 'self'">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,interactive-widget=resizes-content">
 <meta name="theme-color" content="#1b2042">
 <meta name="mobile-web-app-capable" content="yes">
@@ -944,13 +944,13 @@ function renderPlayers(){
 function signInSeat(i){   // a WW account for this seat, signed in with name + PIN, just for this session on this device
   sheetColor = '#c8352c';
   sheet('WW account', `Sign in · ${i ? 'Red' : 'Blue'}`, `<p>${i ? 'Red' : 'Blue'} plays with their own wrestlers and tokens. They stay signed in on this device until you sign them out or close the game.</p>
-    <input id="acctName" maxlength="16" placeholder="Ring name" autocomplete="off" autocapitalize="off" enterkeyhint="next" style="margin-top:8px">
+    <input id="acctName" maxlength="16" placeholder="WW account name" autocomplete="off" autocapitalize="off" enterkeyhint="next" style="margin-top:8px">
     <input id="acctPin" type="password" inputmode="numeric" maxlength="4" placeholder="4-digit PIN" autocomplete="off" enterkeyhint="go" style="margin-top:8px">
     <p id="acctErr" class="hint" style="color:#c8352c;min-height:1.2em;margin:6px 0 0"></p>`,
     [['Cancel', closeSheet], ['Sign in', () => go(), true]]);
   let busy = false;
   const go = async () => { const n = $('#acctName').value.trim(), pin = $('#acctPin').value, err = $('#acctErr'); $('#acctName').blur(); $('#acctPin').blur();
-    if (!n || !/^\d{4}$/.test(pin)) { err.textContent = 'Enter a ring name and a 4-digit PIN.'; return; }
+    if (!n || !/^\d{4}$/.test(pin)) { err.textContent = 'Enter a WW account name and a 4-digit PIN.'; return; }
     const other = accts[1 - i]; if (other && other.name.toLowerCase() === n.toLowerCase()) { err.textContent = `${other.name} is already in the ${i ? 'Blue' : 'Red'} seat.`; return; }
     if (busy) return; busy = true; err.textContent = 'Signing in…';
     try { const a = await wwSeatLogin(n, pin); accts[i] = a; closeSheet(); syncMenu();
@@ -1010,9 +1010,9 @@ function renderOnb(){
   const box = $('#onbIn'), back = `<button id="onbBack" class="homeBack">\u2190 ${onb.step === 0 || onb.fromMe || (onb.fresh && onb.step === 1) ? 'Cancel' : 'Back'}</button>`;
   const wire = () => { const b = $('#onbBack'); if (b) b.onclick = () => { if (onb.step === 0 || onb.fromMe || (onb.fresh && onb.step === 1)) { $('#onb').hidden = true; goHome(); } else { onb.step--; renderOnb(); } }; };
   if (onb.step === 0) {
-    box.innerHTML = `${back}<span class="step">Create your WW account \u00b7 1 of 4</span><span class="ribbon" style="--rib:#2f8a52">Ring name</span><h2>Every wrestler needs a ring name.</h2><p>It's your account name too. Your starter will fight under it.</p>
-      <input id="onbName" maxlength="14" placeholder="Ring name" autocomplete="off" enterkeyhint="next" value="${(onb.name || '').replace(/"/g, '&quot;')}">
-      <p style="margin:12px 0 4px">Pick a 4-digit PIN. You'll use your ring name + PIN to sign in on any device, in every WW game.</p>
+    box.innerHTML = `${back}<span class="step">Create your WW account \u00b7 1 of 4</span><span class="ribbon" style="--rib:#2f8a52">Account name</span><h2>Pick your WW account name.</h2><p>It works in every WW game. In Sumo Slam it's also your ring name: your starter fights under it.</p>
+      <input id="onbName" maxlength="14" placeholder="Account name" autocomplete="off" enterkeyhint="next" value="${(onb.name || '').replace(/"/g, '&quot;')}">
+      <p style="margin:12px 0 4px">Pick a 4-digit PIN. You'll use your account name + PIN to sign in on any device, in every WW game.</p>
       <input id="onbPin" type="password" inputmode="numeric" pattern="[0-9]*" maxlength="4" placeholder="PIN" autocomplete="new-password" enterkeyhint="done" style="letter-spacing:.4em" value="${onb.pin || ''}">
       <p id="onbErr" class="hint" style="color:#ffb3a8;min-height:1.2em;margin:6px 0 0"></p>
       <div class="go"><button id="onbNext" class="start">Next \u2192</button></div>`;
@@ -1553,10 +1553,10 @@ function tourAddSheet(idx){
   sheetColor = '#2f6f86';
   const pool = () => tourAllowed(ed && ed.acct ? ed.acct : acct ? { owns: STARTERS } : null);
   const draw = () => {
-    const kindSeg = ed && ed.isMe ? '' : tourPaying() && !(ed && ed.acct) ? '<p>Buy-in tourneys need a WW account: sign in with their ring name and PIN.</p>'
+    const kindSeg = ed && ed.isMe ? '' : tourPaying() && !(ed && ed.acct) ? '<p>Buy-in tourneys need a WW account: sign in with their account name and PIN.</p>'
       : ed && ed.acct ? '' : `<div class="seg" id="taKind" style="margin-bottom:8px"><button data-v="0" aria-pressed="${!acct}">Guest</button><button data-v="1" aria-pressed="${acct}">WW account</button></div>`;
     sheet('Tourney', ed ? ed.name : 'Add player', `${kindSeg}
-      ${ed && ed.isMe ? '' : ed && ed.acct ? `<p class="hint" style="margin:0 0 4px">Signed in to WW as <b>${esc(ed.acct.name)}</b> · ${ed.acct.tokens} tokens</p>` : `<input id="taName" maxlength="14" placeholder="${acct ? 'Ring name' : 'Name'}" autocomplete="off" enterkeyhint="${acct ? 'next' : 'done'}" value="${nm.replace(/"/g, '&quot;')}">`}
+      ${ed && ed.isMe ? '' : ed && ed.acct ? `<p class="hint" style="margin:0 0 4px">Signed in to WW as <b>${esc(ed.acct.name)}</b> · ${ed.acct.tokens} tokens</p>` : `<input id="taName" maxlength="14" placeholder="${acct ? 'WW account name' : 'Name'}" autocomplete="off" enterkeyhint="${acct ? 'next' : 'done'}" value="${nm.replace(/"/g, '&quot;')}">`}
       ${acct && !ed ? `<input id="taPin" type="password" inputmode="numeric" maxlength="4" placeholder="4-digit PIN" autocomplete="off" enterkeyhint="done" style="margin-top:8px"><p id="taErr" class="hint" style="color:#c8352c;min-height:1.2em;margin:6px 0 0"></p>` : ''}
       <p class="hint" style="margin:8px 0 4px">${ed ? 'Switch wrestler' : 'Pick their wrestler'} · they keep it for the whole tourney</p>
       <div class="tpick"><button data-k="__rnd" aria-pressed="${key === '__rnd'}"><span class="rq">?</span><small>Random</small></button>${pool().map(k => `<button data-k="${k}" aria-pressed="${key === k}"><canvas data-k="${k}"></canvas><small>${CHARS[k].name}</small>${tierTag(ed && ed.acct ? acctRoll(ed.acct, k) : null)}</button>`).join('')}</div>`,
@@ -1574,7 +1574,7 @@ function tourAddSheet(idx){
     let a = ed ? ed.acct : null;
     if (!a && acct) {   // real WW account: name + PIN
       const pin = $('#taPin') ? $('#taPin').value : '', err = $('#taErr');
-      if (!(nm || '').trim() || !/^\d{4}$/.test(pin)) { if (err) err.textContent = 'Enter their ring name and 4-digit PIN.'; return; }
+      if (!(nm || '').trim() || !/^\d{4}$/.test(pin)) { if (err) err.textContent = 'Enter their WW account name and 4-digit PIN.'; return; }
       if (T.players.some(q => q.acct && q.acct.name && q.acct.name.toLowerCase() === nm.trim().toLowerCase())) { if (err) err.textContent = 'They’re already in this tourney.'; return; }
       if (busy) return; busy = true; if (err) err.textContent = 'Signing in…';
       try { a = await wwSeatLogin(nm.trim(), pin); n = a.name; } catch (e) { busy = false; if (err) err.textContent = e.offline ? "Can't reach the WW server." : e.message; return; }
@@ -2507,8 +2507,8 @@ function accountSheet(after, mode){   // one card for both: sign in, or create a
   mode = mode || 'signin'; const make = mode === 'create';
   sheetColor = '#2f8a52';
   sheet('', 'WW account', `<div class="seg" id="siMode" style="margin-bottom:10px"><button data-v="signin" aria-pressed="${!make}">Sign in</button><button data-v="create" aria-pressed="${make}">Create account</button></div>
-    <p>${make ? 'Pick a ring name and a 4-digit PIN. Your starter fights under the ring name, and the name + PIN sign you in on any device, in every WW game.' : 'Sign in with your ring name and PIN. Full Count team names work too.'}</p>
-    <input id="siName" maxlength="${make ? 14 : 16}" placeholder="Ring name" autocomplete="${make ? 'nickname' : 'username'}" enterkeyhint="next" style="margin-top:10px">
+    <p>${make ? 'Pick an account name and a 4-digit PIN. The name + PIN sign you in on any device, in every WW game. In Sumo Slam the name is also your ring name.' : 'Sign in with your WW account name and PIN, the same one you use in every WW game (Full Count team names work too).'}</p>
+    <input id="siName" maxlength="${make ? 14 : 16}" placeholder="Account name" autocomplete="${make ? 'nickname' : 'username'}" enterkeyhint="next" style="margin-top:10px">
     <input id="siPin" type="password" inputmode="numeric" pattern="[0-9]*" maxlength="4" placeholder="${make ? 'Choose a PIN' : 'PIN'}" autocomplete="${make ? 'new-password' : 'current-password'}" enterkeyhint="done" style="margin-top:8px;letter-spacing:.4em">
     <p id="siErr" class="hint" style="color:#c8352c;min-height:1.2em;margin:6px 0 0"></p>`,
     [['Cancel', closeSheet], [make ? 'Create account' : 'Sign in', () => go(), true]]);
@@ -2522,7 +2522,7 @@ function accountSheet(after, mode){   // one card for both: sign in, or create a
   const live = () => !$('#sheet').hidden && $('#siName') === nm && ['menu', 'home', 'splash', 'done'].includes(phase);   // this card is still the one on screen and no bout has started
   async function go(){ nm.blur(); pn.blur(); const err = $('#siErr'), name = nm.value.trim();
     if (busy) return;
-    if (!name || pn.value.length !== 4) { err.textContent = 'Enter your ring name and a 4-digit PIN.'; SFX.bump(); return; }
+    if (!name || pn.value.length !== 4) { err.textContent = 'Enter your account name and a 4-digit PIN.'; SFX.bump(); return; }
     busy = true; err.textContent = make ? 'Creating…' : 'Signing in…'; const btn = $('#sheetBtns button:last-child'); if (btn) btn.disabled = true;
     const done = () => { busy = false; if (btn && btn.isConnected) btn.disabled = false; };
     try {
