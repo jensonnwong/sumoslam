@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta http-equiv="Content-Security-Policy" content="script-src 'sha256-6FeLdoCCTN6Ry5I3dQyTt4DM1ruPwN9j5LbpJ2WvlCo='; object-src 'none'; base-uri 'self'">
+<meta http-equiv="Content-Security-Policy" content="script-src 'sha256-vaFdGH5iNbnrmNThbFpYv8Oy/oMp8Wd6dGAEGPNpyaU='; object-src 'none'; base-uri 'self'">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover,interactive-widget=resizes-content">
 <meta name="theme-color" content="#1b2042">
 <meta name="mobile-web-app-capable" content="yes">
@@ -401,6 +401,7 @@ h1 span{color:var(--clay)}
 .cc>button.pick{width:100%;height:100%;border:2px solid transparent;border-radius:4px;background:var(--band);color:var(--paper);padding:6px 7px 8px;display:flex;flex-direction:column;align-items:stretch;gap:4px;text-align:left}
 .cc.on>button.pick{border-color:var(--sel);background:var(--night-2);box-shadow:0 0 0 3px rgba(255,207,63,.18)}
 .cc canvas{width:56px;height:56px;align-self:center;display:block}
+.cc .pface{width:60px;height:60px;align-self:center;display:block;border-radius:50%;border:2.5px solid #1f1a17;overflow:hidden;background:#f4ead2;box-shadow:2px 2px 0 #1f1a17}.cc .pface svg{display:block;width:100%;height:100%}.cc.on .pface{border-color:#c8402f;box-shadow:2px 2px 0 #c8402f}.cc.locked .pface{filter:grayscale(1);opacity:.5;box-shadow:none}
 .cc b{font-family:var(--display);font-weight:400;font-size:13px;line-height:1.1;overflow-wrap:anywhere}
 .tst{display:block;font-size:11px;letter-spacing:2px;color:var(--gold);line-height:1.1;text-shadow:0 1px 0 #1f1a17;font-weight:900}.tst s{text-decoration:none;color:#b9a988;text-shadow:none}.cc .tst{margin-top:-2px}small .tst{display:inline}
 .prize-roll{display:flex;flex-direction:column;align-items:center;gap:6px;margin-top:8px}.prize-roll .stars{font-size:26px;letter-spacing:5px;color:var(--gold);text-shadow:0 2px 0 #1f1a17}.prize-roll .stars s{text-decoration:none;color:#b9a988}.prize-roll .rolls{font-size:12px;padding:8px 12px;gap:3px 10px;color:#5c5148}.prize-roll .rolls b{color:#1f1a17}.prize-roll .rolls small{color:#5c5148;font-weight:700}
@@ -1175,7 +1176,7 @@ function applyStarter(f){   // each player's wrestler uses that player's copy; y
    Any phone can bring a second player (split screen: their controls at the top, like the same-phone 1 v 1).
    1 v 1 = exactly 2 players on 2 phones; 2 v 2 = 2-4 players who pick Blue or Red (CPUs fill the gaps); Rumble = 2-8 players, 6-8 wrestlers. ---------- */
 const TEST_BUILD = true;   // the site build sets this for test uploads: accounts and online are off, so live profiles are never touched
-const BUILD = 'v2.0 test 14 · Nov 21 13:09';   // stamped with the date and time by the site build, so you can tell which version a phone is running
+const BUILD = 'v2.0 test 15 · Nov 21 14:38';   // stamped with the date and time by the site build, so you can tell which version a phone is running
 let NET = null, netBusy = false;   // netBusy: one Make / Join / Quick at a time (no double-tap rooms)
 // NET = { role, seat, code, ws, topic, me:{name,pick,side}, peers:{seat:{name,pick,roll,side,rx}}, match, slots, rins, ... }
 const RT_URL = () => (window.__WWRT || WW.url.replace(/^http/, 'ws') + '/realtime/v1/websocket') + `?apikey=${encodeURIComponent(WW.key)}&vsn=1.0.0`;
@@ -2538,17 +2539,16 @@ function renderSelect(){
       const rival = RIVALS.includes(key) || STARTERS.includes(key), notStarter = STARTERS.includes(key);
       el.className = 'cc locked';
       btn.disabled = true;
-      btn.innerHTML = rival ? `<canvas></canvas><b>${CHARS[key].name}</b><span class="arch">${notStarter ? 'Starter' : 'House rival'}</span><span class="lockmsg">${notStarter ? 'Not your starter' : st.random ? 'Only via Random' : 'Beat to unlock'}</span>` : `<canvas></canvas><b>???</b><span class="lockmsg">${CHARS[key].secret ? 'A secret. The machines know.' : 'Win it in Prizes or Story'}</span>`;
+      btn.innerHTML = rival ? `${porChip(key)}<b>${CHARS[key].name}</b><span class="arch">${notStarter ? 'Starter' : 'House rival'}</span><span class="lockmsg">${notStarter ? 'Not your starter' : st.random ? 'Only via Random' : 'Beat to unlock'}</span>` : `<canvas></canvas><b>???</b><span class="lockmsg">${CHARS[key].secret ? 'A secret. The machines know.' : 'Win it in Prizes or Story'}</span>`;
       const g = btn.querySelector('canvas');
-      if (rival) drawPortrait(g, key, '#5b5f7e'); else { g.width = g.height = 136; const x = g.getContext('2d'); x.scale(2, 2); x.beginPath(); x.arc(34, 34, 32, 0, TAU); x.fillStyle = '#262d5c'; x.fill(); x.beginPath(); x.ellipse(34, 38, 18, 20, 0, 0, TAU); x.fillStyle = '#141834'; x.fill(); x.beginPath(); x.arc(34, 24, 10, 0, TAU); x.fill(); }
+      if (!rival) { g.width = g.height = 136; const x = g.getContext('2d'); x.scale(2, 2); x.beginPath(); x.arc(34, 34, 32, 0, TAU); x.fillStyle = '#262d5c'; x.fill(); x.beginPath(); x.ellipse(34, 38, 18, 20, 0, 0, TAU); x.fillStyle = '#141834'; x.fill(); x.beginPath(); x.arc(34, 24, 10, 0, TAU); x.fill(); }
     } else {
       const c = CHARS[key];
       const seat = seatN, nm = dispName(key, seat);
       const tr = seatRoll(seat, key);
-      btn.innerHTML = `<canvas></canvas><b>${nm}</b>${tr ? `<span class="tst" aria-label="${TIER_WORD[tr.tier]}">${starsHTML(tr.tier)}</span>` : ''}<span class="arch">${nm !== c.name ? `${c.name} \u00b7 yours` : ARCH[key] || ''}</span>
+      btn.innerHTML = `${porChip(key)}<b>${nm}</b>${tr ? `<span class="tst" aria-label="${TIER_WORD[tr.tier]}">${starsHTML(tr.tier)}</span>` : ''}<span class="arch">${nm !== c.name ? `${c.name} \u00b7 yours` : ARCH[key] || ''}</span>
         <span class="bars">${summary(c).map(([l, v]) => `<span>${l}</span><span class="bar"><i style="width:${v / 5 * 100}%"></i></span>`).join('')}</span>
         <span class="sp">\u2605 ${c.specialName}</span>`;
-      drawPortrait(btn.querySelector('canvas'), key, on ? '#ffcf3f' : st.tint);
       btn.onclick = () => { if (on) return openFull(key); selFlow.rnd = false; cfg[st.p] = key; saveCfg(); SFX.push(); renderSelect(); };
       const inf = document.createElement('button'); inf.className = 'info'; inf.textContent = 'i'; inf.setAttribute('aria-label', `${c.name} full card`);
       inf.onclick = e => { e.stopPropagation(); openFull(key); };
@@ -2839,6 +2839,7 @@ function portraitSvg(key){
   const body = P.duo ? P.duo.map((k, i) => `<g transform="translate(${i ? 104 : -2} 74) scale(.66)">${porBody(k)}</g>`).join('') : one(key);
   return `<svg class="wc-portrait" role="img" aria-label="Portrait of ${CHARS[key].name}" viewBox="0 16 300 236" preserveAspectRatio="xMidYMid slice"><g fill="none" stroke="${tint}" stroke-linecap="round" opacity=".4">${POR_BG[P.bg || 'wave']}</g>${body}</svg>`;
 }
+const porChip = key => `<span class="pface">${portraitSvg(key).replace('viewBox="0 16 300 236"', 'viewBox="45 16 210 210"').replace('role="img"', 'aria-hidden="true"')}</span>`;   // round face crop of the portrait for lists
 function openFull(key){
   const c = CHARS[key]; sheetColor = null;
   sheet(ARCH[key] || '', c.name, `<div class="fullcard"><div class="wc-top${POR[key] ? ' por' : ''}" style="background-image:${patternCss(key).replace(/"/g, '&quot;')}">${POR[key] ? `<div class="wc-frame">${portraitSvg(key)}</div>` : '<canvas id="wcPor" class="wc-por"></canvas>'}${handSvg(key)}</div><div class="shape">${c.shapeName}</div>
