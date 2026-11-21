@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta http-equiv="Content-Security-Policy" content="script-src 'sha256-8eIWJqfyVU1VO3qGQczvOoIw9KnaiKXk9LgLSzuQ380='; object-src 'none'; base-uri 'self'">
+<meta http-equiv="Content-Security-Policy" content="script-src 'sha256-xVevIjHn0YthRMoVUDOpH5vjkydTOoo8OMXQ1EvQYvY='; object-src 'none'; base-uri 'self'">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover,interactive-widget=resizes-content">
 <meta name="theme-color" content="#1b2042">
 <meta name="mobile-web-app-capable" content="yes">
@@ -482,6 +482,10 @@ h1 span{color:var(--clay)}
 .wc-por{width:104px;height:104px;border-radius:50%}
 .wc-hand{position:absolute;right:8px;bottom:-12px;transform:rotate(12deg);max-width:none}
 .fullcard{position:relative}
+.wc-top.por{height:auto;padding:9px;display:block}
+.wc-frame{border:3px solid #1f1a17;background:#f4ead2;aspect-ratio:300/236;overflow:hidden}
+.wc-portrait{display:block;width:100%;height:100%}
+.wc-top.por .wc-hand{right:2px;bottom:-16px}
 </style>
 </head>
 <body>
@@ -1171,7 +1175,7 @@ function applyStarter(f){   // each player's wrestler uses that player's copy; y
    Any phone can bring a second player (split screen: their controls at the top, like the same-phone 1 v 1).
    1 v 1 = exactly 2 players on 2 phones; 2 v 2 = 2-4 players who pick Blue or Red (CPUs fill the gaps); Rumble = 2-8 players, 6-8 wrestlers. ---------- */
 const TEST_BUILD = true;   // the site build sets this for test uploads: accounts and online are off, so live profiles are never touched
-const BUILD = 'v2.0 test 6 · Nov 21 09:30';   // stamped with the date and time by the site build, so you can tell which version a phone is running
+const BUILD = 'v2.0 test 7 · Nov 21 09:38';   // stamped with the date and time by the site build, so you can tell which version a phone is running
 let NET = null, netBusy = false;   // netBusy: one Make / Join / Quick at a time (no double-tap rooms)
 // NET = { role, seat, code, ws, topic, me:{name,pick,side}, peers:{seat:{name,pick,roll,side,rx}}, match, slots, rins, ... }
 const RT_URL = () => (window.__WWRT || WW.url.replace(/^http/, 'ws') + '/realtime/v1/websocket') + `?apikey=${encodeURIComponent(WW.key)}&vsn=1.0.0`;
@@ -2582,9 +2586,72 @@ const patternCss = key => { const [w, h, body] = PATTERN[FAM_OF[key] || 'classic
 const HAND_D = 'M6 40C5.6 33 5.2 26 5 21.5C4.8 16.5 13 16 13.8 20.5C14 24 14.2 27 14.4 27.5C14.5 22 14.8 15 15 10C15.5 4 24 4 24.2 10C24.4 14 24.6 17 24.8 18C25 13 25.3 9 25.6 6C26.5 -0.5 35 0 35 6C35.1 11 35.3 17 35.6 19.5C35.9 16 36.4 13.5 36.8 11.5C38 5.5 46.5 6.5 45.6 12.5C44.8 21 44.3 31 44 41C47 38 51 34 54.5 32C58 30 61.5 33.5 59.5 37.5C56.5 44 51 52 46 59C41 66 34 70.5 26 70.5C20 70.5 15 69.5 12 67C7 63 5.5 56 6 49C6.2 45.5 6.3 43 6 40Z';
 const handSvg = key => { const c = CHARS[key], k = .78 + (c.w - 3) * .09, kx = k * (c.sx > 1.2 ? 1.18 : c.sx < .95 ? .9 : 1);   // the hand's build follows the body
   return `<svg class="wc-hand" aria-hidden="true" viewBox="-6 -6 76 84" width="${Math.round(92 * kx)}" height="${Math.round(102 * k)}"><path d="${HAND_D}" fill="#c8402f" fill-opacity=".9"/><path d="M12 48c8 4 18 4 26 -1M14 56c7 3 14 3 21 0M17 40c5 2 11 2 16 0" fill="none" stroke="#fbf5e4" stroke-width="1.2" stroke-linecap="round"/></svg>`; };
+/* ---------- v2.0 portrait rig: one head-and-shoulders drawing with swappable parts ---------- */
+const POR = {   // per-wrestler choices; anything missing falls back to the plain template
+  taro:  { brow: 'firm', mouth: 'line' },
+  bun:   { brow: 'soft', mouth: 'smile', chin: true, knot: .8 },
+  kiko:  { brow: 'arch', mouth: 'smirk', neck: true },
+  puff:  { brow: 'firm', mouth: 'puff', cheeks: true, stubble: true, sweat: true, mark: 'puffer' },
+  bull:  { brow: 'fierce', mouth: 'snarl', chin: true, mark: 'horns' },
+  monk:  { brow: 'calm', eyes: 'closed', mouth: 'calm', mark: 'beads' }
+};
+function portraitSvg(key){
+  const lk = LOOK[key] || {}, c = CHARS[key], shade = tone2, P = POR[key] || {}, I = '#1f1a17', skin = lk.skin || c.skin || '#f0c493', hair = lk.hair || '#1f1a17', tint = (lk.suit && lk.suit !== 'trunks' && lk.suitCol) || lk.belt || '#24375e';
+  const fx = c.sx >= 1.3 ? 1.1 : c.sx <= .95 ? .9 : 1, bald = !!lk.bald, robe = lk.suit && lk.suit !== 'trunks';
+  const o = [];
+  // one wispy painted line behind the head, in a pale wash of his colour
+  o.push(`<g fill="none" stroke="${tint}" stroke-linecap="round" opacity=".38"><path d="M-12 170C22 166 30 108 64 102C96 97 110 142 150 142C196 142 212 96 248 98" stroke-width="8"/><path d="M248 98C274 100 284 122 270 132" stroke-width="5"/><path d="M270 132C262 137 252 132 254 124" stroke-width="2.5"/><path d="M-12 160C18 154 26 100 62 93C80 90 92 98 100 108" stroke-width="2" stroke-dasharray="46 10 30 8"/><path d="M214 104C226 92 240 88 254 90C272 93 284 104 286 116" stroke-width="2" stroke-dasharray="34 9 20 7"/></g>`);
+  o.push(`<g stroke-linejoin="round" stroke-linecap="round">`);
+  if (P.mark === 'puffer') o.push(`<g fill="#fbf5e4" stroke="${I}" stroke-width="2.5"><circle cx="36" cy="186" r="9"/><circle cx="22" cy="160" r="6"/><circle cx="44" cy="146" r="4"/><circle cx="28" cy="126" r="3"/></g><g fill="${tint}" stroke="${I}" stroke-width="3"><path d="M50 236L44 206L74 222Z"/><path d="M20 262L6 234L40 244Z"/><path d="M250 236L256 206L226 222Z"/><path d="M280 262L294 234L260 244Z"/></g>`);
+  // shoulders and chest (or the costume)
+  const body = robe ? lk.suitCol : skin;
+  o.push(`<path d="M-30 400C-24 290 24 236 ${P.neck ? 108 : 100} ${P.neck ? 206 : 214}L${P.neck ? 192 : 200} ${P.neck ? 206 : 214}C276 236 324 290 330 400Z" fill="${body}" stroke="${I}" stroke-width="4"/><path d="M200 214C276 236 324 290 330 400H262C270 320 250 250 200 214Z" fill="${I}" opacity=".16"/>`);
+  if (robe) o.push(`<path d="M104 216L150 300L196 216" fill="${skin}" stroke="${I}" stroke-width="3.5"/><path d="M96 220L150 318M204 220L176 268" fill="none" stroke="${I}" stroke-width="3"/>`);
+  else o.push(`<path d="M100 214C116 236 184 236 200 214" fill="none" stroke="${I}" stroke-width="3"/>`);
+  if (P.mark === 'beads') { let b = ''; for (let i = 0; i <= 8; i++) { const t = i / 8, x = 98 + 104 * t, y = 216 + Math.sin(t * Math.PI) * 24; b += `<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="8.5"/>`; } o.push(`<g fill="#8a4b26" stroke="${I}" stroke-width="2.5">${b}</g>`); }
+  // head
+  o.push(`<g transform="translate(150 16) scale(${(.8 * fx).toFixed(3)} .8) translate(-150 -16)">`);
+  if (P.mark === 'horns') o.push(`<g fill="${hair}" stroke="${I}" stroke-width="4"><path d="M92 112C52 100 34 62 46 22C62 52 82 70 112 82Z"/><path d="M208 112C248 100 266 62 254 22C238 52 218 70 188 82Z"/></g>`);
+  const face = 'M150 66C192 66 214 96 216 138C244 150 256 190 242 224C230 254 196 272 150 272C104 272 70 254 58 224C44 190 56 150 84 138C86 96 108 66 150 66Z';
+  o.push(`<path d="${face}" fill="${skin}"/><path d="M216 138C244 150 256 190 242 224C230 254 196 272 150 272C196 258 216 214 204 160C208 150 212 144 216 138Z" fill="${I}" opacity=".16"/>`);
+  o.push(`<path d="M62 150C48 148 44 164 50 176C54 184 60 184 62 180" fill="${skin}" stroke="${I}" stroke-width="3.5"/><path d="M238 150C252 148 256 164 250 176C246 184 240 184 238 180" fill="${skin}" stroke="${I}" stroke-width="3.5"/>`);
+  o.push(`<path d="${face}" fill="none" stroke="${I}" stroke-width="4.5"/>`);
+  if (!bald) {
+    o.push(`<path d="M84 142C80 92 108 60 150 60C192 60 220 92 216 142C210 120 198 104 180 98L150 110L120 98C102 104 90 120 84 142Z" fill="${hair}" stroke="${I}" stroke-width="2"/><path d="M84 140l-10 6 9 4-8 8 10 2M216 140l10 6-9 4 8 8-10 2" fill="${hair}" stroke="${I}" stroke-width="2"/>`);
+    if (P.mark !== 'horns') { const ks = P.knot || 1; o.push(`<g transform="translate(150 66) scale(${ks}) translate(-150 -66)"><path d="M104 66C96 40 120 22 150 22C180 22 204 40 196 66C182 54 166 50 150 50C134 50 118 54 104 66Z" fill="${hair}" stroke="${I}" stroke-width="2"/><path d="M150 24V50M128 30L138 51M172 30L162 51" fill="none" stroke="#6b6259" stroke-width="1.5"/><path d="M134 56h32" fill="none" stroke="#c8402f" stroke-width="4"/></g>`); }
+    o.push(`<path d="M98 100C104 84 118 74 134 70" fill="none" stroke="#8d8378" stroke-width="2.5"/>`);
+  } else o.push(`<path d="M104 96C112 82 126 74 142 72" fill="none" stroke="${shade(skin, .8)}" stroke-width="3"/>`);
+  if (lk.band) o.push(`<path d="M84 136C104 116 196 116 216 136" fill="none" stroke="${I}" stroke-width="14"/><path d="M84 136C104 116 196 116 216 136" fill="none" stroke="${lk.band}" stroke-width="9"/>`);
+  // brows
+  const BROW = { firm: 'M96 136C108 132 124 138 136 150L132 156C120 148 108 144 96 146ZM204 136C192 132 176 138 164 150L168 156C180 148 192 144 204 146Z',
+    fierce: 'M92 126C108 126 126 138 138 154L132 160C120 150 106 142 92 140ZM208 126C192 126 174 138 162 154L168 160C180 150 194 142 208 140Z',
+    soft: 'M96 144C108 136 124 136 136 142L134 148C122 144 108 144 98 150ZM204 144C192 136 176 136 164 142L166 148C178 144 192 144 202 150Z',
+    arch: 'M96 144C106 132 126 132 138 146L133 150C122 142 108 142 99 150ZM204 138C194 130 176 134 164 148L169 152C180 142 192 140 202 146Z',
+    calm: 'M96 148C110 142 124 142 136 146L135 151C124 148 110 148 98 153ZM204 148C190 142 176 142 164 146L165 151C176 148 190 148 202 153Z' };
+  o.push(`<path d="${BROW[P.brow || 'firm']}" fill="${I}"/>`);
+  // eyes
+  if (P.eyes === 'closed') o.push(`<path d="M100 170C108 178 124 178 132 170M168 170C176 178 192 178 200 170" fill="none" stroke="${I}" stroke-width="4"/>`);
+  else o.push(`<ellipse cx="116" cy="168" rx="17" ry="${P.brow === 'fierce' ? 11 : 14}" fill="#fbf5e4" stroke="${I}" stroke-width="3"/><ellipse cx="184" cy="168" rx="17" ry="${P.brow === 'fierce' ? 11 : 14}" fill="#fbf5e4" stroke="${I}" stroke-width="3"/><circle cx="${P.brow === 'arch' ? 120 : 113}" cy="170" r="5.5" fill="${I}"/><circle cx="${P.brow === 'arch' ? 188 : 181}" cy="170" r="5.5" fill="${I}"/><path d="M99 160C108 152 124 152 133 160M167 160C176 152 192 152 201 160" fill="none" stroke="${I}" stroke-width="3"/>`);
+  // nose
+  o.push(`<path d="M150 160C150 178 138 190 134 198C132 206 140 210 146 206C150 210 154 210 158 206C164 210 170 204 166 197" fill="none" stroke="${I}" stroke-width="3.5"/>`);
+  // mouth
+  const M = P.mouth || 'line';
+  if (M === 'puff') o.push(`<ellipse cx="150" cy="232" rx="8" ry="6.5" fill="#a8623f" stroke="${I}" stroke-width="3"/><ellipse cx="150" cy="233" rx="3.5" ry="3" fill="${I}"/>`);
+  else if (M === 'smile') o.push(`<path d="M126 226C138 240 162 240 174 226" fill="none" stroke="${I}" stroke-width="4"/><path d="M122 224l6 3M178 224l-6 3" stroke="${I}" stroke-width="3"/>`);
+  else if (M === 'smirk') o.push(`<path d="M130 232C142 236 158 234 172 224" fill="none" stroke="${I}" stroke-width="4"/><path d="M172 224l5 -1" stroke="${I}" stroke-width="3"/>`);
+  else if (M === 'snarl') o.push(`<path d="M124 226C136 220 164 220 176 226C168 242 132 242 124 226Z" fill="#fbf5e4" stroke="${I}" stroke-width="3.5"/><path d="M137 222v17M150 221v19M163 222v17" stroke="${I}" stroke-width="2"/>`);
+  else if (M === 'calm') o.push(`<path d="M134 230C144 235 156 235 166 230" fill="none" stroke="${I}" stroke-width="4"/>`);
+  else o.push(`<path d="M130 232C142 228 158 228 170 232" fill="none" stroke="${I}" stroke-width="4"/><path d="M142 242h16" stroke="${I}" stroke-width="2.5" opacity=".6"/>`);
+  if (P.cheeks) o.push(`<path d="M64 188C58 206 64 230 82 244M236 188C242 206 236 230 218 244" fill="none" stroke="${I}" stroke-width="3"/>`);
+  if (P.chin) o.push(`<path d="M118 256C136 266 164 266 182 256" fill="none" stroke="${I}" stroke-width="3"/>`);
+  if (P.sweat) o.push(`<path d="M204 112C200 120 200 126 204 128C208 126 208 120 204 112Z" fill="#bfe0ff" stroke="${I}" stroke-width="2"/>`);
+  if (P.stubble) o.push(`<g fill="${I}" opacity=".45"><circle cx="132" cy="246" r="1.2"/><circle cx="140" cy="250" r="1.2"/><circle cx="150" cy="251" r="1.2"/><circle cx="160" cy="250" r="1.2"/><circle cx="168" cy="246" r="1.2"/><circle cx="136" cy="240" r="1.2"/><circle cx="164" cy="240" r="1.2"/></g>`);
+  o.push(`</g></g>`);
+  return `<svg class="wc-portrait" role="img" aria-label="Portrait of ${c.name}" viewBox="0 16 300 236" preserveAspectRatio="xMidYMid slice">${o.join('')}</svg>`;
+}
 function openFull(key){
   const c = CHARS[key]; sheetColor = null;
-  sheet(ARCH[key] || '', c.name, `<div class="fullcard"><div class="wc-top" style="background-image:${patternCss(key).replace(/"/g, '&quot;')}"><canvas id="wcPor" class="wc-por"></canvas>${handSvg(key)}</div><div class="shape">${c.shapeName}</div>
+  sheet(ARCH[key] || '', c.name, `<div class="fullcard"><div class="wc-top${POR[key] ? ' por' : ''}" style="background-image:${patternCss(key).replace(/"/g, '&quot;')}">${POR[key] ? `<div class="wc-frame">${portraitSvg(key)}</div>` : '<canvas id="wcPor" class="wc-por"></canvas>'}${handSvg(key)}</div><div class="shape">${c.shapeName}</div>
     <span class="stats">${STAT_ROWS.map(([l, k]) => `<span>${l}</span><span class="dots">${[1, 2, 3, 4, 5].map(i => `<s class="${i <= c[k] ? 'on' : ''}"></s>`).join('')}</span>`).join('')}</span>
     <div class="abl"><div class="ab"><em>Passive</em>${c.passiveName}: ${c.passiveText}</div><div class="ab"><em>Special \u00b7 hold PUSH</em>${c.specialName}: ${c.specialText}</div></div>${(() => { const r = selFlow ? seatRoll(stSeat(selFlow.steps[selFlow.i]), key) : myRoll(key); return r ? `<div class="ab" style="margin-top:8px"><em>Your copy \u00b7 <span style="color:var(--gold);letter-spacing:2px">${'\u2605'.repeat(r.tier)}</span> ${TIER_WORD[r.tier]}</em>Pushes ${r.push} (${c.push[0]}\u2013${c.push[1]}) \u00b7 Recharge ${r.rech} (${c.rech[0]}\u2013${c.rech[1]}) \u00b7 Spirit ${r.spirit} (${c.spirit[0]}\u2013${c.spirit[1]}) \u00b7 Luck ${r.luck} (${c.luck[0]}\u2013${c.luck[1]})</div>` : ''; })()}</div>`,
     [['Back', closeSheet], [`Pick ${c.name}`, () => { const st = selFlow.steps[selFlow.i]; selFlow.rnd = false; cfg[st.p] = key; saveCfg(); closeSheet(); renderSelect(); }, true]]);
