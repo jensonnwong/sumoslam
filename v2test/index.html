@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta http-equiv="Content-Security-Policy" content="script-src 'sha256-GCtOtxlHyt3W7bXuO3Sf7/CVtwhnvkNFz6svAcs+ne8='; object-src 'none'; base-uri 'self'">
+<meta http-equiv="Content-Security-Policy" content="script-src 'sha256-QagB+VpkS1RCaEdyfLBLXCxLuT/CcuCgre7VWXMKYxs='; object-src 'none'; base-uri 'self'">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover,interactive-widget=resizes-content">
 <meta name="theme-color" content="#1b2042">
 <meta name="mobile-web-app-capable" content="yes">
@@ -451,6 +451,12 @@ h1 span{color:var(--clay)}
 .hudBtn{border:3px solid #1f1a17;border-radius:4px;background:#f4ead2;color:#1f1a17;box-shadow:3px 3px 0 #1f1a17;font-family:var(--display);font-weight:400}
 .hudBtn:active{transform:translate(2px,2px);box-shadow:1px 1px 0 #1f1a17}
 #muteBtn.off{color:#8d8378}
+
+/* v2.0 look, slice 3: Home chips */
+.homeTop button,.homeTop .tok{border:3px solid #0d1730;border-radius:4px;background:#f4ead2;color:#1f1a17;box-shadow:3px 3px 0 #0d1730;font-family:var(--display);font-weight:400}
+.homeTop .tok{background:#0d1730;color:#f4ead2;border-color:#f4ead2;box-shadow:none;font-family:var(--body);font-weight:900}
+.homeTop .ava{background:#f0c493;border-color:#1f1a17}
+.homeTop .tok i{background:#d9a441;box-shadow:inset 0 0 0 2px #f4ead2}
 </style>
 </head>
 <body>
@@ -941,7 +947,7 @@ $('#toMenu').addEventListener('click', () => { if ($('#toMenu').onclick) return;
 $('#menuBtn').addEventListener('click', () => { if (phase === 'fight' || phase === 'countdown' || phase === 'roundEnd') wwEvent('quit_mid_bout', { mode: cfg.mode, seconds_in: Math.round(matchT), score: score.slice() }); goHome(); });
 $('#endHome').addEventListener('click', () => goHome());
 $('#homeBack').addEventListener('click', () => goHome());
-$('#meChip').addEventListener('click', () => openStation('me'));
+$('#meChip').addEventListener('click', () => sheet('', (me && me.name) || 'Guest', '<p>Your stable and record, or the ranking board.</p>', [['Back', closeSheet], ['Ranks', () => openStation('ranks')], ['Me', () => openStation('me'), true]]));
 $('#gearBtn').addEventListener('click', () => openStation('settings'));
 $('#sheet').addEventListener('click', e => { if (e.target.id === 'sheet') closeSheet(); });
 
@@ -1138,7 +1144,7 @@ function applyStarter(f){   // each player's wrestler uses that player's copy; y
    Any phone can bring a second player (split screen: their controls at the top, like the same-phone 1 v 1).
    1 v 1 = exactly 2 players on 2 phones; 2 v 2 = 2-4 players who pick Blue or Red (CPUs fill the gaps); Rumble = 2-8 players, 6-8 wrestlers. ---------- */
 const TEST_BUILD = true;   // the site build sets this for test uploads: accounts and online are off, so live profiles are never touched
-const BUILD = 'v2.0 test 3 · Nov 21 08:58';   // stamped with the date and time by the site build, so you can tell which version a phone is running
+const BUILD = 'v2.0 test 4 · Nov 21 09:08';   // stamped with the date and time by the site build, so you can tell which version a phone is running
 let NET = null, netBusy = false;   // netBusy: one Make / Join / Quick at a time (no double-tap rooms)
 // NET = { role, seat, code, ws, topic, me:{name,pick,side}, peers:{seat:{name,pick,roll,side,rx}}, match, slots, rins, ... }
 const RT_URL = () => (window.__WWRT || WW.url.replace(/^http/, 'ws') + '/realtime/v1/websocket') + `?apikey=${encodeURIComponent(WW.key)}&vsn=1.0.0`;
@@ -2554,14 +2560,13 @@ $('#selGo').addEventListener('click', () => {
 /* ---------- splash + home hub: walk your wrestler to a sign and push, or just tap the sign ---------- */
 let bouts = 0; try { bouts = +localStorage.getItem('v2t_sumoProtoBouts') || 0; } catch (e) {}
 const STORY_AT = 5, HOME_R = 262, PAD = 30;
-const STATIONS = [   // six nobori banners: two top, one each side, two bottom
-  { id: 'play',   label: 'PLAY',   icon: 'play',   cloth: '#c8352c', a: -Math.PI * 2 / 3 },
-  { id: 'story',  label: 'STORY',  icon: 'book',   cloth: '#5d3c8a', a: -Math.PI / 3 },
-  { id: 'online', label: 'ONLINE', icon: 'globe',  cloth: '#2f5fb8', a: 0 },
-  { id: 'prizes', label: 'PRIZES', icon: 'claw',   cloth: '#c98a12', a: Math.PI / 3 },
-  { id: 'me',     label: 'ME',     icon: 'me',     cloth: '#2f8a52', a: Math.PI * 2 / 3 },
-  { id: 'ranks',  label: 'RANKS',  icon: 'podium', cloth: '#d0612a', a: Math.PI }
+const STATIONS = [   // v2.0: four nobori banners, two each side of the ring. Me and Ranks sit behind the name chip
+  { id: 'play',   label: 'PLAY',   icon: 'play',   cloth: '#c8402f', a: Math.PI + .5 },
+  { id: 'story',  label: 'STORY',  icon: 'book',   cloth: '#d9a441', ink: true, a: Math.PI - .5 },
+  { id: 'online', label: 'ONLINE', icon: 'globe',  cloth: '#fbf5e4', ink: true, a: -.5 },
+  { id: 'prizes', label: 'PRIZES', icon: 'claw',   cloth: '#3f6b52', a: .5 }
 ];
+const SHEET_CLOTH = { me: '#3f6b52', ranks: '#c8402f' };
 const resetFlags = () => STATIONS.forEach(s => { s.x = Math.cos(s.a) * HOME_R; s.y = Math.sin(s.a) * HOME_R; s.moved = false; });
 resetFlags();
 let carry = null, lastPressT = -9, pendingPress = null, pressLock = 0;   // double-tap PUSH near a flag to pick it up; tap to set it down
@@ -2737,7 +2742,7 @@ function sheet(tag, title, body, btns){
 const soon = (title, items) => sheet('Coming soon', title, `<ul>${items.map(i => `<li>${i}</li>`).join('')}</ul>`, [['Back', closeSheet, true]]);
 function openStation(id){
   audio(); wwEvent('hub_flag_used', { flag: id }); homeFlash = { id, t: .35 }; SFX.go();
-  sheetColor = id === 'settings' ? '#3a4277' : (STATIONS.find(q => q.id === id) || {}).cloth || null;
+  sheetColor = id === 'settings' ? '#3a4277' : (STATIONS.find(q => q.id === id) || {}).cloth || SHEET_CLOTH[id] || null;
   const s = STATIONS.find(q => q.id === id);
   if (s && locked(s)) { SFX.bump(); const ok = (v, t) => `<li style="list-style:none;margin-left:-18px"><b style="color:${v ? '#2f8a52' : '#c8352c'}">${v ? '\u2713' : '\u2717'}</b> ${t}</li>`;
     const needAcct = !me, r = profile && profile.rank, n = r ? r.w + r.l : 0;
@@ -2816,13 +2821,12 @@ function homeStationAt(px, py){
   return null;
 }
 function homeLayout(){
-  const band = clamp(H * .17, 110, 160), top = 104, bottom = H - band - 10;
-  const dims = STATIONS.map(st => bannerDims(st)), bw = dims[0].w, over = Math.max(...dims.map(d => d.h + d.poleH)), gy = HOME_R * Math.sin(Math.PI / 3);   // banners stand up above their foot
-  const sc = Math.max(.25, Math.min((W * .985 / 2 - bw - 6 - 14) / (210 + 16), (bottom - top - over) / (2 * gy + 30)));
-  const sideX = 210 + 16 + (bw / 2 + 6) / sc;   // side banners stand just outside the ring, on the widened platform
-  STATIONS.forEach(st => { if (!st.moved && Math.abs(Math.sin(st.a)) < .01) { st.x = Math.sign(Math.cos(st.a)) * sideX; st.y = 0; } });
-  const lo = top + over + gy * sc, hi = bottom - gy * sc;
-  L = { band, top, bottom, cx: W / 2, cy: (lo + Math.max(lo, hi)) / 2, sc, platHW: sideX + (bw / 2 + 12) / sc };   // platform widens to hold the side banners
+  const band = clamp(H * .17, 110, 160), gateTop = SAFE.t + 70, gateW = Math.min(W * .96, 460), gateK = Math.min(gateW / 374, (H - band) * .3 / 222), top = gateTop + 222 * gateK + 12, bottom = H - band - 14;
+  const dims = STATIONS.map(st => bannerDims(st)), bw = dims[0].w, over = Math.max(...dims.map(d => d.h + d.poleH));
+  const sc = Math.max(.25, Math.min((W * .985 / 2 - bw - 8) / (R0 + 22), (bottom - top) / (2 * (R0 + 24))));
+  const sideX = R0 + 22 + (bw / 2 + 4) / sc;
+  STATIONS.forEach(st => { if (!st.moved) { st.x = Math.sign(Math.cos(st.a)) * sideX; st.y = Math.sin(st.a) > 0 ? (over + 10) / sc : -10 / sc; } });   // two banners each side: one foot just above the middle, one a banner's height below
+  L = { band, top, bottom, cx: W / 2, cy: (top + bottom) / 2, sc, gate: { top: gateTop, k: gateK } };
 }
 let homeHold = null, homeSpecCd = 0;
 function updateHome(dt){
@@ -2831,15 +2835,13 @@ function updateHome(dt){
   f.inp = $('#sheet').hidden ? humanInput(f) : { x: 0, y: 0 };
   const d = Math.hypot(f.x, f.y);
   homeSel = null;
-  if (!carry) { let best = null, bd = 150; for (const s of STATIONS) { const ad = Math.hypot(s.x - f.x, s.y - f.y); if (ad < bd) { bd = ad; best = s; } } homeSel = best; }   // nearest flag (within reach) wherever it stands
+  if (!carry) { let best = null, bd = 185; for (const s of STATIONS) { const ad = Math.hypot(s.x - f.x, s.y - f.y); if (ad < bd) { bd = ad; best = s; } } homeSel = best; }   // nearest flag (within reach) wherever it stands
   f.faceDir = null;   // no lock-on in the hub: you face where you walk
   if (homeHold && !carry && $('#sheet').hidden) { homeHold.t += dt; if (!homeHold.fired && homeHold.t >= .45 && homeT > (homeSpecCd || 0)) { homeHold.fired = true; homeSpecCd = homeT + 1.2; f.meter = 100; try { special(f); } catch (e) {} f.meter = 0; f.pushes = f.maxPush; } }   // hold PUSH: show off your special, just for fun
   floats.forEach(t => { t.y -= 26 * dt; t.life -= dt * .9; }); floats = floats.filter(t => t.life > 0);
   stepFighter(f, dt, true);
   if (homeSel && Math.hypot(f.inp.x, f.inp.y) < .12 && Math.hypot(f.vx, f.vy) < 30) f.face = turnToward(f.face, Math.atan2(homeSel.y - f.y, homeSel.x - f.x), 1.1 * dt);   // only a slow, loose turn toward the lit flag while standing still
-  const hx = (L.platHW || 245) - f.rad - 6, hy = R0 + 35 - f.rad - 6;   // free roam to the edge of the sand platform
-  if (Math.abs(f.x) > hx) { f.x = Math.sign(f.x) * hx; if (f.vx * f.x > 0) f.vx = 0; }
-  if (Math.abs(f.y) > hy) { f.y = Math.sign(f.y) * hy; if (f.vy * f.y > 0) f.vy = 0; }
+  { const lim = R0 - f.rad - 8, dd = Math.hypot(f.x, f.y); if (dd > lim) { f.x *= lim / dd; f.y *= lim / dd; const nx = f.x / lim, ny = f.y / lim, vn = f.vx * nx + f.vy * ny; if (vn > 0) { f.vx -= vn * nx; f.vy -= vn * ny; } } }   // home: he stays inside the bales
   if (carry) { f.pushPose = Math.max(f.pushPose || 0, .05); f.armSide = 1;   // right arm stays out, gripping the pole
     const fw = f.rad * (.54 + .8464 * f.c.sy), sd = f.rad * .5, rx = -Math.sin(f.face), ry = Math.cos(f.face);   // right hand: forward + to his right
     carry.x = f.x + Math.cos(f.face) * fw + rx * sd; carry.y = f.y + Math.sin(f.face) * fw + ry * sd; }
@@ -2882,22 +2884,20 @@ function bannerBox(s){
 function drawBanner(s, sel, lk, fl){
   const b = bannerBox(s), t = homeT, sway = sel ? Math.sin(t * 5) * .06 : Math.sin(t * 1.3 + s.a * 3) * .015;
   // ground shadow + pole
-  ctx.beginPath(); ctx.ellipse(b.gx, b.gy0, b.w * (s === carry ? .3 : .45), b.w * .14, 0, 0, TAU); ctx.fillStyle = 'rgba(0,0,0,.28)'; ctx.fill();
+  ctx.beginPath(); ctx.ellipse(b.gx, b.gy0, b.w * (s === carry ? .3 : .45), b.w * .14, 0, 0, TAU); ctx.fillStyle = '#5c6a8a'; ctx.fill(); ctx.strokeStyle = NIGHT_INK; ctx.lineWidth = 1.5; ctx.stroke();
   const px = b.x + 3;
-  ctx.strokeStyle = '#3a2716'; ctx.lineWidth = 4; ctx.lineCap = 'round'; ctx.beginPath(); ctx.moveTo(px, b.gy); ctx.lineTo(px, b.y - 6); ctx.stroke();
-  ctx.beginPath(); ctx.moveTo(px - 2, b.y - 2); ctx.lineTo(b.x + b.w + 4, b.y - 2); ctx.stroke();
-  ctx.beginPath(); ctx.arc(px, b.y - 8, 3.5, 0, TAU); ctx.fillStyle = '#ffcf3f'; ctx.fill();
+  ctx.lineCap = 'round'; [[6, NIGHT_INK], [3, '#b9842a']].forEach(([lw, col]) => { ctx.strokeStyle = col; ctx.lineWidth = lw; ctx.beginPath(); ctx.moveTo(px, b.gy); ctx.lineTo(px, b.y - 6); ctx.moveTo(px - 2, b.y - 2); ctx.lineTo(b.x + b.w + 4, b.y - 2); ctx.stroke(); });
   // cloth hangs from the crossbar and sways from the top
   ctx.save(); ctx.translate(b.x + b.w / 2 + 2, b.y); ctx.transform(1, 0, sway, 1, 0, 0);
   const w = b.w - 4, h = b.h, notch = b.notch, cloth = lk ? '#5b5f7e' : s.cloth;
   ctx.beginPath(); ctx.moveTo(-w / 2, 0); ctx.lineTo(w / 2, 0); ctx.lineTo(w / 2, h); ctx.lineTo(0, h - notch); ctx.lineTo(-w / 2, h); ctx.closePath();
-  ctx.fillStyle = 'rgba(0,0,0,.3)'; ctx.save(); ctx.translate(3, 3); ctx.fill(); ctx.restore();
+  ctx.fillStyle = NIGHT_INK; ctx.save(); ctx.translate(4, 4); ctx.fill(); ctx.restore();
   ctx.fillStyle = cloth; ctx.fill();
-  ctx.lineWidth = sel || fl ? 3.5 : 2; ctx.strokeStyle = sel || fl ? '#ffcf3f' : '#1b2042'; ctx.lineJoin = 'round'; ctx.stroke();
-  ctx.fillStyle = 'rgba(255,255,255,.12)'; ctx.fillRect(-w / 2 + 3, 3, w * .08, h - notch - 4);   // fold highlight
-  ctx.save(); ctx.translate(0, 6 + b.iconH * .5); drawIcon(s.icon, b.iconH, '#fff6e6'); ctx.restore();
-  ctx.fillStyle = 'rgba(255,246,230,.5)'; ctx.fillRect(-w * .3, 6 + b.iconH, w * .6, 1.5);
-  b.lines.forEach((ln, i) => text(ln, 0, 6 + b.iconH + 6 + b.size * .6 + i * b.size * 1.15, b.size, '#fff6e6'));
+  ctx.lineWidth = sel || fl ? 4 : 3; ctx.strokeStyle = sel || fl ? '#ffd23f' : NIGHT_INK; ctx.lineJoin = 'round'; ctx.stroke();
+  const tc = s.ink && !lk ? INK.ink : '#fffaf0';
+  ctx.save(); ctx.translate(0, 6 + b.iconH * .5); drawIcon(s.icon, b.iconH, tc); ctx.restore();
+  
+  b.lines.forEach((ln, i) => text(ln, 0, 6 + b.iconH + 6 + b.size * .6 + i * b.size * 1.15, b.size, tc));
   ctx.restore();
   if (lk) drawLock(b.x + b.w + 2, b.y + 8, 9);
 }
@@ -2905,32 +2905,49 @@ function drawLock(x, y, r){
   ctx.save(); ctx.translate(x, y); ctx.fillStyle = '#ffcf3f'; ctx.strokeStyle = '#ffcf3f'; ctx.lineWidth = r * .22;
   ctx.beginPath(); ctx.arc(0, -r * .25, r * .4, Math.PI, TAU); ctx.stroke(); roundRect(-r * .6, -r * .25, r * 1.2, r * .95, r * .2); ctx.fill(); ctx.restore();
 }
+const GATE = typeof Path2D !== 'undefined' ? { beam: new Path2D('M28 92C88 102 302 102 362 92L358 112C302 120 88 120 32 112Z'), beamSh: new Path2D('M31 106C88 114 302 114 359 106L358 112C302 120 88 120 32 112Z'), roof: new Path2D('M8 62C70 82 320 82 382 62L374 90C316 102 74 102 16 90Z'), roofHi: new Path2D('M18 70C76 86 314 86 372 70'), roofSh: new Path2D('M14 84C74 96 316 96 376 84L374 90C316 102 74 102 16 90Z') } : null;
+function drawGate(){   // the shrine gate across the top of Home, with the title lettered between its posts
+  if (!GATE || !L.gate) return; const k = L.gate.k, O = '#d4582e', OS = '#a8401f';
+  ctx.save(); ctx.translate(W / 2 - 195 * k, L.gate.top - 62 * k); ctx.scale(k, k); ctx.lineJoin = 'round'; ctx.strokeStyle = NIGHT_INK;
+  const box = (x, y, w, h, fill, lw) => { ctx.beginPath(); ctx.rect(x, y, w, h); ctx.fillStyle = fill; ctx.fill(); if (lw) { ctx.lineWidth = lw; ctx.stroke(); } };
+  box(70, 118, 26, 162, NIGHT_INK); box(304, 118, 26, 162, NIGHT_INK);
+  box(64, 112, 26, 164, O, 3); box(300, 112, 26, 164, O, 3); box(80, 114, 8, 160, OS); box(316, 114, 8, 160, OS);
+  box(58, 272, 38, 10, '#5c6a8a', 2.5); box(294, 272, 38, 10, '#5c6a8a', 2.5);
+  box(183, 112, 24, 36, O, 3); box(36, 146, 318, 17, O, 3); box(38, 157, 314, 5, OS);
+  [52, 92, 288, 328].forEach(x => box(x, 141, 10, 27, INK.paper2, 2));
+  ctx.lineWidth = 3; ctx.fillStyle = O; ctx.fill(GATE.beam); ctx.stroke(GATE.beam); ctx.fillStyle = OS; ctx.fill(GATE.beamSh);
+  ctx.fillStyle = INK.pine; ctx.fill(GATE.roof); ctx.stroke(GATE.roof); ctx.fillStyle = '#2c5540'; ctx.fill(GATE.roofSh);
+  ctx.strokeStyle = '#7fae93'; ctx.lineWidth = 2; ctx.lineCap = 'round'; ctx.stroke(GATE.roofHi);
+  ctx.font = "38px Dela Gothic One, 'Arial Black', Impact, sans-serif"; ctx.textAlign = 'center'; ctx.textBaseline = 'alphabetic';
+  let fs = 38; const mw = Math.max(ctx.measureText('SUMO').width, ctx.measureText('SLAM').width); if (mw > 196) { fs = 38 * 196 / mw; ctx.font = `${fs}px Dela Gothic One, 'Arial Black', Impact, sans-serif`; }   // always fits between the posts
+  [['SUMO', 209], ['SLAM', 249]].forEach(([t, y]) => { ctx.fillStyle = NIGHT_INK; ctx.fillText(t, 197, y + 3); ctx.fillStyle = INK.paper2; ctx.fillText(t, 194, y); });
+  ctx.restore();
+}
 function drawHome(){
   homeLayout();
-  drawRing();
+  drawRing(true); drawGate();
   const tt = homeT;
   prints.forEach(p => { const [x, y] = S(p.x, p.y); ctx.save(); ctx.translate(x, y); ctx.rotate(p.a); ctx.globalAlpha = clamp(p.life / 1.6, 0, 1) * .32; ctx.fillStyle = '#9a6d37'; ctx.beginPath(); ctx.ellipse(0, 0, 5 * L.sc, 3.4 * L.sc, 0, 0, TAU); ctx.fill(); ctx.restore(); }); ctx.globalAlpha = 1;
   const lit = homeSel;
   [...STATIONS].sort((a, b) => a.y - b.y).filter(st => st.y < F[0].y && st !== carry).forEach(st => drawBanner(st, lit === st, locked(st), homeFlash && homeFlash.id === st.id));
   if (homeSel) {   // dotted guide from the wrestler to the lit sign
     const f = F[0], [x0, y0] = S(f.x, f.y), [x1, y1] = S(homeSel.x, homeSel.y);
-    ctx.setLineDash([3, 6]); ctx.strokeStyle = 'rgba(255,207,63,.7)'; ctx.lineWidth = 2; ctx.beginPath(); ctx.moveTo(x0, y0); ctx.lineTo(x1, y1); ctx.stroke(); ctx.setLineDash([]);
+    ctx.setLineDash([3, 6]); ctx.strokeStyle = 'rgba(244,234,210,.75)'; ctx.lineWidth = 2; ctx.beginPath(); ctx.moveTo(x0, y0); ctx.lineTo(x1, y1); ctx.stroke(); ctx.setLineDash([]);
   }
   drawZones(); F.forEach(drawFighter);
   parts.forEach(p => { const [x, y] = S(p.x, p.y); ctx.globalAlpha = clamp(p.life / p.max, 0, 1); ctx.fillStyle = p.color; ctx.beginPath(); ctx.arc(x, y, p.size * L.sc, 0, TAU); ctx.fill(); }); ctx.globalAlpha = 1;
   [...STATIONS].sort((a, b) => a.y - b.y).filter(st => st.y >= F[0].y || st === carry).sort((a, b) => (a === carry) - (b === carry)).forEach(st => drawBanner(st, lit === st, locked(st), homeFlash && homeFlash.id === st.id));   // front banners stand over the wrestler
   drawFloats();
-  text('SUMO', L.cx, 78, clamp(W * .1, 30, 44), '#fff6e6');
   // control band: joystick + PUSH, same spots as in a bout
   const y0 = H - L.band, cy = y0 + L.band / 2, c = ctrl[0], f = F[0];
-  ctx.fillStyle = '#141834'; ctx.fillRect(-SAFE.l, y0, FW, L.band + SAFE.b); ctx.fillStyle = f.tint; ctx.fillRect(-SAFE.l, y0, FW, 3);
+  ctx.fillStyle = NIGHT; ctx.fillRect(-SAFE.l, y0, FW, L.band + SAFE.b);
   const jx = c.joy !== null ? c.bx : W * .22, jy = c.joy !== null ? c.by : cy;
-  ctx.beginPath(); ctx.arc(jx, jy, 46, 0, TAU); ctx.fillStyle = 'rgba(255,246,230,.06)'; ctx.fill(); ctx.strokeStyle = 'rgba(255,246,230,.25)'; ctx.lineWidth = 2; ctx.stroke();
+  ctx.beginPath(); ctx.arc(jx, jy, 46, 0, TAU); ctx.fillStyle = NIGHT; ctx.fill(); ctx.strokeStyle = INK.paper2; ctx.lineWidth = 3; ctx.stroke(); ctx.beginPath(); ctx.arc(jx, jy, 38, 0, TAU); ctx.lineWidth = 1.5; ctx.stroke();
   let kx = jx, ky = jy; if (c.joy !== null) { const dx = c.kx - c.bx, dy = c.ky - c.by, m = Math.hypot(dx, dy), k = m > 46 ? 46 / m : 1; kx = jx + dx * k; ky = jy + dy * k; }
-  ctx.beginPath(); ctx.arc(kx, ky, 20, 0, TAU); ctx.fillStyle = 'rgba(255,246,230,.55)'; ctx.fill();
+  ctx.beginPath(); ctx.arc(kx + 3, ky + 3, 20, 0, TAU); ctx.fillStyle = NIGHT_INK; ctx.fill(); ctx.beginPath(); ctx.arc(kx, ky, 20, 0, TAU); ctx.fillStyle = INK.paper2; ctx.fill(); ctx.strokeStyle = NIGHT_INK; ctx.lineWidth = 3; ctx.stroke();
   const bx = W * .78, br = Math.min(46, W * .115), pr = c.btn !== null;
   drawPushBtn(bx, cy, br, { pressed: pr, lit: !!homeSel, main: 'PUSH', sub: homeSel ? (locked(homeSel) ? 'locked' : 'to enter') : 'hold: special' });
-  if (homeSel) textFit(homeSel.label, W / 2, cy, 12, '#ffcf3f', Math.max(70, bx - W * .22 - br - 46 - 22), { font: 'body' });   // name of the banner you're standing at; no idle hint
+  if (homeSel) textFit(homeSel.label, W / 2, cy, 12, INK.paper2, Math.max(70, bx - W * .22 - br - 46 - 22), { font: 'body' });   // name of the banner you're standing at; no idle hint
 }
 function drawSplash(){
   const g = ctx.createRadialGradient(W / 2, H * .4, 10, W / 2, H * .4, Math.max(W, H) * .7); g.addColorStop(0, '#2b3370'); g.addColorStop(1, '#141834');
@@ -3941,11 +3958,20 @@ function sandGrain(){   // layer 5: fine sand grain, drawn once and tiled over t
   for (let i = 0; i < 2600; i++) { const d = rnd() < .62; g.fillStyle = d ? `rgba(110,74,22,${.10 + rnd() * .22})` : `rgba(255,246,222,${.12 + rnd() * .25})`; const z = .5 + rnd() * 1.1; g.fillRect(rnd() * 192, rnd() * 192, z, z); }
   return grainPat = ctx.createPattern(c, 'repeat');
 }
-function drawRing(){
+const NIGHT = '#1a2a4f', NIGHT_INK = '#0d1730';
+const CLOUD = typeof Path2D !== 'undefined' ? new Path2D('M6 30H74c7 0 10 -5 7 -10c-2 -4 -8 -5 -11 -2c0 -8 -10 -13 -18 -8c-4 -8 -18 -9 -24 -1c-6 7 -2 17 6 17c6 0 9 -6 6 -10c-2 -3 -7 -3 -8 1M-10 36H38M50 36H88M14 42H60') : null;
+function drawRing(night){
   const sc = L.sc;
-  ctx.fillStyle = INK.paper; ctx.fillRect(0, 0, W, H);   // rice paper behind everything
+  ctx.fillStyle = night ? NIGHT : INK.paper; ctx.fillRect(-SAFE.l, -SAFE.t, FW, H + SAFE.t + SAFE.b);   // rice paper behind a bout, deep indigo behind Home
+  if (night && CLOUD) { ctx.save(); ctx.strokeStyle = 'rgba(244,234,210,.2)'; ctx.lineWidth = 1.6; ctx.lineCap = ctx.lineJoin = 'round';   // a few line-art clouds, kept faint
+    [[-.09, .23, 1.15, 1], [1.05, .26, 1, -1], [.25, .655, 1.1, 1], [.95, .36, .8, -1]].forEach(([u, v, k, fx]) => { ctx.save(); ctx.translate(u * W, v * H); ctx.scale(k * fx, k); ctx.stroke(CLOUD); ctx.restore(); }); ctx.restore(); }
   ctx.save(); ctx.translate(L.cx, L.cy); ctx.scale(sc, sc);
   const side = 2 * R0 + 70, hw = Math.max(side / 2, L.platHW || 0), R = ring.R;
+  if (night) {   // Home: the ring alone, on a hard shadow, with a narrow band of brushed sand
+    ctx.beginPath(); ctx.arc(7, 9, R0 + 20, 0, TAU); ctx.fillStyle = NIGHT_INK; ctx.fill();
+    ctx.beginPath(); ctx.arc(0, 0, R0 + 20, 0, TAU); ctx.fillStyle = INK.clayLt; ctx.fill(); ctx.strokeStyle = NIGHT_INK; ctx.lineWidth = 3; ctx.stroke();
+    ctx.strokeStyle = '#c9a04e'; ctx.lineWidth = 1; [[9, [70, 9], 0], [14, [52, 7], 20]].forEach(([d, dash, off]) => { ctx.setLineDash(dash); ctx.lineDashOffset = off; ctx.beginPath(); ctx.arc(0, 0, R0 + 4 + d, 0, TAU); ctx.stroke(); }); ctx.setLineDash([]); ctx.lineDashOffset = 0;
+  } else {
   // layer 1: flat shapes. The platform sits on a hard ink shadow, never blurred
   ctx.fillStyle = INK.ink; roundRect(-hw + 6, -side / 2 + 7, hw * 2, side, 10); ctx.fill();
   ctx.fillStyle = INK.clayLt; roundRect(-hw, -side / 2, hw * 2, side, 10); ctx.fill(); ctx.strokeStyle = INK.ink; ctx.lineWidth = 4; ctx.stroke();
@@ -3953,6 +3979,7 @@ function drawRing(){
   ctx.save(); roundRect(-hw + 3, -side / 2 + 3, hw * 2 - 6, side - 6, 8); ctx.clip(); ctx.strokeStyle = '#c9a04e'; ctx.lineWidth = 1;
   [[9, [70, 9], 0], [15, [52, 7], 20], [21, [84, 11], 44], [27, [60, 8], 9], [34, [76, 10], 31], [42, [58, 9], 5]].forEach(([d, dash, off]) => { ctx.setLineDash(dash); ctx.lineDashOffset = off; ctx.beginPath(); ctx.arc(0, 0, R0 + 12 + d, 0, TAU); ctx.stroke(); });
   ctx.setLineDash([]); ctx.lineDashOffset = 0; ctx.restore();
+  }
   if (R < R0 - 1) { ctx.beginPath(); ctx.arc(0, 0, R0, 0, TAU); ctx.strokeStyle = 'rgba(31,26,23,.4)'; ctx.lineWidth = 2.5; ctx.setLineDash([8, 10]); ctx.stroke(); ctx.setLineDash([]); }
   // the clay, with grain (layer 5) and a shade wash inside the bales (layer 2)
   ctx.beginPath(); ctx.arc(0, 0, R, 0, TAU); ctx.fillStyle = INK.clay; ctx.fill();
@@ -3963,7 +3990,7 @@ function drawRing(){
   ctx.setLineDash([bale - gap, gap]); ctx.lineDashOffset = (bale - gap) / 2;
   ctx.beginPath(); ctx.arc(0, 0, R, 0, TAU); ctx.strokeStyle = INK.paper2; ctx.lineWidth = 11; ctx.stroke();
   ctx.beginPath(); ctx.arc(0, 0, R - 3, 0, TAU); ctx.strokeStyle = '#d8c9a6'; ctx.lineWidth = 4; ctx.stroke();
-  ctx.setLineDash([1.2, 9]); ctx.lineDashOffset = 0; ctx.beginPath(); ctx.arc(0, 0, R, 0, TAU); ctx.strokeStyle = 'rgba(31,26,23,.55)'; ctx.lineWidth = 11; ctx.stroke(); ctx.setLineDash([]);
+  ctx.setLineDash([1.4, bale / 3 - 1.4]); ctx.lineDashOffset = 0; ctx.beginPath(); ctx.arc(0, 0, R, 0, TAU); ctx.strokeStyle = 'rgba(31,26,23,.5)'; ctx.lineWidth = 11; ctx.stroke(); ctx.setLineDash([]);
   ctx.strokeStyle = INK.ink; ctx.lineWidth = 2; ctx.beginPath(); ctx.arc(0, 0, R + 5.5, 0, TAU); ctx.stroke(); ctx.beginPath(); ctx.arc(0, 0, R - 5.5, 0, TAU); ctx.stroke();
   // the four bales set a step further out, one on each side
   ctx.fillStyle = INK.paper2; ctx.lineWidth = 2;
