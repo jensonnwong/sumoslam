@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta http-equiv="Content-Security-Policy" content="script-src 'sha256-vaFdGH5iNbnrmNThbFpYv8Oy/oMp8Wd6dGAEGPNpyaU='; object-src 'none'; base-uri 'self'">
+<meta http-equiv="Content-Security-Policy" content="script-src 'sha256-n7ohlxjuqdBSVZcvke7pEiJUd51MJEF0DcHUPx+nJHg='; object-src 'none'; base-uri 'self'">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover,interactive-widget=resizes-content">
 <meta name="theme-color" content="#1b2042">
 <meta name="mobile-web-app-capable" content="yes">
@@ -1176,7 +1176,7 @@ function applyStarter(f){   // each player's wrestler uses that player's copy; y
    Any phone can bring a second player (split screen: their controls at the top, like the same-phone 1 v 1).
    1 v 1 = exactly 2 players on 2 phones; 2 v 2 = 2-4 players who pick Blue or Red (CPUs fill the gaps); Rumble = 2-8 players, 6-8 wrestlers. ---------- */
 const TEST_BUILD = true;   // the site build sets this for test uploads: accounts and online are off, so live profiles are never touched
-const BUILD = 'v2.0 test 15 · Nov 21 14:38';   // stamped with the date and time by the site build, so you can tell which version a phone is running
+const BUILD = 'v2.0 test 15 · Nov 21 14:39';   // stamped with the date and time by the site build, so you can tell which version a phone is running
 let NET = null, netBusy = false;   // netBusy: one Make / Join / Quick at a time (no double-tap rooms)
 // NET = { role, seat, code, ws, topic, me:{name,pick,side}, peers:{seat:{name,pick,roll,side,rx}}, match, slots, rins, ... }
 const RT_URL = () => (window.__WWRT || WW.url.replace(/^http/, 'ws') + '/realtime/v1/websocket') + `?apikey=${encodeURIComponent(WW.key)}&vsn=1.0.0`;
@@ -2839,7 +2839,7 @@ function portraitSvg(key){
   const body = P.duo ? P.duo.map((k, i) => `<g transform="translate(${i ? 104 : -2} 74) scale(.66)">${porBody(k)}</g>`).join('') : one(key);
   return `<svg class="wc-portrait" role="img" aria-label="Portrait of ${CHARS[key].name}" viewBox="0 16 300 236" preserveAspectRatio="xMidYMid slice"><g fill="none" stroke="${tint}" stroke-linecap="round" opacity=".4">${POR_BG[P.bg || 'wave']}</g>${body}</svg>`;
 }
-const porChip = key => `<span class="pface">${portraitSvg(key).replace('viewBox="0 16 300 236"', 'viewBox="45 16 210 210"').replace('role="img"', 'aria-hidden="true"')}</span>`;   // round face crop of the portrait for lists
+const porChip = key => `<span class="pface">${portraitSvg(key).replace('viewBox="0 16 300 236"', 'viewBox="36 6 228 228"').replace('role="img"', 'aria-hidden="true"')}</span>`;   // round face crop of the portrait for lists
 function openFull(key){
   const c = CHARS[key]; sheetColor = null;
   sheet(ARCH[key] || '', c.name, `<div class="fullcard"><div class="wc-top${POR[key] ? ' por' : ''}" style="background-image:${patternCss(key).replace(/"/g, '&quot;')}">${POR[key] ? `<div class="wc-frame">${portraitSvg(key)}</div>` : '<canvas id="wcPor" class="wc-por"></canvas>'}${handSvg(key)}</div><div class="shape">${c.shapeName}</div>
