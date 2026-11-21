@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta http-equiv="Content-Security-Policy" content="script-src 'sha256-ofERHe5ljY6ktulB5lrkqAQsSaGPl000WnGRyzv1yEs='; object-src 'none'; base-uri 'self'">
+<meta http-equiv="Content-Security-Policy" content="script-src 'sha256-6FeLdoCCTN6Ry5I3dQyTt4DM1ruPwN9j5LbpJ2WvlCo='; object-src 'none'; base-uri 'self'">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover,interactive-widget=resizes-content">
 <meta name="theme-color" content="#1b2042">
 <meta name="mobile-web-app-capable" content="yes">
@@ -1175,7 +1175,7 @@ function applyStarter(f){   // each player's wrestler uses that player's copy; y
    Any phone can bring a second player (split screen: their controls at the top, like the same-phone 1 v 1).
    1 v 1 = exactly 2 players on 2 phones; 2 v 2 = 2-4 players who pick Blue or Red (CPUs fill the gaps); Rumble = 2-8 players, 6-8 wrestlers. ---------- */
 const TEST_BUILD = true;   // the site build sets this for test uploads: accounts and online are off, so live profiles are never touched
-const BUILD = 'v2.0 test 13 · Nov 21 12:55';   // stamped with the date and time by the site build, so you can tell which version a phone is running
+const BUILD = 'v2.0 test 14 · Nov 21 13:09';   // stamped with the date and time by the site build, so you can tell which version a phone is running
 let NET = null, netBusy = false;   // netBusy: one Make / Join / Quick at a time (no double-tap rooms)
 // NET = { role, seat, code, ws, topic, me:{name,pick,side}, peers:{seat:{name,pick,roll,side,rx}}, match, slots, rins, ... }
 const RT_URL = () => (window.__WWRT || WW.url.replace(/^http/, 'ws') + '/realtime/v1/websocket') + `?apikey=${encodeURIComponent(WW.key)}&vsn=1.0.0`;
@@ -2632,13 +2632,14 @@ const POR = {   // per-wrestler choices; anything missing falls back to the plai
   tsumari:{ face: 'pear', top: 'beanie', brow: 'heavy', eyes: 'round', nose: 'broad', mouth: 'calm', tache2: true, bg: 'pipes' },
   sato:  { face: 'long', top: 'neat', glasses: true, brow: 'worried', eyes: 'small', nose: 'sharp', mouth: 'frown', sweat: true, neck: true, bg: 'chart', bgCol: '#2b2f48' },
   guard: { face: 'square', top: 'peaked', brow: 'firm', eyes: 'small', nose: 'hook', mouth: 'line', chin: true, bg: 'beam' },
-  yubin: { face: 'round', top: 'cap', brow: 'soft', eyes: 'round', nose: 'button', mouth: 'smile', bg: 'mail', bgCol: '#5a8fc4' },
+  yubin: { face: 'slim', neck: true, top: 'cap', brow: 'soft', eyes: 'round', nose: 'hook', mouth: 'smile', shadow: true, hollow: true, bg: 'mail', bgCol: '#5a8fc4' },
   kando: { face: 'round', small: true, top: 'bun', pin: '#9ad0ec', brow: 'thin', eyes: 'closed', lashes: true, nose: 'button', mouth: 'tiny', bg: 'bubbles', bgCol: '#8a7fc0' }
 };
 const POR_FACE = {   // [outline, how far the ears sit out from the round face]
   round:  ['M150 66C192 66 214 96 216 138C244 150 256 190 242 224C230 254 196 272 150 272C104 272 70 254 58 224C44 190 56 150 84 138C86 96 108 66 150 66Z', 0],
   square: ['M150 66C192 66 214 96 216 138C240 148 252 184 249 220C246 256 206 271 150 271C94 271 54 256 51 220C48 184 60 148 84 138C86 96 108 66 150 66Z', 3],
   pear:   ['M150 66C190 66 210 96 212 136C250 150 270 196 254 232C240 262 198 277 150 277C102 277 60 262 46 232C30 196 50 150 88 136C90 96 110 66 150 66Z', 8],
+  slim:   ['M150 58C186 58 204 92 206 134C222 150 228 190 220 226C212 260 186 280 150 280C114 280 88 260 80 226C72 190 78 150 94 134C96 92 114 58 150 58Z', -18],
   long:   ['M150 58C188 58 208 92 210 136C232 150 240 192 230 228C220 262 190 282 150 282C110 282 80 262 70 228C60 192 68 150 90 136C92 92 112 58 150 58Z', -10] };
 const POR_BG = {   // one painted motif behind the head that says who he is; drawn in a pale wash of his colour
   wave:  '<path d="M-12 170C22 166 30 108 64 102C96 97 110 142 150 142C196 142 212 96 248 98" stroke-width="8"/><path d="M248 98C274 100 284 122 270 132" stroke-width="5"/><path d="M270 132C262 137 252 132 254 124" stroke-width="2.5"/><path d="M-12 160C18 154 26 100 62 93C80 90 92 98 100 108" stroke-width="2" stroke-dasharray="46 10 30 8"/><path d="M214 104C226 92 240 88 254 90C272 93 284 104 286 116" stroke-width="2" stroke-dasharray="34 9 20 7"/>',
@@ -2691,7 +2692,7 @@ const POR_BG = {   // one painted motif behind the head that says who he is; dra
 };
 function porBody(key){
   const lk = LOOK[key] || {}, c = CHARS[key] || {}, shade = tone2, P = POR[key] || {}, I = lk.line || '#1f1a17', skin = lk.skin || c.skin || '#f0c493', hair = lk.hair || '#1f1a17', tint = (lk.suit && lk.suit !== 'trunks' && lk.suitCol) || lk.belt || '#24375e';
-  const bald = !!lk.bald, robe = lk.suit && lk.suit !== 'trunks', [face, ed] = POR_FACE[P.face || 'round'], long = P.face === 'long';
+  const bald = !!lk.bald, robe = lk.suit && lk.suit !== 'trunks', [face, ed] = POR_FACE[P.face || 'round'], long = P.face === 'long' || P.face === 'slim';
   const o = [];
   o.push(`<g stroke-linejoin="round" stroke-linecap="round">`);
   if (P.mark === 'puffer') o.push(`<g fill="#fbf5e4" stroke="${I}" stroke-width="2.5"><circle cx="36" cy="186" r="9"/><circle cx="22" cy="160" r="6"/><circle cx="44" cy="146" r="4"/><circle cx="28" cy="126" r="3"/></g><g fill="${tint}" stroke="${I}" stroke-width="3"><path d="M50 236L44 206L74 222Z"/><path d="M20 262L6 234L40 244Z"/><path d="M250 236L256 206L226 222Z"/><path d="M280 262L294 234L260 244Z"/></g>`);
@@ -2798,6 +2799,8 @@ function porBody(key){
   if (P.tache) o.push(`<path d="M150 216C140 210 126 212 118 222C114 226 108 224 108 218M150 216C160 210 174 212 182 222C186 226 192 224 192 218" fill="none" stroke="${I}" stroke-width="4"/><path d="M143 250L150 264L157 250Z" fill="${I}"/>`);
   if (P.ring) o.push(`<path d="M140 208C138 222 162 222 160 208" fill="none" stroke="${I}" stroke-width="6.5"/><path d="M140 208C138 222 162 222 160 208" fill="none" stroke="#d9a441" stroke-width="3.5"/>`);
   // mouth
+  if (P.shadow) o.push(`<g clip-path="url(#pf-${key})"><path d="M60 222C84 206 112 204 128 212C140 204 160 204 172 212C188 204 216 206 240 222V300H60Z" fill="#3a4658" opacity=".24"/><g fill="${I}" opacity=".4">${[[104,236],[114,248],[126,258],[140,264],[160,264],[174,258],[186,248],[196,236],[110,226],[190,226],[132,246],[168,246],[150,256],[138,214],[150,212],[162,214],[120,238],[180,238],[150,270]].map(([x, y]) => `<circle cx="${x}" cy="${y}" r="1.2"/>`).join('')}</g></g>`);
+  if (P.hollow) o.push(`<path d="M98 204C100 220 106 232 116 240M202 204C200 220 194 232 184 240" fill="none" stroke="${I}" stroke-width="2.5" opacity=".5"/>`);
   const M = P.mouth || 'line', my = P.ring ? 6 : 0;
   if (M === 'puff') o.push(`<ellipse cx="150" cy="232" rx="8" ry="6.5" fill="#a8623f" stroke="${I}" stroke-width="3"/><ellipse cx="150" cy="233" rx="3.5" ry="3" fill="${I}"/>`);
   else if (M === 'smile') o.push(`<path d="M124 226C138 242 162 242 176 226" fill="none" stroke="${I}" stroke-width="4"/><path d="M120 224l6 3M180 224l-6 3" stroke="${I}" stroke-width="3"/>`);
