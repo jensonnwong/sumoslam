@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta http-equiv="Content-Security-Policy" content="script-src 'sha256-aOQY+Ni9YqBmgEZUQTIk/DsDzEkT0LmPBtx0gwhhVT8='; object-src 'none'; base-uri 'self'">
+<meta http-equiv="Content-Security-Policy" content="script-src 'sha256-8eIWJqfyVU1VO3qGQczvOoIw9KnaiKXk9LgLSzuQ380='; object-src 'none'; base-uri 'self'">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover,interactive-widget=resizes-content">
 <meta name="theme-color" content="#1b2042">
 <meta name="mobile-web-app-capable" content="yes">
@@ -220,7 +220,7 @@ h1 span{color:var(--clay)}
 .ol-vs{align-self:center;font-family:var(--display);color:var(--accent);font-size:16px}
 .ol-side{display:flex;flex-direction:column;gap:6px;background:var(--band);border:2px solid #1f1a17;border-radius:4px;padding:8px;color:var(--paper);text-align:center;font:inherit;min-width:0}
 .ol-side.blue{border-color:#3d7bf5}.ol-side.red{border-color:#ef4b4b}.ol-side.mine{background:#ffe9a3;box-shadow:0 0 0 2px var(--sel) inset}.ol-side:disabled{opacity:.75}
-.ol-sideh{font-weight:900;font-size:11px;letter-spacing:.1em;text-transform:uppercase}.ol-side.blue .ol-sideh{color:#7fb6ff}.ol-side.red .ol-sideh{color:#ff9f8f}
+.ol-sideh{font-weight:900;font-size:11px;letter-spacing:.1em;text-transform:uppercase}.ol-side.blue .ol-sideh{color:#7fb6ff}.ol-side.red .ol-sideh{color:#c8402f}
 .ol-slot{display:flex;flex-direction:column;background:rgba(31,26,23,.06);border-radius:4px;padding:6px 4px;min-width:0}.ol-slot b{font-size:13px;font-weight:900;overflow-wrap:anywhere}.ol-slot small{font-size:10px;color:var(--muted);font-weight:800}
 .ol-slot.cpu{border:1px dashed rgba(31,26,23,.4);background:none}.ol-slot.cpu b{color:var(--muted)}
 .ol-sidego{font-size:10px;font-weight:900;color:var(--accent);letter-spacing:.05em}
@@ -239,7 +239,7 @@ h1 span{color:var(--clay)}
 .rk{display:grid;grid-template-columns:30px 40px 1fr auto;align-items:center;gap:10px;background:var(--band);border:2px solid #1f1a17;border-radius:4px;padding:6px 12px 6px 8px}
 .rk.me{border-color:var(--sel);background:#ffe9a3}
 .rk .pos{font-family:var(--display);font-size:16px;text-align:center;color:var(--muted)}
-.rk.p1 .pos{color:#ffcf3f}.rk.p2 .pos{color:#d9e1f2}.rk.p3 .pos{color:#e0975a}
+.rk.p1 .pos{color:#ffcf3f}.rk.p2 .pos{color:#5c5148}.rk.p3 .pos{color:#e0975a}
 .rk canvas{display:block}
 .rk .who{min-width:0;display:flex;flex-direction:column;gap:1px}
 .rk .who b{font-weight:900;font-size:15px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
@@ -272,7 +272,7 @@ h1 span{color:var(--clay)}
 .basho .node small{font-size:9px;font-weight:800;color:var(--muted);text-align:center;line-height:1.1;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;padding:0 2px}
 .basho .bf{display:flex;justify-content:space-between;align-items:center;gap:8px;font-size:12px;font-weight:800;color:var(--muted)}
 .basho .sgo{padding:9px 14px;font-size:14px;white-space:nowrap;flex:0 0 auto}
-.basho .bl{font-size:12px;font-weight:800;color:#ff9b8f}
+.basho .bl{font-size:12px;font-weight:800;color:#c8402f}
 .prz-body{flex:1 1 auto;overflow-y:auto;padding:4px max(16px, env(safe-area-inset-right, 0px)) max(20px, env(safe-area-inset-bottom, 0px)) max(16px, env(safe-area-inset-left, 0px));max-width:760px;width:100%;box-sizing:border-box;margin:0 auto;display:flex;flex-direction:column;gap:12px}
 .mach{display:flex;gap:12px;align-items:center;background:var(--band);border-radius:4px;padding:12px;border:2px solid #1f1a17}
 .mach .mi{width:64px;height:64px;border-radius:4px;flex:0 0 auto;display:flex;align-items:center;justify-content:center;font-family:var(--display);font-size:26px;color:var(--ink)}
@@ -403,7 +403,7 @@ h1 span{color:var(--clay)}
 .cc canvas{width:56px;height:56px;align-self:center;display:block}
 .cc b{font-family:var(--display);font-weight:400;font-size:13px;line-height:1.1;overflow-wrap:anywhere}
 .tst{display:block;font-size:11px;letter-spacing:2px;color:var(--gold);line-height:1.1;text-shadow:0 1px 0 #1f1a17;font-weight:900}.tst s{text-decoration:none;color:#b9a988;text-shadow:none}.cc .tst{margin-top:-2px}small .tst{display:inline}
-.prize-roll{display:flex;flex-direction:column;align-items:center;gap:6px;margin-top:8px}.prize-roll .stars{font-size:26px;letter-spacing:5px;color:var(--gold);text-shadow:0 2px 0 #1f1a17}.prize-roll .stars s{text-decoration:none;color:#b9a988}.prize-roll .rolls{font-size:12px;padding:8px 12px;gap:3px 10px;color:#c9cdf0}.prize-roll .rolls b{color:#1f1a17}.prize-roll .rolls small{color:#9aa0c8;font-weight:700}
+.prize-roll{display:flex;flex-direction:column;align-items:center;gap:6px;margin-top:8px}.prize-roll .stars{font-size:26px;letter-spacing:5px;color:var(--gold);text-shadow:0 2px 0 #1f1a17}.prize-roll .stars s{text-decoration:none;color:#b9a988}.prize-roll .rolls{font-size:12px;padding:8px 12px;gap:3px 10px;color:#5c5148}.prize-roll .rolls b{color:#1f1a17}.prize-roll .rolls small{color:#5c5148;font-weight:700}
 .cc .arch{font-size:9px;font-weight:900;letter-spacing:.08em;text-transform:uppercase;color:var(--accent);margin-top:-3px}
 .cc .bars{display:grid;grid-template-columns:auto 1fr;gap:3px 5px;align-items:center;font-size:9px;font-weight:900;color:var(--muted);letter-spacing:.04em}
 .cc .bar{height:6px;border-radius:4px;background:#e3d5b3;overflow:hidden;position:relative}
@@ -477,6 +477,11 @@ h1 span{color:var(--clay)}
 .end-move{font-family:var(--display);font-size:30px;line-height:1;color:#1f1a17;display:flex;flex-direction:column;gap:4px;align-items:center}
 .end-move small{font-family:var(--body);font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:#8a2a1e}
 .end-card h2{font-size:26px}
+.vs{--paper:#fbf5e4;--muted:#d9d2c0;--accent:#ffd23f;--sel:#ffd23f;--band:#141834;--night:#1b2042;--night-2:#262d5c;color:#fbf5e4}
+.wc-top{position:relative;height:124px;margin-bottom:10px;border:3px solid #1f1a17;background-color:#f4ead2;display:flex;align-items:center;justify-content:center}
+.wc-por{width:104px;height:104px;border-radius:50%}
+.wc-hand{position:absolute;right:8px;bottom:-12px;transform:rotate(12deg);max-width:none}
+.fullcard{position:relative}
 </style>
 </head>
 <body>
@@ -1166,7 +1171,7 @@ function applyStarter(f){   // each player's wrestler uses that player's copy; y
    Any phone can bring a second player (split screen: their controls at the top, like the same-phone 1 v 1).
    1 v 1 = exactly 2 players on 2 phones; 2 v 2 = 2-4 players who pick Blue or Red (CPUs fill the gaps); Rumble = 2-8 players, 6-8 wrestlers. ---------- */
 const TEST_BUILD = true;   // the site build sets this for test uploads: accounts and online are off, so live profiles are never touched
-const BUILD = 'v2.0 test 5 · Nov 21 09:22';   // stamped with the date and time by the site build, so you can tell which version a phone is running
+const BUILD = 'v2.0 test 6 · Nov 21 09:30';   // stamped with the date and time by the site build, so you can tell which version a phone is running
 let NET = null, netBusy = false;   // netBusy: one Make / Join / Quick at a time (no double-tap rooms)
 // NET = { role, seat, code, ws, topic, me:{name,pick,side}, peers:{seat:{name,pick,roll,side,rx}}, match, slots, rins, ... }
 const RT_URL = () => (window.__WWRT || WW.url.replace(/^http/, 'ws') + '/realtime/v1/websocket') + `?apikey=${encodeURIComponent(WW.key)}&vsn=1.0.0`;
@@ -2559,12 +2564,31 @@ function renderSelect(){
   $('#selName').textContent = name;
   $('#selGo').textContent = !last ? 'Next \u2192' : cfg.mode === 'rumble' && selFlow.from !== 'quick' ? 'Rumble!' : 'Hakkeyoi!';
 }
+/* ---------- v2.0 wrestler card: a traditional pattern by family, in the wrestler's own colour, and his handprint ---------- */
+const FAMILY = { classic: ['taro', 'bun', 'kiko', 'salt', 'goro', 'shin', 'daichi', 'tomo', 'twins', 'kota'], blossom: ['baby', 'hime', 'musuko', 'ume', 'aiko', 'fumi', 'yuki', 'mushi'], beast: ['bull', 'gatz', 'kuma', 'bup', 'kokko', 'ghost'], sea: ['puff', 'tsuri', 'ame'],
+  stage: ['magic', 'show', 'piero', 'oto', 'kamen'], sport: ['kenta', 'rina', 'keeper', 'kaze'], trade: ['abura', 'noka', 'tsumari', 'sato', 'guard', 'yubin', 'kando'], temple: ['monk'] };
+const FAM_OF = {}; for (const f in FAMILY) FAMILY[f].forEach(k => FAM_OF[k] = f);
+const PATTERN = {   // [tile width, tile height, svg body with C as the colour]
+  classic: [16, 16, '<path d="M0 0h8v8H0zM8 8h8v8H8z" fill="C" fill-opacity=".28"/>'],   // checks
+  blossom: [18, 16, '<g fill="C" fill-opacity=".6"><circle cx="9" cy="4.2" r="2"/><circle cx="12.6" cy="6.8" r="2"/><circle cx="11.2" cy="11" r="2"/><circle cx="6.8" cy="11" r="2"/><circle cx="5.4" cy="6.8" r="2"/></g>'],   // plum blossoms
+  beast: [14, 12, '<path d="M0 12L7 0L14 12Z" fill="C" fill-opacity=".35"/>'],   // triangle scales
+  sea: [28, 14, '<g fill="none" stroke="C" stroke-opacity=".7" stroke-width="1.4"><path d="M0 14A14 14 0 0 1 28 14M4.5 14A9.5 9.5 0 0 1 23.5 14M9 14A5 5 0 0 1 19 14"/><path d="M-14 7A14 14 0 0 1 14 7M14 7A14 14 0 0 1 42 7M-9.5 7A9.5 9.5 0 0 1 9.5 7M18.5 7A9.5 9.5 0 0 1 37.5 7M-5 7A5 5 0 0 1 5 7M23 7A5 5 0 0 1 33 7"/></g>'],   // waves
+  stage: [16, 16, '<g fill="none" stroke="C" stroke-opacity=".7" stroke-width="1.3"><circle cx="0" cy="0" r="8"/><circle cx="16" cy="0" r="8"/><circle cx="0" cy="16" r="8"/><circle cx="16" cy="16" r="8"/><circle cx="8" cy="8" r="8"/></g>'],   // linked circles
+  sport: [16, 12, '<path d="M0 3L8 9L16 3M0 9L8 15L16 9M0 -3L8 3L16 -3" fill="none" stroke="C" stroke-opacity=".7" stroke-width="2"/>'],   // arrow feathers
+  trade: [24, 14, '<path d="M0 7H24M12 0V14M0 0L12 7L0 14M24 0L12 7L24 14" fill="none" stroke="C" stroke-opacity=".7" stroke-width="1.2"/>'],   // hemp leaf
+  temple: [10, 10, '<g fill="C" fill-opacity=".6"><circle cx="2.5" cy="2.5" r="1.3"/><circle cx="7.5" cy="7.5" r="1.3"/></g>'] };   // fine dots
+const wColor = key => { const lk = LOOK[key] || {}; return lk.suit && lk.suit !== 'trunks' && lk.suitCol && !/^#f[0-9a-f]f/i.test(lk.suitCol) ? lk.suitCol : (lk.belt || '#24375e'); };
+const patternCss = key => { const [w, h, body] = PATTERN[FAM_OF[key] || 'classic']; return `url("data:image/svg+xml,${encodeURIComponent(`<svg xmlns='http://www.w3.org/2000/svg' width='${w}' height='${h}'>${body.replace(/"/g, "'").replace(/C/g, wColor(key))}</svg>`)}")`; };
+const HAND_D = 'M6 40C5.6 33 5.2 26 5 21.5C4.8 16.5 13 16 13.8 20.5C14 24 14.2 27 14.4 27.5C14.5 22 14.8 15 15 10C15.5 4 24 4 24.2 10C24.4 14 24.6 17 24.8 18C25 13 25.3 9 25.6 6C26.5 -0.5 35 0 35 6C35.1 11 35.3 17 35.6 19.5C35.9 16 36.4 13.5 36.8 11.5C38 5.5 46.5 6.5 45.6 12.5C44.8 21 44.3 31 44 41C47 38 51 34 54.5 32C58 30 61.5 33.5 59.5 37.5C56.5 44 51 52 46 59C41 66 34 70.5 26 70.5C20 70.5 15 69.5 12 67C7 63 5.5 56 6 49C6.2 45.5 6.3 43 6 40Z';
+const handSvg = key => { const c = CHARS[key], k = .78 + (c.w - 3) * .09, kx = k * (c.sx > 1.2 ? 1.18 : c.sx < .95 ? .9 : 1);   // the hand's build follows the body
+  return `<svg class="wc-hand" aria-hidden="true" viewBox="-6 -6 76 84" width="${Math.round(92 * kx)}" height="${Math.round(102 * k)}"><path d="${HAND_D}" fill="#c8402f" fill-opacity=".9"/><path d="M12 48c8 4 18 4 26 -1M14 56c7 3 14 3 21 0M17 40c5 2 11 2 16 0" fill="none" stroke="#fbf5e4" stroke-width="1.2" stroke-linecap="round"/></svg>`; };
 function openFull(key){
   const c = CHARS[key]; sheetColor = null;
-  sheet(ARCH[key] || '', c.name, `<div class="fullcard"><div class="shape">${c.shapeName}</div>
+  sheet(ARCH[key] || '', c.name, `<div class="fullcard"><div class="wc-top" style="background-image:${patternCss(key).replace(/"/g, '&quot;')}"><canvas id="wcPor" class="wc-por"></canvas>${handSvg(key)}</div><div class="shape">${c.shapeName}</div>
     <span class="stats">${STAT_ROWS.map(([l, k]) => `<span>${l}</span><span class="dots">${[1, 2, 3, 4, 5].map(i => `<s class="${i <= c[k] ? 'on' : ''}"></s>`).join('')}</span>`).join('')}</span>
     <div class="abl"><div class="ab"><em>Passive</em>${c.passiveName}: ${c.passiveText}</div><div class="ab"><em>Special \u00b7 hold PUSH</em>${c.specialName}: ${c.specialText}</div></div>${(() => { const r = selFlow ? seatRoll(stSeat(selFlow.steps[selFlow.i]), key) : myRoll(key); return r ? `<div class="ab" style="margin-top:8px"><em>Your copy \u00b7 <span style="color:var(--gold);letter-spacing:2px">${'\u2605'.repeat(r.tier)}</span> ${TIER_WORD[r.tier]}</em>Pushes ${r.push} (${c.push[0]}\u2013${c.push[1]}) \u00b7 Recharge ${r.rech} (${c.rech[0]}\u2013${c.rech[1]}) \u00b7 Spirit ${r.spirit} (${c.spirit[0]}\u2013${c.spirit[1]}) \u00b7 Luck ${r.luck} (${c.luck[0]}\u2013${c.luck[1]})</div>` : ''; })()}</div>`,
     [['Back', closeSheet], [`Pick ${c.name}`, () => { const st = selFlow.steps[selFlow.i]; selFlow.rnd = false; cfg[st.p] = key; saveCfg(); closeSheet(); renderSelect(); }, true]]);
+  const pc = $('#wcPor'); if (pc) drawPortrait(pc, key, '#1f1a17', 104, Math.PI, 0);
 }
 $('#selBack').addEventListener('click', () => {
   if (selFlow.i > 0) { selFlow.i--; selFlow.rnd = stepRnd(selFlow.steps[selFlow.i]) && selFlow.steps[selFlow.i].cpu; return renderSelect(); }
@@ -2928,9 +2952,9 @@ function drawLock(x, y, r){
   ctx.beginPath(); ctx.arc(0, -r * .25, r * .4, Math.PI, TAU); ctx.stroke(); roundRect(-r * .6, -r * .25, r * 1.2, r * .95, r * .2); ctx.fill(); ctx.restore();
 }
 const GATE = typeof Path2D !== 'undefined' ? { beam: new Path2D('M28 92C88 102 302 102 362 92L358 112C302 120 88 120 32 112Z'), beamSh: new Path2D('M31 106C88 114 302 114 359 106L358 112C302 120 88 120 32 112Z'), roof: new Path2D('M8 62C70 82 320 82 382 62L374 90C316 102 74 102 16 90Z'), roofHi: new Path2D('M18 70C76 86 314 86 372 70'), roofSh: new Path2D('M14 84C74 96 316 96 376 84L374 90C316 102 74 102 16 90Z') } : null;
-function drawGate(){   // the shrine gate across the top of Home, with the title lettered between its posts
-  if (!GATE || !L.gate) return; const k = L.gate.k, O = '#d4582e', OS = '#a8401f';
-  ctx.save(); ctx.translate(W / 2 - 195 * k, L.gate.top - 62 * k); ctx.scale(k, k); ctx.lineJoin = 'round'; ctx.strokeStyle = NIGHT_INK;
+function drawGate(top = L.gate && L.gate.top, k = L.gate && L.gate.k){   // the shrine gate across the top of Home (and the splash), with the title lettered between its posts
+  if (!GATE || !k) return; const O = '#d4582e', OS = '#a8401f';
+  ctx.save(); ctx.translate(W / 2 - 195 * k, top - 62 * k); ctx.scale(k, k); ctx.lineJoin = 'round'; ctx.strokeStyle = NIGHT_INK;
   const box = (x, y, w, h, fill, lw) => { ctx.beginPath(); ctx.rect(x, y, w, h); ctx.fillStyle = fill; ctx.fill(); if (lw) { ctx.lineWidth = lw; ctx.stroke(); } };
   box(70, 118, 26, 162, NIGHT_INK); box(304, 118, 26, 162, NIGHT_INK);
   box(64, 112, 26, 164, O, 3); box(300, 112, 26, 164, O, 3); box(80, 114, 8, 160, OS); box(316, 114, 8, 160, OS);
@@ -2971,15 +2995,14 @@ function drawHome(){
   drawPushBtn(bx, cy, br, { pressed: pr, lit: !!homeSel, main: 'PUSH', sub: homeSel ? (locked(homeSel) ? 'locked' : 'to enter') : 'hold: special' });
   if (homeSel) textFit(homeSel.label, W / 2, cy, 12, INK.paper2, Math.max(70, bx - W * .22 - br - 46 - 22), { font: 'body' });   // name of the banner you're standing at; no idle hint
 }
-function drawSplash(){
-  const g = ctx.createRadialGradient(W / 2, H * .4, 10, W / 2, H * .4, Math.max(W, H) * .7); g.addColorStop(0, '#2b3370'); g.addColorStop(1, '#141834');
-  ctx.fillStyle = g; ctx.fillRect(0, 0, W, H);
-  const t = performance.now() / 1000, sz = clamp(W * .22, 56, 120);
-  ctx.save(); ctx.translate(W / 2, H * .4); ctx.rotate(Math.sin(t * 2) * .03);
-  ctx.lineWidth = 10; ctx.lineJoin = 'round'; ctx.strokeStyle = '#1b2042'; ctx.font = `${sz}px Dela Gothic One, 'Arial Black', sans-serif`; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.strokeText('SUMO', 0, 0); text('SUMO', 0, 0, sz, '#ffcf3f');
-  ctx.restore();
-  text('Splash art goes here', W / 2, H * .4 + sz * .8, 13, '#aab1d8', 'center', 'body');
-  ctx.globalAlpha = .55 + .45 * Math.sin(t * 4); text('Tap to start', W / 2, H * .72, 18, '#fff6e6'); ctx.globalAlpha = 1;
+function drawSplash(){   // v2.0: the night gate fills the title screen
+  ctx.fillStyle = NIGHT; ctx.fillRect(-SAFE.l, -SAFE.t, FW, H + SAFE.t + SAFE.b);
+  if (CLOUD) { ctx.save(); ctx.strokeStyle = 'rgba(244,234,210,.2)'; ctx.lineWidth = 1.6; ctx.lineCap = ctx.lineJoin = 'round';
+    [[-.08, .2, 1.2, 1], [1.06, .3, 1.05, -1], [.1, .7, 1, 1], [.98, .78, .9, -1]].forEach(([u, v, k, fx]) => { ctx.save(); ctx.translate(u * W, v * H); ctx.scale(k * fx, k); ctx.stroke(CLOUD); ctx.restore(); }); ctx.restore(); }
+  const t = performance.now() / 1000, k = Math.min(W * .96 / 374, H * .46 / 222), top = Math.max(SAFE.t + 24, H * .5 - 222 * k * .62);
+  drawGate(top, k);
+  const y = top + 222 * k + Math.min(70, H * .09);
+  ctx.globalAlpha = .6 + .4 * Math.sin(t * 4); text('Tap to start', W / 2, y, 18, INK.paper2); ctx.globalAlpha = 1;
 }
 function leaveSplash(){ if (phase !== 'splash') return; audio(); SFX.go(); goHome(); }
 function syncMuteBtn(){   // speaker icon; waves when on, a cross when muted
