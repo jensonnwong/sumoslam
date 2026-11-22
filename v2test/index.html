@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta http-equiv="Content-Security-Policy" content="script-src 'sha256-CeO4NS5wu0S4u8xqP1o18EDzA9gr8CPEVc/ghvTveXM='; object-src 'none'; base-uri 'self'">
+<meta http-equiv="Content-Security-Policy" content="script-src 'sha256-tEyDCJ3jC2IsOdZq6OJNgI9kDXr2BMlo+sc+l1GXyWI='; object-src 'none'; base-uri 'self'">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover,interactive-widget=resizes-content">
 <meta name="theme-color" content="#1b2042">
 <meta name="mobile-web-app-capable" content="yes">
@@ -479,6 +479,15 @@ h1 span{color:var(--clay)}
 .end-move small{font-family:var(--body);font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:#8a2a1e}
 .end-card h2{font-size:26px}
 .vs{--paper:#fbf5e4;--muted:#d9d2c0;--accent:#ffd23f;--sel:#ffd23f;--band:#141834;--night:#1b2042;--night-2:#262d5c;color:#fbf5e4}
+.vs{background:linear-gradient(100deg,#24375e 0 49.4%,#1f1a17 49.4% 50.6%,#c8402f 50.6%)}
+.vs::before{background:repeating-linear-gradient(100deg,rgba(251,245,228,.045) 0 3px,transparent 3px 22px)}
+.vs.rumble{background:#1a2a4f}
+.vs-side .who{color:#fbf5e4!important;opacity:1}
+.vs-side canvas{filter:drop-shadow(4px 4px 0 #1f1a17)}
+.vs-badge{color:#fbf5e4;text-shadow:4px 4px 0 #1f1a17;-webkit-text-stroke:2px #1f1a17}
+.vs-stats{background:#1f1a17;border-radius:4px;border:3px solid #1f1a17;box-shadow:4px 4px 0 rgba(31,26,23,.55)}
+.vs-stake{border-radius:4px;box-shadow:4px 4px 0 #1f1a17}.vs-stake small{color:#5c5148}
+.vs-btns{background:linear-gradient(to top, rgba(31,26,23,.97) 62%, rgba(31,26,23,0))}
 .wc-top{position:relative;height:124px;margin-bottom:10px;border:3px solid #1f1a17;background-color:#f4ead2;display:flex;align-items:center;justify-content:center}
 .wc-por{width:104px;height:104px;border-radius:50%}
 .wc-hand{position:absolute;right:8px;bottom:-12px;transform:rotate(12deg);max-width:none}
@@ -1176,7 +1185,7 @@ function applyStarter(f){   // each player's wrestler uses that player's copy; y
    Any phone can bring a second player (split screen: their controls at the top, like the same-phone 1 v 1).
    1 v 1 = exactly 2 players on 2 phones; 2 v 2 = 2-4 players who pick Blue or Red (CPUs fill the gaps); Rumble = 2-8 players, 6-8 wrestlers. ---------- */
 const TEST_BUILD = true;   // the site build sets this for test uploads: accounts and online are off, so live profiles are never touched
-const BUILD = 'v2.0 test 17 · Nov 21 16:10';   // stamped with the date and time by the site build, so you can tell which version a phone is running
+const BUILD = 'v2.0 test 18 · Nov 21 16:25';   // stamped with the date and time by the site build, so you can tell which version a phone is running
 let NET = null, netBusy = false;   // netBusy: one Make / Join / Quick at a time (no double-tap rooms)
 // NET = { role, seat, code, ws, topic, me:{name,pick,side}, peers:{seat:{name,pick,roll,side,rx}}, match, slots, rins, ... }
 const RT_URL = () => (window.__WWRT || WW.url.replace(/^http/, 'ws') + '/realtime/v1/websocket') + `?apikey=${encodeURIComponent(WW.key)}&vsn=1.0.0`;
@@ -4729,13 +4738,13 @@ function drawRumbleStrip(){
   F.forEach((f, i) => {
     const x = x0 + (i % cols) * (w + gap), y = y0 + Math.floor(i / cols) * (h + gap);
     ctx.globalAlpha = f.out ? .4 : 1;
-    ctx.fillStyle = f.human ? 'rgba(255,207,63,.22)' : 'rgba(255,246,230,.08)'; roundRect(x, y, w, h, 7); ctx.fill();
+    ctx.fillStyle = f.human ? '#f2c230' : '#fbf5e4'; roundRect(x, y, w, h, 3); ctx.fill(); ctx.strokeStyle = INK.ink; ctx.lineWidth = 1.5; ctx.stroke();
     ctx.beginPath(); ctx.arc(x + 11, y + h / 2, 5.5, 0, TAU); ctx.fillStyle = f.tint; ctx.fill(); ctx.strokeStyle = '#0e1128'; ctx.lineWidth = 1.5; ctx.stroke();
     const nm = (f.idx === 0 && f.human ? 'You' : netOn() && f.netName ? f.netName : f.human ? 'P2' : f.c.name.replace('Grandma ', '').replace('The ', '').replace(' Thrower', ''));
-    { ctx.font = fontStr(11, 'body'); const room = w - 21 - (cfg.rscore === 'points' || f.out ? 24 : 6), s4 = Math.max(7.5, 11 * Math.min(1, room / Math.max(1, ctx.measureText(nm).width))); text(nm, x + 21, y + h / 2 + .5, s4, '#fff6e6', 'left', 'body'); }
-    if (cfg.rscore === 'points') text(String(f.kos), x + w - 9, y + h / 2 + .5, 12, '#ffcf3f', 'right');
-    else if (f.out) text(ordinal(f.place), x + w - 7, y + h / 2 + .5, 10, '#aab1d8', 'right', 'body');
-    if (f.out) { ctx.strokeStyle = '#aab1d8'; ctx.lineWidth = 1.5; ctx.beginPath(); ctx.moveTo(x + 20, y + h / 2); ctx.lineTo(x + w - 26, y + h / 2); ctx.stroke(); }
+    { ctx.font = fontStr(11, 'body'); const room = w - 21 - (cfg.rscore === 'points' || f.out ? 24 : 6), s4 = Math.max(7.5, 11 * Math.min(1, room / Math.max(1, ctx.measureText(nm).width))); text(nm, x + 21, y + h / 2 + .5, s4, INK.ink, 'left', 'body'); }
+    if (cfg.rscore === 'points') text(String(f.kos), x + w - 9, y + h / 2 + .5, 12, INK.red, 'right');
+    else if (f.out && f.place) text(ordinal(f.place), x + w - 7, y + h / 2 + .5, 10, '#5c5148', 'right', 'body');
+    if (f.out) { ctx.strokeStyle = '#5c5148'; ctx.lineWidth = 1.5; ctx.beginPath(); ctx.moveTo(x + 20, y + h / 2); ctx.lineTo(x + w - 26, y + h / 2); ctx.stroke(); }
     ctx.globalAlpha = 1;
   });
 }
