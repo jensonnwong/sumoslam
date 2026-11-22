@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta http-equiv="Content-Security-Policy" content="script-src 'sha256-h4YH/rT3HkDrg+fWwSW9tjLcMHAsFMU4rmju2WxAE/U='; object-src 'none'; base-uri 'self'">
+<meta http-equiv="Content-Security-Policy" content="script-src 'sha256-B70uA3UTxn1mnM8CIa9FMAr4eCalLzf2/ITy5orR+Lo='; object-src 'none'; base-uri 'self'">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover,interactive-widget=resizes-content">
 <meta name="theme-color" content="#1b2042">
 <meta name="mobile-web-app-capable" content="yes">
@@ -534,6 +534,10 @@ h1 span{color:var(--clay)}
 .bk-tag{font-size:10px;font-weight:900;letter-spacing:.1em;text-transform:uppercase;border:2px solid #1f1a17;padding:2px 7px;white-space:nowrap}.bk-tag.seal{border-color:#c8402f;color:#c8402f}.bk-tag.gold{background:#f2c230;border-color:#1f1a17}.bk-seal.gold{border-color:#1f1a17;color:#1f1a17;background:#f2c230;transform:rotate(3deg)}
 .bk-pro{padding:6px 12px!important;min-height:0!important;font-size:13px!important}
 .bk-go{padding:8px 16px!important;font-size:15px!important;min-height:0!important}
+
+.bk-rule{border:3px solid #1f1a17;background:#fbf5e4;padding:8px 10px;font-weight:800;font-size:13px;line-height:1.35}.bk-rule b{display:block;font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:#8a2a1e}
+.bk-mates{display:flex;gap:8px;overflow-x:auto;padding:2px 2px 6px}.bk-mate{flex:0 0 auto;border:3px solid transparent;background:#fbf5e4;padding:5px 6px;display:flex;flex-direction:column;align-items:center;gap:3px;width:84px}.bk-mate.on{border-color:#c8402f}.bk-mate small{font-weight:800;font-size:10px;line-height:1.1;text-align:center;color:#1f1a17}
+.bk-mate .pface{width:54px;height:54px;display:block;border-radius:50%;border:2.5px solid #1f1a17;overflow:hidden;background:#f4ead2}.bk-mate .pface svg{display:block;width:100%;height:100%}
 </style>
 </head>
 <body>
@@ -809,6 +813,14 @@ const CHARS = {
     push:[5,6], rech:[4,7], spirit:[4,7], luck:[4,7], weaveP:.1, combo:[.45, .45, 1.2],
     passive:'weave', passiveName:'Bob & Weave', passiveText:'Slips 10% of pushes coming at him from the front',
     special:'onetwo', specialName:'One-Two-Cross', specialText:'Two quick jabs and a big cross, all in about half a second' },
+  kage: { name:'Outlaw Kage', shapeName:'Lean \u00b7 Medium', size:1.0, sx:.98, sy:1, w:3, r:3, s:4, a:3, ag:4, g:3, p:3, story:true,
+    push:[5,6], rech:[4,7], spirit:[4,7], luck:[4,7],
+    passive:'blank', passiveName:'White Mask', passiveText:'No face to read: CPUs see his pushes coming late',
+    special:'ambush', specialName:'Ambush', specialText:'A sudden dash, and the next push against him does nothing' },
+  kuro: { name:'Kuro-kai Mask', shapeName:'Solid \u00b7 Medium', size:1.0, sx:1.12, sy:1, w:3, r:3, s:3, a:3, ag:3, g:3, p:3, story:true, cpuOnly:true,
+    push:[5,6], rech:[4,7], spirit:[4,7], luck:[3,6],
+    passive:'blank', passiveName:'White Mask', passiveText:'No face to read: CPUs see his pushes coming late',
+    special:'secondwind', specialName:'Second Breath', specialText:'Refills his pushes and speeds up for a moment' },
   kamen: { name:'Luchador Kamen', shapeName:'Compact · Medium', size:1.0, sx:1.02, sy:1, w:2, r:3, s:3, a:3, ag:4, g:3, p:3,
     push:[5,6], rech:[4,7], spirit:[4,7], luck:[4,7], splashK:1.4, ropeK:1.2, landStun:.6, lariatK:1.8, lariatT:.5,
     passive:'ropes', passiveName:'Off the Ropes', passiveText:'Once per round, bounces back off the edge instead of going out',
@@ -1224,7 +1236,7 @@ function applyStarter(f){   // each player's wrestler uses that player's copy; y
    Any phone can bring a second player (split screen: their controls at the top, like the same-phone 1 v 1).
    1 v 1 = exactly 2 players on 2 phones; 2 v 2 = 2-4 players who pick Blue or Red (CPUs fill the gaps); Rumble = 2-8 players, 6-8 wrestlers. ---------- */
 const TEST_BUILD = true;   // the site build sets this for test uploads: accounts and online are off, so live profiles are never touched
-const BUILD = 'v2.0 test 21 · Nov 21 16:53';   // stamped with the date and time by the site build, so you can tell which version a phone is running
+const BUILD = 'v2.0 test 22 · Nov 21 17:06';   // stamped with the date and time by the site build, so you can tell which version a phone is running
 let NET = null, netBusy = false;   // netBusy: one Make / Join / Quick at a time (no double-tap rooms)
 // NET = { role, seat, code, ws, topic, me:{name,pick,side}, peers:{seat:{name,pick,roll,side,rx}}, match, slots, rins, ... }
 const RT_URL = () => (window.__WWRT || WW.url.replace(/^http/, 'ws') + '/realtime/v1/websocket') + `?apikey=${encodeURIComponent(WW.key)}&vsn=1.0.0`;
@@ -1445,7 +1457,7 @@ function netGo(){   // host: everyone's picks are known -> build the line-up, st
   if (!NET || NET.role !== 'host' || !netPeerSeats().length) return;
   const mode = NET.mode || 'duel', ps = netPlayers(); if (!netModeOk(mode, ps.length)) return;
   NET.meAgain = false; NET.againFrom = new Set(); NET.endSheet = false; closeSheet();
-  const pool = Object.keys(CHARS).filter(k => !CHARS[k].secret), rk = () => pool[Math.floor(rand() * pool.length)];
+  const pool = Object.keys(CHARS).filter(k => !CHARS[k].secret && !CHARS[k].story), rk = () => pool[Math.floor(rand() * pool.length)];
   let slots, teams = null, tcol = null, rn = 0;   // slots[i] = the player (pid) in wrestler i, or -1 for a CPU; the host is always 0, the host's player 2 always 1
   if (mode === 'duel') slots = ps.map(q => q.pid);
   else if (mode === 'rumble') { rn = Math.min(RUMBLE_MAX, Math.max(RUMBLE_MIN, ps.length)); slots = ps.slice(0, rn).map(q => q.pid); while (slots.length < rn) slots.push(-1); }
@@ -1744,7 +1756,7 @@ $('#storyBack').addEventListener('click', () => goHome());
 /* ---------- Tourney: in-person single elimination on one device. CPUs fill open slots. Friendly (no stakes) or Buy-in (WW accounts, winner 70% / runner-up 30%) ---------- */
 let TOUR = null, tourMatch = null;   // TOUR = { stage:'setup'|'bracket'|'done', type, size, buyin, players:[], rounds:[[{a,b,w}]], cur }
 const TOUR_ROUND = n => n === 1 ? 'Final' : n === 2 ? 'Semifinals' : 'Quarterfinals';
-const tourAllowed = acct => fresh() ? (acct ? acct.owns : STARTERS) : Object.keys(CHARS);
+const tourAllowed = acct => fresh() ? (acct ? acct.owns : STARTERS) : rosterKeys();
 let tourRoster = []; try { tourRoster = JSON.parse(sessionStorage.getItem('v2t_sumoTourRoster') || '[]'); } catch (e) {}
 function saveRoster(){ if (!TOUR) return; tourRoster = TOUR.players.map(p => ({ name: p.name, key: p.key, isMe: !!p.isMe, acct: p.isMe ? null : p.acct })); try { sessionStorage.setItem('v2t_sumoTourRoster', JSON.stringify(tourRoster)); } catch (e) {} }
 function newTour(){ TOUR = { stage: 'setup', type: cfg.tourType || 'friendly', size: +(cfg.tourSize || 8), buyin: TOUR && TOUR.buyin || 2, players: [], rounds: [], cur: null };
@@ -1830,7 +1842,7 @@ function tourBegin(){
   const T = TOUR;
   if (tourPaying()) { const broke = T.players.find(p => !p.acct || (p.isMe ? wallet() : p.acct.tokens) < T.buyin); if (broke) { sheet('Tourney', 'Can’t start', `<p>${broke.name} ${broke.acct ? `doesn't have ${T.buyin} tokens for the buy-in` : 'needs a WW account for a buy-in tourney'}.</p>`, [['OK', closeSheet, true]]); return; }
     T.players.forEach(p => tourPay(p, -T.buyin)); T.pot = T.buyin * T.players.length; }
-  const used = new Set(T.players.map(p => p.key)), pool = cpuPool().filter(k => !used.has(k)).sort(() => rand() - .5), all = Object.keys(CHARS).filter(k => !used.has(k)).sort(() => rand() - .5);
+  const used = new Set(T.players.map(p => p.key)), pool = cpuPool().filter(k => !used.has(k)).sort(() => rand() - .5), all = rosterKeys().filter(k => !used.has(k)).sort(() => rand() - .5);
   const cpus = []; for (let i = T.players.length; i < T.size; i++) { const k = pool.shift() || all.shift() || 'taro'; cpus.push({ name: CHARS[k].name, key: k, cpu: true }); }
   // seed so humans meet CPUs first where possible: spread humans across the bracket halves
   const humans = T.players.slice().sort(() => rand() - .5), slots = new Array(T.size).fill(null);
@@ -2119,7 +2131,7 @@ function machLoop(){
   requestAnimationFrame(step);
 }
 /* ---------- mini figures: front-view chibi wrestlers for the claw glass + prize card ---------- */
-const MINI_MOOD = { kokko: 'happy', tsumari: 'calm', noka: 'happy', kuma: 'happy', kaze: 'happy', oto: 'happy', piero: 'happy', sato: 'calm', aiko: 'happy', ame: 'happy', kando: 'happy', mushi: 'happy', bup: 'happy', baby: 'happy', show: 'happy', puff: 'happy', hime: 'happy', musuko: 'happy', kota: 'happy', fumi: 'happy', yuki: 'happy', ichi: 'happy', ni: 'happy', shin: 'sleepy', ghost: 'calm', monk: 'calm', ume: 'calm', magic: 'calm' };
+const MINI_MOOD = { kage: 'calm', kuro: 'calm', kokko: 'happy', tsumari: 'calm', noka: 'happy', kuma: 'happy', kaze: 'happy', oto: 'happy', piero: 'happy', sato: 'calm', aiko: 'happy', ame: 'happy', kando: 'happy', mushi: 'happy', bup: 'happy', baby: 'happy', show: 'happy', puff: 'happy', hime: 'happy', musuko: 'happy', kota: 'happy', fumi: 'happy', yuki: 'happy', ichi: 'happy', ni: 'happy', shin: 'sleepy', ghost: 'calm', monk: 'calm', ume: 'calm', magic: 'calm' };
 const miniCache = {};
 function miniSuit(g, lk, ln, ell){
   const sc = lk.suitCol, k = lk.suit, pants = lk.pants || '#1f1a17';
@@ -2222,7 +2234,8 @@ function drawMini(g, key){
   if (lk.headphones) { g.lineWidth = 5; g.strokeStyle = lk.headphones; g.beginPath(); g.arc(0, -10, 24, Math.PI * .1, Math.PI * .9); g.stroke(); g.strokeStyle = ln; [-1, 1].forEach(sd => ell(sd * 22, -4, 7, 8, lk.headphones)); g.lineWidth = 4; }
   if (lk.beanie) { g.beginPath(); g.ellipse(0, -46, 29, 18, 0, Math.PI, TAU); g.closePath(); g.fillStyle = lk.beanie; g.fill(); g.stroke(); g.fillStyle = tone2(lk.beanie, .8); g.fillRect(-29, -48, 58, 7); g.strokeRect(-29, -48, 58, 7); ell(0, -66, 6, 6, lk.beanie); }
   if (lk.wig) { [[-30, -44], [30, -44], [-22, -60], [22, -60], [0, -66], [-12, -66], [12, -66]].forEach(([x, y]) => ell(x, y, 12, 11, lk.wig)); }
-  if (lk.mask) { g.save(); g.beginPath(); g.ellipse(0, -33, 28, 26, 0, 0, TAU); g.clip(); g.fillStyle = lk.mask; g.fillRect(-30, -62, 60, 34); g.fillStyle = lk.maskTrim; [-1, 1].forEach(sd => { g.beginPath(); g.ellipse(sd * 10, -32, 9, 7, sd * .3, 0, TAU); g.fill(); }); g.beginPath(); g.moveTo(-3, -58); g.lineTo(0, -44); g.lineTo(3, -58); g.closePath(); g.fill(); g.restore(); g.beginPath(); g.ellipse(0, -33, 28, 26, 0, 0, TAU); g.stroke(); [-1, 1].forEach(sd => ell(sd * 10, -32, 5.5, 4.5, '#fbf1dc', 0, false)); }
+  if (lk.kuro) { ell(0, -33, 26, 25, '#fbf5e4'); g.fillStyle = '#1f1a17'; [-1, 1].forEach(sd => { g.beginPath(); g.ellipse(sd * 10, -35, 7, 2.6, sd * .25, 0, TAU); g.fill(); }); g.fillRect(-5, -20, 10, 1.8); }
+  else if (lk.mask) { g.save(); g.beginPath(); g.ellipse(0, -33, 28, 26, 0, 0, TAU); g.clip(); g.fillStyle = lk.mask; g.fillRect(-30, -62, 60, 34); g.fillStyle = lk.maskTrim; [-1, 1].forEach(sd => { g.beginPath(); g.ellipse(sd * 10, -32, 9, 7, sd * .3, 0, TAU); g.fill(); }); g.beginPath(); g.moveTo(-3, -58); g.lineTo(0, -44); g.lineTo(3, -58); g.closePath(); g.fill(); g.restore(); g.beginPath(); g.ellipse(0, -33, 28, 26, 0, 0, TAU); g.stroke(); [-1, 1].forEach(sd => ell(sd * 10, -32, 5.5, 4.5, '#fbf1dc', 0, false)); }
   if (lk.pigtails) [-1, 1].forEach(sd => { ell(sd * 32, -44, 9, 15, hair, sd * .35); ell(sd * 27, -52, 4, 3, lk.pigtails, 0, false); });
   if (lk.antlers) [-1, 1].forEach(sd => { g.strokeStyle = '#7a4a24'; g.lineWidth = 4.5; g.beginPath(); g.moveTo(sd * 12, -56); g.lineTo(sd * 21, -72); g.moveTo(sd * 16, -64); g.lineTo(sd * 29, -67); g.moveTo(sd * 19, -69); g.lineTo(sd * 15, -77); g.stroke(); g.strokeStyle = ln; g.lineWidth = 4; });
   if (lk.tiara) { g.beginPath(); g.moveTo(-13, -50); g.lineTo(-13, -58); g.lineTo(-7, -53); g.lineTo(0, -62); g.lineTo(7, -53); g.lineTo(13, -58); g.lineTo(13, -50); g.closePath(); g.fillStyle = '#f2c230'; g.fill(); g.lineWidth = 2.5; g.stroke(); g.lineWidth = 4; ell(0, -55, 2.4, 2.4, '#ff6fb5', 0, false); }
@@ -2495,7 +2508,7 @@ function drawMachine(){
 }
 
 /* ---------- character select: compact cards (portrait, archetype, 3 summary bars, special) + "i" for the full card ---------- */
-const ARCH = { taro: 'All-rounder', bun: 'Wall', kiko: 'Long reach', monk: 'Anchor', salt: 'Trickster', bull: 'Charger', ume: 'Dodger', ghost: 'Phantom', magic: 'Illusionist', yuki: 'Speedster', shin: 'Sleeper', show: 'Combo', puff: 'Bouncer', tomo: 'Time bomb', abura: 'Trapper', daichi: 'Saboteur', goro: 'Avenger', kota: 'Mimic', fumi: 'Crowd control', twins: 'Tag team', baby: 'Tantrum', musuko: 'Slugger', tsuri: 'Trapper', hime: 'Wildcard', keeper: 'Goalkeeper', kando: 'Neat freak', guard: 'Lockdown', mushi: 'Catcher', gatz: 'Bruiser', bup: 'Swapper', aiko: 'Showstopper', rina: 'Artillery', ame: 'Wildcard', sato: 'Grinder', piero: 'Prankster', kenta: 'Striker', kamen: 'High flyer', yubin: 'Courier', oto: 'Disruptor', kaze: 'Sweeper', kuma: 'Grabber', noka: 'Rancher', kokko: 'Wild card', tsumari: 'Puppeteer' };
+const ARCH = { kage: 'Outlaw', kuro: 'Outlaw', taro: 'All-rounder', bun: 'Wall', kiko: 'Long reach', monk: 'Anchor', salt: 'Trickster', bull: 'Charger', ume: 'Dodger', ghost: 'Phantom', magic: 'Illusionist', yuki: 'Speedster', shin: 'Sleeper', show: 'Combo', puff: 'Bouncer', tomo: 'Time bomb', abura: 'Trapper', daichi: 'Saboteur', goro: 'Avenger', kota: 'Mimic', fumi: 'Crowd control', twins: 'Tag team', baby: 'Tantrum', musuko: 'Slugger', tsuri: 'Trapper', hime: 'Wildcard', keeper: 'Goalkeeper', kando: 'Neat freak', guard: 'Lockdown', mushi: 'Catcher', gatz: 'Bruiser', bup: 'Swapper', aiko: 'Showstopper', rina: 'Artillery', ame: 'Wildcard', sato: 'Grinder', piero: 'Prankster', kenta: 'Striker', kamen: 'High flyer', yubin: 'Courier', oto: 'Disruptor', kaze: 'Sweeper', kuma: 'Grabber', noka: 'Rancher', kokko: 'Wild card', tsumari: 'Puppeteer' };
 const ROSTER_SIZE = 50;
 const STARTERS = ['taro', 'bun', 'kiko'], RIVALS = ['monk', 'salt', 'ume'];   // fresh account: 3 starters to pick; Random can also pull a house rival
 const fresh = () => !(devOn() && cfg.unlock === 'all');
@@ -2506,8 +2519,9 @@ const seatOwns = i => {   // signed-in players bring their own collection (read 
   return i === 0 ? mine : [...new Set([...STARTERS, ...mine])];   // CPU opponent: the starters plus anyone you've unlocked
 };
 const canPick = (k, seat = 0) => !fresh() || seatOwns(seat).includes(k);
-const cpuPool = () => fresh() ? [...STARTERS, ...RIVALS] : Object.keys(CHARS);
-const rosterOrder = (seat = 0) => { const base = [...STARTERS, ...RIVALS, ...Object.keys(CHARS).filter(k => !STARTERS.includes(k) && !RIVALS.includes(k))]; return [...base.filter(k => canPick(k, seat)), ...base.filter(k => !canPick(k, seat))]; };
+const rosterKeys = () => Object.keys(CHARS).filter(k => !CHARS[k].story || (!CHARS[k].cpuOnly && me && me.owns.includes(k)));   // Story-only wrestlers appear once won
+const cpuPool = () => fresh() ? [...STARTERS, ...RIVALS] : Object.keys(CHARS).filter(k => !CHARS[k].story);
+const rosterOrder = (seat = 0) => { const base = [...STARTERS, ...RIVALS, ...rosterKeys().filter(k => !STARTERS.includes(k) && !RIVALS.includes(k))]; return [...base.filter(k => canPick(k, seat)), ...base.filter(k => !canPick(k, seat))]; };
 let modeArtDone = false;
 function drawScene(cnv, list){
   const W2 = 120, H2 = 80, dpr = 2; cnv.width = W2 * dpr; cnv.height = H2 * dpr;
@@ -2562,7 +2576,7 @@ const tagStep = (p, who, title, tint) => ({ p, who, title, tint, cpu: true, rand
 const stSeat = st => st.cpu ? 'cpu' : st.p === 'p2' ? 1 : 0;
 const stepRnd = st => st.cpu ? (cfg.tagRnd || []).includes(st.p) || !CHARS[cfg[st.p]] : !!st.random;
 function tagLineup(){   // 2 v 2 order: cpu [you, partner, rival, rival] \u00b7 coop [you, P2, rival, rival] \u00b7 vs [blue, red, blue CPU, red CPU]
-  const pool = Object.keys(CHARS).filter(k => !CHARS[k].secret), rk = () => pool[Math.floor(rand() * pool.length)];   // CPUs come from the whole roster
+  const pool = Object.keys(CHARS).filter(k => !CHARS[k].secret && !CHARS[k].story), rk = () => pool[Math.floor(rand() * pool.length)];   // CPUs come from the whole roster
   return [cfg.p1, cfg.tag === 'cpu' ? rk() : cfg.p2, rk(), rk()]; }
 function openSelect(from){
   const steps = from === 'quick' ? [{ p: 'p1', who: 'You', title: 'Pick your wrestler' }]
@@ -2591,7 +2605,7 @@ function renderSelect(){
     const el = document.createElement('div'); el.className = 'cc' + (on ? ' on' : ''); el.setAttribute('role', 'listitem');
     const btn = document.createElement('button'); btn.className = 'pick'; btn.setAttribute('aria-pressed', String(on));
     if (key === '__rnd') {
-      btn.innerHTML = `<canvas></canvas><b>Random</b><span class="arch">Surprise me</span><span class="sp">${st.random ? (fresh() ? 'Could be a starter or a house rival' : `Any of the ${Object.keys(CHARS).length} wrestlers`) : `Any of ${st.p === 'p2' && cfg.mode === 'h2h' ? 'their' : 'your'} ${mine.length} wrestler${mine.length === 1 ? '' : 's'}; revealed at the face-off`}</span>`;
+      btn.innerHTML = `<canvas></canvas><b>Random</b><span class="arch">Surprise me</span><span class="sp">${st.random ? (fresh() ? 'Could be a starter or a house rival' : `Any of the ${rosterKeys().length} wrestlers`) : `Any of ${st.p === 'p2' && cfg.mode === 'h2h' ? 'their' : 'your'} ${mine.length} wrestler${mine.length === 1 ? '' : 's'}; revealed at the face-off`}</span>`;
       const g = btn.querySelector('canvas'); g.width = g.height = 136; const x = g.getContext('2d'); x.scale(2, 2);
       x.beginPath(); x.arc(34, 34, 32, 0, TAU); x.fillStyle = '#323a6e'; x.fill(); x.fillStyle = '#ffcf3f'; x.font = "34px Dela Gothic One, 'Arial Black', sans-serif"; x.textAlign = 'center'; x.textBaseline = 'middle'; x.fillText('?', 34, 36);
       btn.onclick = () => { selFlow.rnd = true; renderSelect(); };
@@ -2617,7 +2631,7 @@ function renderSelect(){
     if (el.classList.contains('locked') && st.random && RIVALS.includes(key)) el.classList.add('rival');
     el.prepend(btn); grid.appendChild(el);
   }
-  for (let n = Object.keys(CHARS).length; n < ROSTER_SIZE; n++) {   // the rest of the roster, still to unlock
+  for (let n = rosterKeys().length; n < ROSTER_SIZE; n++) {   // the rest of the roster, still to unlock
     const el = document.createElement('div'); el.className = 'cc locked';
     el.innerHTML = `<button class="pick" disabled><canvas></canvas><b>???</b><span class="lockmsg">Win it in Prizes or Story</span></button>`;
     const g = el.querySelector('canvas'); g.width = g.height = 136; const x = g.getContext('2d'); x.scale(2, 2);
@@ -2683,6 +2697,8 @@ const POR = {   // per-wrestler choices; anything missing falls back to the plai
   piero: { face: 'round', top: 'wig', brow: 'none', eyes: 'round', marks: true, nose: 'ball', mouth: 'clown', ruff: true, bg: 'banana', bgCol: '#d9a441' },
   oto:   { face: 'round', phones: true, brow: 'none', eyes: 'shades', nose: 'broad', mouth: 'smirk', hairline: 'straight', bg: 'vinyl' },
   kamen: { face: 'square', top: 'mask', brow: 'none', eyes: 'narrow', nose: 'none', mouth: 'snarl', bg: 'ropes', bgCol: '#c8402f' },
+  kage:  { face: 'long', top: 'mask', kuro: true, crack: true, brow: 'none', eyes: 'none', nose: 'none', mouth: 'none', neck: true, bg: 'wisp', bgCol: '#1f1a17' },
+  kuro:  { face: 'square', top: 'mask', kuro: true, brow: 'none', eyes: 'none', nose: 'none', mouth: 'none', bg: 'smoke', bgCol: '#1f1a17' },
   kenta: { face: 'square', brow: 'firm', eyes: 'narrow', nose: 'broad', mouth: 'line', plaster: true, bruise: true, hairline: 'straight', bg: 'gloves' },
   rina:  { face: 'long', small: .92, top: 'ponytail', hairline: 'straight', brow: 'thin', eyes: 'round', lashes: true, nose: 'sharp', mouth: 'grin', neck: true, bg: 'vball', bgCol: '#ff8a1f' },
   keeper:{ face: 'round', small: true, top: 'none', hairline: 'bangs', brow: 'firm', eyes: 'round', nose: 'button', mouth: 'line', sweat: true, bg: 'goal' },
@@ -2783,7 +2799,8 @@ function porBody(key){
   const ear = (sx, lobe) => `<path d="M${150 + sx * (88 + ed)} 150C${150 + sx * (102 + ed)} 148 ${150 + sx * (106 + ed)} 164 ${150 + sx * (100 + ed)} 176C${150 + sx * (96 + ed)} ${lobe ? 200 : 184} ${150 + sx * (90 + ed)} ${lobe ? 200 : 184} ${150 + sx * (88 + ed)} ${lobe ? 190 : 180}" fill="${skin}" stroke="${I}" stroke-width="3.5"/>`;
   o.push(`<clipPath id="pf-${key}"><path d="${face}"/></clipPath>${P.top === 'hood' || P.top === 'mask' || P.plush ? '' : ear(-1, P.lobes) + ear(1, P.lobes)}<path d="${face}" fill="${P.top === 'mask' ? lk.mask : skin}"/><path d="M206 110C222 160 216 236 150 296H330V100Z" fill="${I}" opacity=".16" clip-path="url(#pf-${key})"/><path d="${face}" fill="none" stroke="${I}" stroke-width="4.5"/>`);
   const top = P.top || 'knot', tufts = `<path d="M84 140l-10 6 9 4-8 8 10 2M216 140l10 6-9 4 8 8-10 2" fill="${hair}" stroke="${I}" stroke-width="2"/>`;
-  if (top === 'mask') { const tr = lk.maskTrim || '#f2c230';
+  if (top === 'mask' && P.kuro) { o.push(`<path d="M92 170C104 158 128 161 140 173C128 180 104 180 92 170ZM208 170C196 158 172 161 160 173C172 180 196 180 208 170Z" fill="${I}"/><path d="M138 238h24" stroke="${I}" stroke-width="3" opacity=".7"/><path d="M150 186V204" stroke="${I}" stroke-width="2.5" opacity=".35"/>${P.crack ? `<path d="M182 70L166 108L184 130L164 168L172 196" fill="none" stroke="${I}" stroke-width="3" stroke-linejoin="round"/><path d="M166 108L152 116M184 130L198 136" stroke="${I}" stroke-width="2"/>` : ''}`);
+  } else if (top === 'mask') { const tr = lk.maskTrim || '#f2c230';
     o.push(`<g fill="${skin}" stroke="${tr}" stroke-width="6"><path d="M90 172C96 150 128 148 140 168C132 188 100 190 90 172ZM210 172C204 150 172 148 160 168C168 188 200 190 210 172Z"/><ellipse cx="150" cy="234" rx="34" ry="19"/></g><g fill="none" stroke="${I}" stroke-width="2"><path d="M90 172C96 150 128 148 140 168C132 188 100 190 90 172ZM210 172C204 150 172 148 160 168C168 188 200 190 210 172Z" transform="translate(150 170) scale(1.1) translate(-150 -170)"/></g><path d="M150 74L160 100L186 104L166 120L172 146L150 132L128 146L134 120L114 104L140 100Z" fill="${tr}" stroke="${I}" stroke-width="3" stroke-linejoin="round"/><path d="M150 186V206" stroke="${I}" stroke-width="3" opacity=".5"/>`);
   } else if (top === 'wig' || top === 'bob' && bald) { o.push(`<path d="M104 96C112 82 126 74 142 72" fill="none" stroke="${shade(skin, .8)}" stroke-width="3"/>`);
   } else if (top === 'straw') { const hcol = lk.hat || '#d9c38a';
@@ -2844,6 +2861,7 @@ function porBody(key){
   else if (E === 'button') o.push(`<circle cx="114" cy="166" r="12" fill="${I}"/><circle cx="186" cy="166" r="12" fill="${I}"/><path d="M109 161l10 10M119 161l-10 10M181 161l10 10M191 161l-10 10" stroke="#8d8378" stroke-width="2"/><path d="M150 66V132" stroke="${I}" stroke-width="2.5" stroke-dasharray="7 6" fill="none"/>`);
   else if (E === 'hollow') o.push(`<ellipse cx="116" cy="170" rx="14" ry="17" fill="${I}"/><ellipse cx="184" cy="170" rx="14" ry="17" fill="${I}"/><circle cx="120" cy="164" r="3" fill="#fbf5e4"/><circle cx="188" cy="164" r="3" fill="#fbf5e4"/>`);
   else if (E === 'shades') o.push(`<path d="M88 152H140C144 152 146 156 145 162C142 184 128 192 114 192C98 192 88 180 88 164ZM212 152H160C156 152 154 156 155 162C158 184 172 192 186 192C202 192 212 180 212 164Z" fill="#1b2042" stroke="${I}" stroke-width="3.5" stroke-linejoin="round"/><path d="M144 158C148 154 152 154 156 158M88 158L76 152M212 158L224 152" fill="none" stroke="${I}" stroke-width="3.5"/><path d="M98 160l14 0M170 160l14 0" stroke="#8fb8de" stroke-width="3"/>`);
+  else if (E === 'none') { }
   else if (E === 'small') o.push(`<circle cx="112" cy="168" r="10" fill="#fbf5e4" stroke="${I}" stroke-width="3"/><circle cx="188" cy="168" r="10" fill="#fbf5e4" stroke="${I}" stroke-width="3"/><circle cx="114" cy="169" r="4.5" fill="${I}"/><circle cx="186" cy="169" r="4.5" fill="${I}"/>`);
   else o.push(`<ellipse cx="116" cy="168" rx="17" ry="14" fill="#fbf5e4" stroke="${I}" stroke-width="3"/><ellipse cx="184" cy="168" rx="17" ry="14" fill="#fbf5e4" stroke="${I}" stroke-width="3"/><circle cx="${P.brow === 'arch' ? 121 : 113}" cy="170" r="5.5" fill="${I}"/><circle cx="${P.brow === 'arch' ? 189 : 181}" cy="170" r="5.5" fill="${I}"/><path d="M99 160C108 152 124 152 133 160M167 160C176 152 192 152 201 160" fill="none" stroke="${I}" stroke-width="3"/>`);
   if (P.glasses) o.push(`<g fill="#fbf5e4" fill-opacity=".3" stroke="${I}" stroke-width="3.5"><rect x="90" y="150" width="50" height="38" rx="8"/><rect x="160" y="150" width="50" height="38" rx="8"/></g><path d="M140 166C146 162 154 162 160 166M90 164L78 158M210 164L222 158" fill="none" stroke="${I}" stroke-width="3.5"/>`);
@@ -2876,6 +2894,7 @@ function porBody(key){
   else if (M === 'muzzle') o.push(`<ellipse cx="150" cy="216" rx="44" ry="32" fill="${lk.muzzle || '#e8c9a0'}" stroke="${I}" stroke-width="3.5"/><path d="M136 196C136 190 164 190 164 196C164 206 154 212 150 212C146 212 136 206 136 196Z" fill="${I}"/><path d="M150 212V222M130 226C138 236 150 232 150 222C150 232 162 236 170 226" fill="none" stroke="${I}" stroke-width="3.5"/>`);
   else if (M === 'o') o.push(`<ellipse cx="150" cy="236" rx="9" ry="12" fill="${I}"/>`);
   else if (M === 'clown') o.push(`<path d="M108 222C132 236 168 236 192 222C186 262 114 262 108 222Z" fill="#c8402f" stroke="${I}" stroke-width="3.5"/><path d="M124 234C140 242 160 242 176 234C170 250 130 250 124 234Z" fill="#fbf5e4" stroke="${I}" stroke-width="2.5"/>`);
+  else if (M === 'none') { }
   else if (M === 'calm') o.push(`<path d="M134 234C144 239 156 239 166 234" fill="none" stroke="${I}" stroke-width="4"/>`);
   else o.push(`<path d="M128 232C142 228 158 228 172 232" fill="none" stroke="${I}" stroke-width="4"/><path d="M142 243h16" stroke="${I}" stroke-width="2.5" opacity=".6"/>`);
   if (P.cheeks) o.push(`<path d="M${64 - ed} 188C${58 - ed} 206 ${64 - ed} 230 ${82 - ed} 244M${236 + ed} 188C${242 + ed} 206 ${236 + ed} 230 ${218 + ed} 244" fill="none" stroke="${I}" stroke-width="3"/>`);
@@ -2912,13 +2931,14 @@ const BOOK = [
     open: { title: 'Tokyo, January', panels: [['scene', 'tokyo', 'The great hall under snow. The ranking sheet fills the wall, top names huge. Yours is tiny, at the very bottom.'], ['say', 'master', 'Four days, then whoever is left standing at the top of your side. Sleep.']] },
     close: { title: 'Moving up', panels: [['scene', 'sheet', 'Your name climbs the ranking sheet.'], ['join'], ['scene', 'alley', 'You walk home late, down an alley behind the hall.']] } }
 ];
+BOOK.push({ id: 'ambush', type: 'ambush', name: 'The lantern goes out', place: 'An alley behind the hall', theirs: ['kuro', 'kage'] });
 const BOOK_PROLOGUE = ['The gate', 'First morning', 'The amateur hall', 'Going pro'];
 const BOOK_LINE = { mushi: 'Catches beetles for fun. You are a large beetle.', twins: 'Two of them. One mawashi budget.', bup: 'Small. Antlers. Hugs like a vice.', sato: 'Took a half day for this. Must be back by two.', kokko: 'Nobody knows why the chicken suit. Nobody asks twice.', ghost: 'Nobody has ever touched him. Nobody is sure they could.',
   ume: 'She sets down her shopping and cracks her knuckles.', kota: 'He copies your stance. Then your frown. Then your sigh.', magic: 'He pulls your portrait out of his hat. It is a good likeness.' };
 const BOOK_LOSS = ['Sand washes off. Get up.', 'You watched their hands. Watch their feet.', 'Again. Slower in the head, faster in the legs.', 'Good. Now you know what losing to that one feels like.'];
 const BOOK_LV = ['easy', 'normal', 'hard'];
 function bookState(){ const b = profile.book = profile.book || { st: 0, ph: 'open', i: 0, lv: 'easy', picks: {}, rec: {}, done: [], clean: [] };
-  const S = BOOK[b.st]; if (S && !b.picks[S.id]) { const pool = S.pool.slice(); if (!S.days) pool.sort(() => rand() - .5); b.picks[S.id] = pool.slice(0, S.n); b.rec[S.id] = b.rec[S.id] || []; saveProfile(); }
+  const S = BOOK[b.st]; if (S && S.pool && !b.picks[S.id]) { const pool = S.pool.slice(); if (!S.days) pool.sort(() => rand() - .5); b.picks[S.id] = pool.slice(0, S.n); b.rec[S.id] = b.rec[S.id] || []; saveProfile(); }
   return b; }
 const bookBouts = S => bookState().picks[S.id].concat(S.boss);
 const BOOK_MULT = { easy: 1, normal: 1.5, hard: 2 }, bookPay = S => Math.round(S.pay * (BOOK_MULT[bookState().lv] || 1));
@@ -2947,6 +2967,11 @@ function bkScene(kind, txt){
   if (kind === 'board') return wrap('#efe3c8', `<rect x="92" y="14" width="116" height="122" fill="#fbf5e4" stroke="${I}" stroke-width="4"/><g transform="translate(112 28) scale(1.25)"><path d="${HAND_D}" fill="#c8402f"/></g><path d="M112 118h76" stroke="${I}" stroke-width="3"/>
       <rect x="18" y="0" width="30" height="150" fill="#cf9a3c" stroke="${I}" stroke-width="3"/><g transform="translate(20 52) scale(.42)" opacity=".5"><path d="${HAND_D}" fill="#1f1a17"/></g><path d="M22 60l22 30M24 86l18-22" stroke="#cf9a3c" stroke-width="3"/>
       <path d="M232 60c16-10 40-10 54 0v10c-14-8-38-8-54 0z" fill="#24375e" stroke="${I}" stroke-width="3" stroke-linejoin="round"/><path d="M250 70v26M258 70v30M266 70v26" stroke="#c8402f" stroke-width="3"/>`);
+  if (kind === 'ambush') return wrap('#0d1730', `<path d="M0 150L90 60V0H0zM300 150L210 60V0h90z" fill="#141f3f" stroke="${I}" stroke-width="3"/><path d="M90 60H210" stroke="${I}" stroke-width="3"/><ellipse cx="226" cy="52" rx="9" ry="12" fill="#3a3f52" stroke="${I}" stroke-width="2.5"/><path d="M226 26v14" stroke="${I}" stroke-width="2"/>
+      ${[[118, 74], [182, 80]].map(([x, y]) => `<g transform="translate(${x} ${y})"><path d="M-20 62c0-30 40-30 40 0v14h-40z" fill="#1f1a17" stroke="#3a3f52" stroke-width="2"/><ellipse cx="0" cy="12" rx="13" ry="17" fill="#fbf5e4" stroke="${I}" stroke-width="2.5"/><path d="M-9 9c3-3 6-2 7 1c-2 2-5 2-7-1zM9 9c-3-3-6-2-7 1c2 2 5 2 7-1z" fill="${I}"/></g>`).join('')}
+      <g transform="translate(60 96)"><circle cx="0" cy="0" r="9" fill="#efc493" stroke="${I}" stroke-width="2.5"/><path d="M-14 40c0-30 28-30 28 0z" fill="#efc493" stroke="${I}" stroke-width="2.5"/></g><g transform="translate(34 106)"><circle cx="0" cy="0" r="8" fill="#d9a877" stroke="${I}" stroke-width="2.5"/><path d="M-12 36c0-26 24-26 24 0z" fill="#d9a877" stroke="${I}" stroke-width="2.5"/></g>`);
+  if (kind === 'card') return wrap('#e2b866', `<g transform="rotate(-8 150 75)"><rect x="104" y="18" width="92" height="114" fill="#fbf5e4" stroke="${I}" stroke-width="4"/><g transform="translate(118 36) scale(1.05)"><path d="${HAND_D}" fill="#1f1a17"/></g></g><path d="M40 120c10-6 22-6 30 0M230 124c10-6 22-6 30 0" fill="none" stroke="#cf9a3c" stroke-width="3"/>`);
+  if (kind === 'stamped') return wrap('#efe3c8', `<rect x="92" y="14" width="116" height="122" fill="#fbf5e4" stroke="${I}" stroke-width="4"/><g transform="translate(112 28) scale(1.25)"><path d="${HAND_D}" fill="#c8402f"/></g><g transform="translate(122 20) rotate(14 30 30) scale(1.3)" opacity=".92"><path d="${HAND_D}" fill="#1f1a17"/></g><path d="M112 118h76" stroke="${I}" stroke-width="3"/><path d="M18 40h40M18 56h30M242 40h40M252 56h30" stroke="#fbf5e4" stroke-width="8"/><path d="M18 40h40M18 56h30M242 40h40M252 56h30" stroke="${I}" stroke-width="1.5" stroke-dasharray="4 4"/>`);
   if (kind === 'sand') return wrap('#e2b866', `<path d="M-20 150C40 40 260 40 320 150" fill="#ecc878" stroke="${I}" stroke-width="3"/><path d="M-8 150C48 52 252 52 308 150" fill="none" stroke="#fbf5e4" stroke-width="9" stroke-dasharray="16 5"/><path d="M-8 150C48 52 252 52 308 150" fill="none" stroke="${I}" stroke-width="1.5" stroke-dasharray="16 5"/>
       <g transform="translate(60 44)"><path d="M-22 26c0-30 44-30 44 0c8 2 12 8 8 12h-60c-4-4 0-10 8-12z" fill="#efc493" stroke="${I}" stroke-width="3" stroke-linejoin="round"/><circle cx="0" cy="-8" r="12" fill="#efc493" stroke="${I}" stroke-width="3"/><path d="M-11 -12c2-12 20-12 22 0c-6-4-16-4-22 0z" fill="${I}"/><path d="M-4 -24h8v6h-8z" fill="${I}"/></g>
       <path d="M22 60c-6-2-8 6-2 8M92 58c6-2 8 6 2 8M30 74c-8 0-8 8 0 8" fill="none" stroke="${I}" stroke-width="2.5"/>
@@ -2955,7 +2980,7 @@ function bkScene(kind, txt){
 }
 const bkPor = (key, cls = '') => `<div class="bk-por ${cls}" style="background-image:${POR[key] && CHARS[key] ? patternCss(key) : 'none'}"><div class="wc-frame">${portraitSvg(key)}</div></div>`;
 const bkName = key => key === 'master' ? 'Stablemaster' : key === profile.starter && profile.name ? profile.name : CHARS[key].name;
-const bkRec = S => { const r = bookState().rec[S.id] || [], total = S.n + 1, wins = Math.min(total, r.filter(x => x).length), lost = r.length - r.filter(x => x).length; let h = ''; for (let k = 0; k < total; k++) h += `<i class="${k < wins ? 'w' : ''}"></i>`; if (lost) h += `<i class="l"></i>${lost > 1 ? `<em>\u00d7${lost}</em>` : ''}`; return `<span class="bk-rec" aria-label="${wins} wins, ${r.length - wins} losses">${h}</span>`; };
+const bkRec = S => { if (!S.pool) return ''; const r = bookState().rec[S.id] || [], total = S.n + 1, wins = Math.min(total, r.filter(x => x).length), lost = r.length - r.filter(x => x).length; let h = ''; for (let k = 0; k < total; k++) h += `<i class="${k < wins ? 'w' : ''}"></i>`; if (lost) h += `<i class="l"></i>${lost > 1 ? `<em>\u00d7${lost}</em>` : ''}`; return `<span class="bk-rec" aria-label="${wins} wins, ${r.length - wins} losses">${h}</span>`; };
 function bkPanel(p, S){
   const [t, a, cap] = p;
   if (t === 'scene') return `<figure class="bk-panel wide">${bkScene(a, p[3])}<figcaption>${cap}</figcaption></figure>`;
@@ -2978,8 +3003,9 @@ function openBook(){   // the hub: a contents page
   body.innerHTML = `<div class="bk-cover"><small>Book of the Ring</small><h2>Chapter 1</h2><p>Best in Japan</p></div>`
     + row('Prologue', BOOK_PROLOGUE.join(' · '), 'done', '<button class="homeBack bk-pro">Read</button>')
     + BOOK.map((S, i) => { const state = b.done.includes(S.id) ? 'done' : i === b.st ? 'now' : 'locked';
+      if (S.type === 'ambush') return row(S.name, state === 'locked' ? '???' : `${S.place} \u00b7 one fight, no second try`, state, state === 'locked' ? '<span class="bk-tag">Locked</span>' : state === 'done' ? `<span class="bk-tag${b.amb === 'won' ? ' seal' : ''}">${b.amb === 'won' ? 'Won' : 'Lost'}</span>` : '<button class="start bk-go">Open</button>');
       return row(S.name, `${S.place} · ${S.n + 1} bouts${state !== 'locked' && b.rec[S.id] ? '' : ''}`, state, state === 'locked' ? '<span class="bk-tag">Locked</span>' : `${state === 'done' ? `${(b.gold || []).includes(S.id) ? '<span class="bk-tag gold">Hard</span>' : ''}<span class="bk-tag${b.clean.includes(S.id) ? ' seal' : ''}">${b.clean.includes(S.id) ? 'Clean sweep' : 'Cleared'}</span>` : '<button class="start bk-go">Open</button>'}`, state === 'locked' ? '' : bkRec(S)); }).join('')
-    + row('The lantern goes out', 'These pages are still being drawn', 'locked', '<span class="bk-tag">Soon</span>');
+    + row('Natsu basho', 'These pages are still being drawn', 'locked', '<span class="bk-tag">Soon</span>');
   const go = body.querySelector('.bk-go'); if (go) go.onclick = () => bookPage();
   const pro = body.querySelector('.bk-pro'); if (pro) pro.onclick = () => bookPrologue(0);
   $('#book').hidden = true; $('#story').hidden = false; body.scrollTop = 0;
@@ -2996,6 +3022,7 @@ function bookPrologue(n){   // pages 1 to 4, already lived through in the starte
 }
 function bookPage(){   // wherever the reader is in the current stage
   const b = bookState(), S = BOOK[b.st]; if (!S) return openBook();
+  if (S.type === 'ambush') return ambushPage();
   if (b.ph === 'open') { const seg = BOOK_LV.map(l => `<button data-l="${l}" class="${l === b.lv ? 'on' : ''}">${LVL_NAME[l]}</button>`).join('');
     bkShow(`${bkHead(S, S.open.title)}${S.open.panels.map(p => bkPanel(p, S)).join('')}<div class="bk-lv"><small>How hard is this stage? You can change it at the next one.</small><div class="seg">${seg}</div></div>`, [['← Contents', openBook], ['Turn the page →', () => { b.ph = 'bout'; saveProfile(); bookPage(); }, true]]);
     $('#bookBody').querySelectorAll('.bk-lv button').forEach(x => x.onclick = () => { b.lv = x.dataset.l; saveProfile(); bookPage(); }); return; }
@@ -3009,7 +3036,39 @@ function bookBout(){
   ['#book', '#story', '#end', '#menuBtn', '#muteBtn', '#sel', '#onb', '#vs'].forEach(q => $(q).hidden = true); closeSheet();
   selFlow = { from: 'quick', steps: [{ p: 'p1' }], i: 0, rnd: false }; lastFrom = 'quick'; startMatch();
 }
+function ambushSide(){ const a = bookState().ambS, S = BOOK.find(x => x.id === 'ambush'); return { mine: [profile.starter, a.partner], theirs: S.theirs }; }
+function ambushPage(){   // pages 11 and 12: two masks, one stablemate, one attempt
+  const b = bookState(), S = BOOK[b.st], a = b.ambS = b.ambS || { mi: 0, ti: 0, partner: null, started: false };
+  const mates = (me ? me.owns : []).filter(k => k !== profile.starter && CHARS[k] && !CHARS[k].story);
+  if (!a.partner || (!a.started && !mates.includes(a.partner))) a.partner = mates[0] || STARTERS.find(k => k !== profile.starter);
+  const top = t => `<header class="bk-top"><small>Book of the Ring \u00b7 ${S.name}</small><h2>${t}</h2></header>`, { mine, theirs } = ambushSide();
+  if (b.ph === 'close') { const won = b.amb === 'won';
+    return bkShow(won ? `${top('A mask cracks')}<figure class="bk-panel say">${bkPor('kage')}<div class="bk-bub"><b>Outlaw Kage</b><p>He kneels. Then he gets up and follows you home.</p></div></figure><figure class="bk-panel wide">${bkScene('card')}<figcaption>On the ground where they stood: a card with a black handprint.</figcaption></figure><p class="bk-note">Outlaw Kage joins your stable. He cannot be won any other way.</p>`
+      : `${top('Bandaged')}<figure class="bk-panel wide">${bkScene('stamped')}<figcaption>You wake at the stable, bandaged. A black handprint is stamped across your own.</figcaption></figure><figure class="bk-panel say">${bkPor('master')}<div class="bk-bub"><b>Stablemaster</b><p>\u201cThey wanted you scared. Are you?\u201d</p></div></figure><p class="bk-note"><span class="bk-stamp">This page stays in the book</span></p>`, [['Close the book', ambushAdvance, true]]); }
+  if (!a.started) { const chips = (mates.length ? mates : [a.partner]).map(k => `<button data-k="${k}" class="bk-mate${k === a.partner ? ' on' : ''}">${porChip(k)}<small>${CHARS[k].name}</small></button>`).join('');
+    bkShow(`${top('The lantern goes out')}<figure class="bk-panel wide">${bkScene('ambush')}<figcaption>Two white masks step out of the dark. A stablemate drops his bag and stands beside you.</figcaption></figure><div class="bk-rule"><b>Tag-in rule</b> If you go out, your partner steps in. Put both masks out to win.</div><div class="bk-lv"><small>Who stands beside you?</small><div class="bk-mates">${chips}</div></div><p class="bk-note"><span class="bk-stamp">This fight happens once</span> ${LVL_NAME[b.lv]}</p>`, [['\u2190 Contents', openBook], ['Fight', () => { a.started = true; saveProfile(); ambushBout(); }, true]]);
+    $('#bookBody').querySelectorAll('.bk-mate').forEach(x => x.onclick = () => { a.partner = x.dataset.k; saveProfile(); ambushPage(); }); return; }
+  const m = mine[a.mi], t = theirs[a.ti];
+  bkShow(`${top(a.last === 'mine' ? 'Your partner steps in' : 'The second mask')}<figure class="bk-panel"><div class="bk-duo">${bkPor(m)}${bkPor(t)}</div><figcaption>${a.last === 'mine' ? `${bkName(mine[0])} is out. ${CHARS[m].name} steps over the rope.` : `One mask is down. ${CHARS[t].name} steps forward.`}</figcaption></figure><p class="bk-note">You have ${2 - a.mi} left. They have ${2 - a.ti} left.</p>`, [['Step in', ambushBout, true]]);
+}
+function ambushBout(){
+  const b = bookState(), a = b.ambS, { mine, theirs } = ambushSide();
+  storyMatch = { v2: true, amb: true }; cfg.mode = 'cpu'; cfg.level = b.lv; cfg.bout = '1'; cfg.p1 = mine[a.mi]; cfg.p2 = theirs[a.ti]; rankingMatch = false;
+  ['#book', '#story', '#end', '#menuBtn', '#muteBtn', '#sel', '#onb', '#vs'].forEach(q => $(q).hidden = true); closeSheet();
+  selFlow = { from: 'quick', steps: [{ p: 'p1' }], i: 0, rnd: false }; lastFrom = 'quick'; startMatch();
+}
+function ambushResult(won){
+  const b = bookState(), a = b.ambS; storyMatch = null; if (won) { a.ti++; a.last = 'theirs'; } else { a.mi++; a.last = 'mine'; }
+  if (a.ti >= 2) { b.amb = 'won'; b.ph = 'close'; } else if (a.mi >= 2) { b.amb = 'lost'; b.ph = 'close'; }
+  saveProfile(); setTimeout(ambushPage, 0);
+}
+function ambushAdvance(){
+  const b = bookState(); if (b.ph !== 'close') return openBook();
+  b.done.push('ambush'); b.st++; b.i = 0; b.ph = 'open'; saveProfile(); $('#book').hidden = true; openBook();
+  if (b.amb === 'won') setTimeout(() => storyUnlock('kage', 'boss'), 300);
+}
 function bookResult(won){   // called when a Story bout ends; the result card gives way to a comic panel
+  if (storyMatch && storyMatch.amb) return ambushResult(won);
   const b = bookState(), S = BOOK[b.st], k = cfg.p2, boss = b.i === S.n, move = lastResult; storyMatch = null;
   (b.rec[S.id] = b.rec[S.id] || []).push(won ? 1 : 0); let pay = 0;
   if (won) { pay = LVL_PAY[b.lv]; addTokens(pay, 'story_bout', { stage: S.id, i: b.i }); }
@@ -3248,7 +3307,7 @@ function openStation(id){
       [['Back', closeSheet], needAcct ? ['Create account', () => accountSheet(() => openStation('story'), 'create'), true] : [r && r.level ? 'Continue ranking' : 'Get your ranking', () => { closeSheet(); if (r && r.level) nextRankingBout(); else { leaveHome(); openRankingOffer(); } }, true]]); }
   if (id === 'play') return sheet('', 'Play', '<p>Quick Play drops you straight into a bout. Exhibition lets you pick the mode (1-on-1, local head to head, royal rumble), CPU level and wrestlers.</p>', [['Exhibition', () => openStation('exhib')], ['Quick Play', () => openStation('quick'), true]]);
   if (id === 'quick') {   // straight into a Normal bout vs a random CPU
-    const keys = Object.keys(CHARS).filter(k => k !== cfg.p1);
+    const keys = Object.keys(CHARS).filter(k => k !== cfg.p1 && !CHARS[k].story);
     cfg.mode = 'cpu'; cfg.bout = '1'; saveCfg();
     leaveHome(); closeSheet(); openSelect('quick'); return;
   }
@@ -3565,6 +3624,7 @@ function resolveHit(f, t, nx, ny, k){
   if (t.c.passive === 'goalie') { t.saves = (t.saves || 0) + 1; if (t.saves % (t.c.saveEvery || 4) === 0) { tally(t.idx, 'dodges'); t.meter = Math.min(100, t.meter + 12 * t.spiritK); addFloat(t.x, t.y - t.rad - 10, 'SAVE!', '#7be0a0', 17); SFX.wobble(); return false; } }
   if (t.c.passive === 'flighty' && rand() < (t.c.flapP || .04)) { tally(t.idx, 'dodges'); addFloat(t.x, t.y - t.rad - 8, 'Flap!', '#fff6e6', 15); SFX.whiff(); return false; }
   if (t.c.passive === 'wobbly' && rand() < .07) { tally(t.idx, 'dodges'); addFloat(t.x, t.y - t.rad - 8, 'Wobble!', '#9fd1ff', 16); t.meter = Math.min(100, t.meter + 12 * t.spiritK); SFX.wobble(); return false; }
+  if (t.guard) { t.guard = 0; tally(t.idx, 'dodges'); addFloat(t.x, t.y - t.rad - 8, 'Shrugged!', '#fbf5e4', 16); SFX.whiff(); return false; }
   let imp = f.power * k * (f.boost > 0 ? 1.25 : 1);
   if (f.c.passive === 'grudge' && f.grudge > 0) { imp *= 1 + .12 * f.grudge; if (f.grudge >= 2) addFloat(f.x, f.y - f.rad - 22, `Grudge x${f.grudge}!`, '#ff6b4a', 14); f.grudge = 0; }
   if (f.c.passive === 'showtime') { const n = fightT - (f.lastLand || -9) < 3 ? Math.min(3, f.combo || 0) : 0; imp *= 1 + .08 * n; if (n >= 2) addFloat(f.x, f.y - f.rad - 22, `x${n + 1}!`, '#ff7ad1', 14 + n * 2); }
@@ -3618,6 +3678,10 @@ function special(f){
   else if (sp === 'palm') { f.palmT = .35; }
   else if (sp === 'poke') { doPush(f, { rangeK: 2, cone: .45, powerK: .5, free: true }); }
   else if (sp === 'fade') { f.fade = 2; }
+  else if (sp === 'ambush') { f.guard = 1; f.vx = Math.cos(f.face) * 560; f.vy = Math.sin(f.face) * 560; f.boost = Math.max(f.boost || 0, 1); burst(f.x, f.y, 12, '#1f1a17', 150, 3); }
+  else if (sp === 'shadow') { const o = F.filter(q => q !== f && !q.out && (q.team == null || q.team !== f.team)).sort((a, b) => Math.hypot(a.x - f.x, a.y - f.y) - Math.hypot(b.x - f.x, b.y - f.y))[0];
+    if (o) { burst(f.x, f.y, 14, '#1f1a17', 150, 3); let nx = o.x - Math.cos(o.face) * (o.rad + f.rad + 8), ny = o.y - Math.sin(o.face) * (o.rad + f.rad + 8); const d = Math.hypot(nx, ny), lim = R - f.rad - 6; if (d > lim) { nx *= lim / d; ny *= lim / d; }
+      f.x = nx; f.y = ny; f.vx = f.vy = 0; f.face = Math.atan2(o.y - f.y, o.x - f.x); f.fade = .45; f.boost = Math.max(f.boost || 0, .8); burst(f.x, f.y, 14, '#1f1a17', 150, 3); } }
   else if (sp === 'bigbang') bigBang(f);
   else if (sp === 'charge') { f.windup = .2; f.vx = -Math.cos(f.face) * 45; f.vy = -Math.sin(f.face) * 45; SFX.snort(); }   // rock back and snort, then charge
   else if (sp === 'eyes') {
@@ -3793,6 +3857,8 @@ function decide(f, P){
     else if (sp === 'poke' && dist < f.range * 2 + o.rad && faceErr < .4 && (dist > range * .9 || oOnEdge)) special(f);
     else if (sp === 'eyes' && dist < range * 1.15 && faceErr < .4) special(f);
     else if (sp === 'fade' && dist < range * 2.2) special(f);
+    else if (sp === 'ambush' && faceErr < .3 && dist < 240) special(f);
+    else if (sp === 'shadow' && dist < range * 3) special(f);
     else if (sp === 'charge' && faceErr < .12 && dist > range * .7 && dist < 260) special(f);
     else if (sp === 'mirror' && dist < range * 2.5) special(f);
     else if (sp === 'spin' && foes(f).filter(q => Math.hypot(q.x - f.x, q.y - f.y) < f.range * 1.1 + q.rad).length >= (F.length > 2 ? 2 : 1)) special(f);
@@ -4541,6 +4607,7 @@ const LOOK = {
   rina:  { suit: 'jersey', suitCol: '#ff8a1f', num: '1', belt: '#1b2042', hair: '#3a2416', band: '#ff8a1f', ponytail: true, vball: true, lashes: true },
   piero: { suit: 'clown', suitCol: '#f4f1ea', dots: ['#ff6b4a', '#3d7bf5', '#f2c230', '#2f8a52'], wig: '#ff6b4a', nose: true, ruff: true, belt: '#ff6b4a', skin: '#f6dcc6' },
   kenta: { suit: 'trunks', suitCol: '#c8352c', stripe: '#f4f1ea', gloves: '#c8352c', band: '#c8352c', belt: '#c8352c' },
+  kage: { belt: '#1f1a17', mask: '#fbf5e4', maskTrim: '#1f1a17', skin: '#e2b48a', kuro: true }, kuro: { belt: '#1f1a17', mask: '#fbf5e4', maskTrim: '#1f1a17', skin: '#d39a6a', kuro: true },
   kamen: { suit: 'trunks', suitCol: '#3d7bf5', stripe: '#f2c230', mask: '#3d7bf5', maskTrim: '#f2c230', belt: '#3d7bf5' },
   yubin: { suit: 'uniform', suitCol: '#8fb8de', pants: '#1b2042', sleeves: '#8fb8de', cap: '#1b2042', mailbag: true, belt: '#1b2042' },
   oto:   { suit: 'jumpsuit', suitCol: '#7c4dff', zip: '#f2c230', sleeves: '#7c4dff', headphones: '#1b2042', shades: true, radio: true, belt: '#7c4dff' },
