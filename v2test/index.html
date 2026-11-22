@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta http-equiv="Content-Security-Policy" content="script-src 'sha256-4X3fqmPJQVgpMibpK4rgairkXKU7GE+XsQmxTn7VKWA='; object-src 'none'; base-uri 'self'">
+<meta http-equiv="Content-Security-Policy" content="script-src 'sha256-CeO4NS5wu0S4u8xqP1o18EDzA9gr8CPEVc/ghvTveXM='; object-src 'none'; base-uri 'self'">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover,interactive-widget=resizes-content">
 <meta name="theme-color" content="#1b2042">
 <meta name="mobile-web-app-capable" content="yes">
@@ -1176,7 +1176,7 @@ function applyStarter(f){   // each player's wrestler uses that player's copy; y
    Any phone can bring a second player (split screen: their controls at the top, like the same-phone 1 v 1).
    1 v 1 = exactly 2 players on 2 phones; 2 v 2 = 2-4 players who pick Blue or Red (CPUs fill the gaps); Rumble = 2-8 players, 6-8 wrestlers. ---------- */
 const TEST_BUILD = true;   // the site build sets this for test uploads: accounts and online are off, so live profiles are never touched
-const BUILD = 'v2.0 test 16 · Nov 21 16:07';   // stamped with the date and time by the site build, so you can tell which version a phone is running
+const BUILD = 'v2.0 test 17 · Nov 21 16:10';   // stamped with the date and time by the site build, so you can tell which version a phone is running
 let NET = null, netBusy = false;   // netBusy: one Make / Join / Quick at a time (no double-tap rooms)
 // NET = { role, seat, code, ws, topic, me:{name,pick,side}, peers:{seat:{name,pick,roll,side,rx}}, match, slots, rins, ... }
 const RT_URL = () => (window.__WWRT || WW.url.replace(/^http/, 'ws') + '/realtime/v1/websocket') + `?apikey=${encodeURIComponent(WW.key)}&vsn=1.0.0`;
@@ -2106,7 +2106,7 @@ function mini(key){ if (!miniCache[key]) { const c = document.createElement('can
 function drawMini(g, key){
   if (key === 'twins') { [['ichi', -25], ['ni', 25]].forEach(([k, x]) => { g.save(); g.translate(x, 18); g.scale(.64, .64); drawMini(g, k); g.restore(); }); return; }
   const lk = LOOK[key] || {}, c = CHARS[key] || CHARS.taro, skin = lk.skin || c.skin || '#e8a676', ln = '#1b2042', hair = lk.hair || '#1c1a22';
-  const mood = MINI_MOOD[key] || 'angry', bald = lk.bald || lk.mask, topper = lk.cap || lk.cowboy || lk.hat || lk.dino || lk.neat || lk.wig || lk.beanie;
+  const mood = MINI_MOOD[key] || 'angry', bald = lk.bald || lk.mask, topper = lk.cap || lk.cowboy || lk.hat || lk.dino || lk.neat || lk.wig || lk.beanie || lk.tophat;
   g.lineJoin = 'round'; g.lineCap = 'round'; g.strokeStyle = ln; g.lineWidth = 4;
   if (key === 'ghost') g.globalAlpha = .8;
   const ell = (x, y, rx, ry, fill, rot = 0, stroke = true) => { g.beginPath(); g.ellipse(x, y, rx, ry, rot, 0, TAU); g.fillStyle = fill; g.fill(); if (stroke) g.stroke(); };
@@ -2160,6 +2160,7 @@ function drawMini(g, key){
   if (!bald && !topper) { if (lk.bun) { ell(0, -62, 10, 8, hair); } else { ell(0, -60, 5, 4, hair); ell(0, -65, 9, 4, hair); } }
   if (lk.curl) { g.lineWidth = 3; g.beginPath(); g.arc(1, -62, 5, Math.PI * .4, Math.PI * 2.1); g.stroke(); g.lineWidth = 4; }
   if (lk.horns) [-1, 1].forEach(sd => { g.beginPath(); g.moveTo(sd * 16, -54); g.quadraticCurveTo(sd * 30, -62, sd * 26, -74); g.quadraticCurveTo(sd * 24, -60, sd * 8, -56); g.closePath(); g.fillStyle = '#f4ead2'; g.fill(); g.lineWidth = 3; g.stroke(); g.lineWidth = 4; });
+  if (lk.tophat) { ell(0, -52, 36, 7, lk.tophat); g.beginPath(); g.moveTo(-22, -53); g.lineTo(-22, -88); g.quadraticCurveTo(0, -93, 22, -88); g.lineTo(22, -53); g.closePath(); g.fillStyle = lk.tophat; g.fill(); g.stroke(); g.fillStyle = lk.belt || '#4b2d7f'; g.fillRect(-21, -66, 42, 9); }
   if (lk.cap) { g.beginPath(); g.ellipse(0, -44, 28, 17, 0, Math.PI, TAU); g.closePath(); g.fillStyle = lk.cap; g.fill(); g.stroke(); ell(14, -44, 22, 5, tone2(lk.cap, .75)); ell(0, -60, 3, 3, '#fbf1dc', 0, false); }
   if (lk.chick) { g.fillStyle = '#e0362c'; [[-11, -60, 7], [0, -66, 8], [11, -60, 7]].forEach(([x, y, r2]) => { g.beginPath(); g.arc(x, y, r2, 0, TAU); g.fill(); g.lineWidth = 3; g.stroke(); });
     g.beginPath(); g.moveTo(-7, -30); g.lineTo(7, -30); g.lineTo(0, -19); g.closePath(); g.fillStyle = '#f2b51e'; g.fill(); g.lineWidth = 2.5; g.stroke(); ell(4, -14, 4, 6, '#e0362c'); g.lineWidth = 4; }
@@ -4328,7 +4329,7 @@ const LOOK = {
   bull:  { belt: '#2a252c', hair: '#1c1a22', band: '#c8352c', horns: true, skin: '#cf855c' },
   ume:   { suit: 'kimono', suitCol: '#7a3e6e', obi: '#f2c230', sleeves: '#7a3e6e', belt: '#bd5a82', hair: '#aaa7b4', bun: true, cane: true, skin: '#f0c3a0' },
   ghost: { belt: '#566381', hair: '#2f3850', skin: '#c4cede', line: '#36405a' },
-  magic: { belt: '#4b2d7f', hair: '#1c1a22', stars: true },
+  magic: { belt: '#4b2d7f', hair: '#1c1a22', stars: true, tophat: '#2a252c' },
   yuki:  { suit: 'dress', suitCol: '#8fd8ee', heart: false, sym: '\u2744', lashes: true, belt: '#6fc7dd', hair: '#25324f', bun: true },
   shin:  { belt: '#6b7f9a', hair: '#2a2730' },
   show:  { belt: '#e8b923', hair: '#1c1a22', band: '#ff4fa3', sparkle: true },
@@ -4459,6 +4460,8 @@ function drawWrestler(f, r, c){
   });
   if (lk.band) { ctx.beginPath(); ctx.arc(0, hy, hr * .96, 0, TAU); ctx.lineWidth = 5; ctx.strokeStyle = line; ctx.stroke(); ctx.lineWidth = 3; ctx.strokeStyle = lk.band; ctx.stroke(); }
   if (f.cue) drawCue(f.cue, r, by, brx, bry, hy, hr, line);
+  if (lk.tophat) { ctx.strokeStyle = line; ctx.lineWidth = 2; ctx.beginPath(); ctx.arc(0, hy, hr * 1.22, 0, TAU); ctx.fillStyle = lk.tophat; ctx.fill(); ctx.stroke();   // top hat from above: brim, band, crown
+    ctx.beginPath(); ctx.arc(0, hy, hr * .84, 0, TAU); ctx.fillStyle = lk.belt || '#4b2d7f'; ctx.fill(); ctx.stroke(); ctx.beginPath(); ctx.arc(0, hy, hr * .68, 0, TAU); ctx.fillStyle = tone2(lk.tophat, 1.25); ctx.fill(); }
   if (lk.cap) { ctx.beginPath(); ctx.ellipse(0, hy - hr * .95, hr * .7, hr * .45, 0, 0, TAU); ctx.fillStyle = tone2(lk.cap, .85); ctx.fill(); ctx.strokeStyle = line; ctx.lineWidth = 2; ctx.stroke();   // ball cap with the brim forward
     ctx.beginPath(); ctx.arc(0, hy, hr * .98, 0, TAU); ctx.fillStyle = lk.cap; ctx.fill(); ctx.stroke(); ctx.beginPath(); ctx.arc(0, hy, hr * .2, 0, TAU); ctx.fillStyle = '#f4f1ea'; ctx.fill(); }
   if (lk.cowboy) { ctx.beginPath(); ctx.ellipse(0, hy, hr * 1.5, hr * 1.7, 0, 0, TAU); ctx.fillStyle = lk.cowboy; ctx.fill(); ctx.strokeStyle = line; ctx.lineWidth = 2; ctx.stroke();
