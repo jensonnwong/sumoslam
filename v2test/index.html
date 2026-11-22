@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta http-equiv="Content-Security-Policy" content="script-src 'sha256-B70uA3UTxn1mnM8CIa9FMAr4eCalLzf2/ITy5orR+Lo='; object-src 'none'; base-uri 'self'">
+<meta http-equiv="Content-Security-Policy" content="script-src 'sha256-xdqregjMfjSEtTHDhE4Q+HAzaD0nIEA8IEIi7v0I9sY='; object-src 'none'; base-uri 'self'">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover,interactive-widget=resizes-content">
 <meta name="theme-color" content="#1b2042">
 <meta name="mobile-web-app-capable" content="yes">
@@ -538,6 +538,8 @@ h1 span{color:var(--clay)}
 .bk-rule{border:3px solid #1f1a17;background:#fbf5e4;padding:8px 10px;font-weight:800;font-size:13px;line-height:1.35}.bk-rule b{display:block;font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:#8a2a1e}
 .bk-mates{display:flex;gap:8px;overflow-x:auto;padding:2px 2px 6px}.bk-mate{flex:0 0 auto;border:3px solid transparent;background:#fbf5e4;padding:5px 6px;display:flex;flex-direction:column;align-items:center;gap:3px;width:84px}.bk-mate.on{border-color:#c8402f}.bk-mate small{font-weight:800;font-size:10px;line-height:1.1;text-align:center;color:#1f1a17}
 .bk-mate .pface{width:54px;height:54px;display:block;border-radius:50%;border:2.5px solid #1f1a17;overflow:hidden;background:#f4ead2}.bk-mate .pface svg{display:block;width:100%;height:100%}
+
+.bk-list{display:block;margin-top:4px;font-family:var(--display);font-weight:400;font-size:15px;letter-spacing:.02em}
 </style>
 </head>
 <body>
@@ -681,7 +683,7 @@ const CHARS = {
     push:[6,7], rech:[5,8], spirit:[4,7], luck:[5,8],
     passive:'wobbly', passiveName:'Wobbly Legs', passiveText:'Dodges 7% of pushes',
     special:'longslap', specialName:'Long Arm Slap', specialText:'1.5x-reach sweeping push' },
-  monk: { name:'The Monk', shapeName:'Proportioned · Medium', size:1.0, sx:1, sy:1, bald:true, w:3, r:3, s:2, a:2, ag:3, g:5, p:3,
+  monk: { name:'The Monk', shapeName:'Proportioned · Medium', size:1.0, sx:1, sy:1, bald:true, w:3, r:3, s:2, a:2, ag:3, g:5, p:4,
     push:[5,6], rech:[5,8], spirit:[5,8], luck:[3,6],
     passive:'surefooted', passiveName:'Sure Footed', passiveText:'Almost no momentum, stops on a dime',
     special:'palm', specialName:'Palm Strike', specialText:'Wind-up, then a heavy two-hand push' },
@@ -821,6 +823,14 @@ const CHARS = {
     push:[5,6], rech:[4,7], spirit:[4,7], luck:[3,6],
     passive:'blank', passiveName:'White Mask', passiveText:'No face to read: CPUs see his pushes coming late',
     special:'secondwind', specialName:'Second Breath', specialText:'Refills his pushes and speeds up for a moment' },
+  tegata: { name:'Lieutenant Tegata', shapeName:'Broad \u00b7 Tall', size:1.08, sx:1.2, sy:1.02, w:4, r:3, s:3, a:3, ag:2, g:4, p:4, story:true,
+    push:[5,6], rech:[4,7], spirit:[4,7], luck:[3,6],
+    passive:'blank', passiveName:'White Mask', passiveText:'No face to read: CPUs see his pushes coming late',
+    special:'blackhand', specialName:'Black Hand', specialText:'A long slap that leaves his mark: the marked wrestler pushes 40% weaker for 3s' },
+  ace: { name:'The Masked Ace', shapeName:'Lean \u00b7 Tall', size:1.04, sx:1, sy:1, w:3, r:4, s:4, a:4, ag:4, g:3, p:4, story:true, cpuOnly:true,
+    push:[6,7], rech:[5,8], spirit:[5,8], luck:[4,7],
+    passive:'blank', passiveName:'White Mask', passiveText:'No face to read: CPUs see his pushes coming late',
+    special:'shadow', specialName:'Shadow Step', specialText:'Vanishes and reappears behind you' },
   kamen: { name:'Luchador Kamen', shapeName:'Compact · Medium', size:1.0, sx:1.02, sy:1, w:2, r:3, s:3, a:3, ag:4, g:3, p:3,
     push:[5,6], rech:[4,7], spirit:[4,7], luck:[4,7], splashK:1.4, ropeK:1.2, landStun:.6, lariatK:1.8, lariatT:.5,
     passive:'ropes', passiveName:'Off the Ropes', passiveText:'Once per round, bounces back off the edge instead of going out',
@@ -1236,7 +1246,7 @@ function applyStarter(f){   // each player's wrestler uses that player's copy; y
    Any phone can bring a second player (split screen: their controls at the top, like the same-phone 1 v 1).
    1 v 1 = exactly 2 players on 2 phones; 2 v 2 = 2-4 players who pick Blue or Red (CPUs fill the gaps); Rumble = 2-8 players, 6-8 wrestlers. ---------- */
 const TEST_BUILD = true;   // the site build sets this for test uploads: accounts and online are off, so live profiles are never touched
-const BUILD = 'v2.0 test 22 · Nov 21 17:06';   // stamped with the date and time by the site build, so you can tell which version a phone is running
+const BUILD = 'v2.0 test 23 · Nov 21 17:15';   // stamped with the date and time by the site build, so you can tell which version a phone is running
 let NET = null, netBusy = false;   // netBusy: one Make / Join / Quick at a time (no double-tap rooms)
 // NET = { role, seat, code, ws, topic, me:{name,pick,side}, peers:{seat:{name,pick,roll,side,rx}}, match, slots, rins, ... }
 const RT_URL = () => (window.__WWRT || WW.url.replace(/^http/, 'ws') + '/realtime/v1/websocket') + `?apikey=${encodeURIComponent(WW.key)}&vsn=1.0.0`;
@@ -2131,7 +2141,7 @@ function machLoop(){
   requestAnimationFrame(step);
 }
 /* ---------- mini figures: front-view chibi wrestlers for the claw glass + prize card ---------- */
-const MINI_MOOD = { kage: 'calm', kuro: 'calm', kokko: 'happy', tsumari: 'calm', noka: 'happy', kuma: 'happy', kaze: 'happy', oto: 'happy', piero: 'happy', sato: 'calm', aiko: 'happy', ame: 'happy', kando: 'happy', mushi: 'happy', bup: 'happy', baby: 'happy', show: 'happy', puff: 'happy', hime: 'happy', musuko: 'happy', kota: 'happy', fumi: 'happy', yuki: 'happy', ichi: 'happy', ni: 'happy', shin: 'sleepy', ghost: 'calm', monk: 'calm', ume: 'calm', magic: 'calm' };
+const MINI_MOOD = { tegata: 'calm', ace: 'calm', kage: 'calm', kuro: 'calm', kokko: 'happy', tsumari: 'calm', noka: 'happy', kuma: 'happy', kaze: 'happy', oto: 'happy', piero: 'happy', sato: 'calm', aiko: 'happy', ame: 'happy', kando: 'happy', mushi: 'happy', bup: 'happy', baby: 'happy', show: 'happy', puff: 'happy', hime: 'happy', musuko: 'happy', kota: 'happy', fumi: 'happy', yuki: 'happy', ichi: 'happy', ni: 'happy', shin: 'sleepy', ghost: 'calm', monk: 'calm', ume: 'calm', magic: 'calm' };
 const miniCache = {};
 function miniSuit(g, lk, ln, ell){
   const sc = lk.suitCol, k = lk.suit, pants = lk.pants || '#1f1a17';
@@ -2508,7 +2518,7 @@ function drawMachine(){
 }
 
 /* ---------- character select: compact cards (portrait, archetype, 3 summary bars, special) + "i" for the full card ---------- */
-const ARCH = { kage: 'Outlaw', kuro: 'Outlaw', taro: 'All-rounder', bun: 'Wall', kiko: 'Long reach', monk: 'Anchor', salt: 'Trickster', bull: 'Charger', ume: 'Dodger', ghost: 'Phantom', magic: 'Illusionist', yuki: 'Speedster', shin: 'Sleeper', show: 'Combo', puff: 'Bouncer', tomo: 'Time bomb', abura: 'Trapper', daichi: 'Saboteur', goro: 'Avenger', kota: 'Mimic', fumi: 'Crowd control', twins: 'Tag team', baby: 'Tantrum', musuko: 'Slugger', tsuri: 'Trapper', hime: 'Wildcard', keeper: 'Goalkeeper', kando: 'Neat freak', guard: 'Lockdown', mushi: 'Catcher', gatz: 'Bruiser', bup: 'Swapper', aiko: 'Showstopper', rina: 'Artillery', ame: 'Wildcard', sato: 'Grinder', piero: 'Prankster', kenta: 'Striker', kamen: 'High flyer', yubin: 'Courier', oto: 'Disruptor', kaze: 'Sweeper', kuma: 'Grabber', noka: 'Rancher', kokko: 'Wild card', tsumari: 'Puppeteer' };
+const ARCH = { tegata: 'Enforcer', ace: 'Outlaw ace', kage: 'Outlaw', kuro: 'Outlaw', taro: 'All-rounder', bun: 'Wall', kiko: 'Long reach', monk: 'Anchor', salt: 'Trickster', bull: 'Charger', ume: 'Dodger', ghost: 'Phantom', magic: 'Illusionist', yuki: 'Speedster', shin: 'Sleeper', show: 'Combo', puff: 'Bouncer', tomo: 'Time bomb', abura: 'Trapper', daichi: 'Saboteur', goro: 'Avenger', kota: 'Mimic', fumi: 'Crowd control', twins: 'Tag team', baby: 'Tantrum', musuko: 'Slugger', tsuri: 'Trapper', hime: 'Wildcard', keeper: 'Goalkeeper', kando: 'Neat freak', guard: 'Lockdown', mushi: 'Catcher', gatz: 'Bruiser', bup: 'Swapper', aiko: 'Showstopper', rina: 'Artillery', ame: 'Wildcard', sato: 'Grinder', piero: 'Prankster', kenta: 'Striker', kamen: 'High flyer', yubin: 'Courier', oto: 'Disruptor', kaze: 'Sweeper', kuma: 'Grabber', noka: 'Rancher', kokko: 'Wild card', tsumari: 'Puppeteer' };
 const ROSTER_SIZE = 50;
 const STARTERS = ['taro', 'bun', 'kiko'], RIVALS = ['monk', 'salt', 'ume'];   // fresh account: 3 starters to pick; Random can also pull a house rival
 const fresh = () => !(devOn() && cfg.unlock === 'all');
@@ -2698,6 +2708,8 @@ const POR = {   // per-wrestler choices; anything missing falls back to the plai
   oto:   { face: 'round', phones: true, brow: 'none', eyes: 'shades', nose: 'broad', mouth: 'smirk', hairline: 'straight', bg: 'vinyl' },
   kamen: { face: 'square', top: 'mask', brow: 'none', eyes: 'narrow', nose: 'none', mouth: 'snarl', bg: 'ropes', bgCol: '#c8402f' },
   kage:  { face: 'long', top: 'mask', kuro: true, crack: true, brow: 'none', eyes: 'none', nose: 'none', mouth: 'none', neck: true, bg: 'wisp', bgCol: '#1f1a17' },
+  tegata:{ face: 'square', top: 'mask', kuro: true, hand: true, brow: 'none', eyes: 'none', nose: 'none', mouth: 'none', bg: 'flame', bgCol: '#1f1a17' },
+  ace:   { face: 'long', top: 'mask', kuro: true, stroke: true, brow: 'none', eyes: 'none', nose: 'none', mouth: 'none', neck: true, bg: 'wind', bgCol: '#1f1a17' },
   kuro:  { face: 'square', top: 'mask', kuro: true, brow: 'none', eyes: 'none', nose: 'none', mouth: 'none', bg: 'smoke', bgCol: '#1f1a17' },
   kenta: { face: 'square', brow: 'firm', eyes: 'narrow', nose: 'broad', mouth: 'line', plaster: true, bruise: true, hairline: 'straight', bg: 'gloves' },
   rina:  { face: 'long', small: .92, top: 'ponytail', hairline: 'straight', brow: 'thin', eyes: 'round', lashes: true, nose: 'sharp', mouth: 'grin', neck: true, bg: 'vball', bgCol: '#ff8a1f' },
@@ -2799,7 +2811,7 @@ function porBody(key){
   const ear = (sx, lobe) => `<path d="M${150 + sx * (88 + ed)} 150C${150 + sx * (102 + ed)} 148 ${150 + sx * (106 + ed)} 164 ${150 + sx * (100 + ed)} 176C${150 + sx * (96 + ed)} ${lobe ? 200 : 184} ${150 + sx * (90 + ed)} ${lobe ? 200 : 184} ${150 + sx * (88 + ed)} ${lobe ? 190 : 180}" fill="${skin}" stroke="${I}" stroke-width="3.5"/>`;
   o.push(`<clipPath id="pf-${key}"><path d="${face}"/></clipPath>${P.top === 'hood' || P.top === 'mask' || P.plush ? '' : ear(-1, P.lobes) + ear(1, P.lobes)}<path d="${face}" fill="${P.top === 'mask' ? lk.mask : skin}"/><path d="M206 110C222 160 216 236 150 296H330V100Z" fill="${I}" opacity=".16" clip-path="url(#pf-${key})"/><path d="${face}" fill="none" stroke="${I}" stroke-width="4.5"/>`);
   const top = P.top || 'knot', tufts = `<path d="M84 140l-10 6 9 4-8 8 10 2M216 140l10 6-9 4 8 8-10 2" fill="${hair}" stroke="${I}" stroke-width="2"/>`;
-  if (top === 'mask' && P.kuro) { o.push(`<path d="M92 170C104 158 128 161 140 173C128 180 104 180 92 170ZM208 170C196 158 172 161 160 173C172 180 196 180 208 170Z" fill="${I}"/><path d="M138 238h24" stroke="${I}" stroke-width="3" opacity=".7"/><path d="M150 186V204" stroke="${I}" stroke-width="2.5" opacity=".35"/>${P.crack ? `<path d="M182 70L166 108L184 130L164 168L172 196" fill="none" stroke="${I}" stroke-width="3" stroke-linejoin="round"/><path d="M166 108L152 116M184 130L198 136" stroke="${I}" stroke-width="2"/>` : ''}`);
+  if (top === 'mask' && P.kuro) { o.push(`<path d="M92 170C104 158 128 161 140 173C128 180 104 180 92 170ZM208 170C196 158 172 161 160 173C172 180 196 180 208 170Z" fill="${I}"/><path d="M138 238h24" stroke="${I}" stroke-width="3" opacity=".7"/><path d="M150 186V204" stroke="${I}" stroke-width="2.5" opacity=".35"/>${P.crack ? `<path d="M182 70L166 108L184 130L164 168L172 196" fill="none" stroke="${I}" stroke-width="3" stroke-linejoin="round"/><path d="M166 108L152 116M184 130L198 136" stroke="${I}" stroke-width="2"/>` : ''}${P.hand ? `<g transform="translate(120 80) scale(.98)" opacity=".92"><path d="${HAND_D}" fill="${I}"/></g>` : ''}${P.stroke ? `<path d="M120 82C114 120 124 172 112 248" fill="none" stroke="${I}" stroke-width="10" stroke-linecap="round" opacity=".9"/><path d="M128 96C126 110 128 122 126 134" fill="none" stroke="${I}" stroke-width="3" stroke-linecap="round" opacity=".6"/>` : ''}`);
   } else if (top === 'mask') { const tr = lk.maskTrim || '#f2c230';
     o.push(`<g fill="${skin}" stroke="${tr}" stroke-width="6"><path d="M90 172C96 150 128 148 140 168C132 188 100 190 90 172ZM210 172C204 150 172 148 160 168C168 188 200 190 210 172Z"/><ellipse cx="150" cy="234" rx="34" ry="19"/></g><g fill="none" stroke="${I}" stroke-width="2"><path d="M90 172C96 150 128 148 140 168C132 188 100 190 90 172ZM210 172C204 150 172 148 160 168C168 188 200 190 210 172Z" transform="translate(150 170) scale(1.1) translate(-150 -170)"/></g><path d="M150 74L160 100L186 104L166 120L172 146L150 132L128 146L134 120L114 104L140 100Z" fill="${tr}" stroke="${I}" stroke-width="3" stroke-linejoin="round"/><path d="M150 186V206" stroke="${I}" stroke-width="3" opacity=".5"/>`);
   } else if (top === 'wig' || top === 'bob' && bald) { o.push(`<path d="M104 96C112 82 126 74 142 72" fill="none" stroke="${shade(skin, .8)}" stroke-width="3"/>`);
@@ -2932,15 +2944,26 @@ const BOOK = [
     close: { title: 'Moving up', panels: [['scene', 'sheet', 'Your name climbs the ranking sheet.'], ['join'], ['scene', 'alley', 'You walk home late, down an alley behind the hall.']] } }
 ];
 BOOK.push({ id: 'ambush', type: 'ambush', name: 'The lantern goes out', place: 'An alley behind the hall', theirs: ['kuro', 'kage'] });
+BOOK.push({ id: 'natsu', name: 'Natsu basho', place: 'Tokyo \u00b7 July', pool: ['puff', 'kenta', 'kuro', 'oto'], n: 4, days: true, boss: 'tegata', pay: 30, joins: 'boss',
+    open: { title: 'Tokyo, July', panels: [['scene', 'summer', 'Heat. Paper fans in every hand. On the ranking sheet, several names have been inked over in black.'], ['say', 'master', 'Those names didn\u2019t retire. Keep your eyes open.']] },
+    close: { title: 'The invitation', panels: [['scene', 'sheet', 'Your name climbs again.'], ['join'], ['scene', 'card', 'The lieutenant leaves a card with a black handprint and one word: Fukuoka.']] } },
+  { id: 'kyushu', name: 'Kyushu basho', place: 'Fukuoka \u00b7 November', pool: ['hime', 'musuko', 'abura'], n: 3, days: true, boss: 'monk', final: 'ace', pay: 40,
+    open: { title: 'The train south', panels: [['scene', 'train', 'The sea through a train window. Your name now sits near the top of the ranking sheet.'], ['say', 'master', 'Two kids from a festival are on the list. Don\u2019t laugh.']] },
+    close: { title: 'The rope', panels: [['scene', 'rope', 'The Grand Champion\u2019s white rope is tied on you.'], ['say', 'master', 'Dust. It\u2019s dust in my eye.'], ['scene', 'goldhand', 'Your handprint is pressed again, this time flecked with gold.']] },
+    close2: { title: 'What the mask held', panels: [['count']] } });
+const BOOK_AFTER = { monk: 'One thing about the ace. Watch the sand, not the man.' };
+const BOOK_LINE2 = ({ puff: 'Puffs up when nervous. Always nervous.', kenta: 'Hands like bricks. Keeps them up.', oto: 'Brought his own soundtrack. It is loud.', kuro: 'No name on the board. Just a black handprint.', tegata: 'He presses a black hand onto the ring\u2019s clay.',
+  hime: 'The princess from the festival. She was holding back.', musuko: 'Eight years old. Still brought the bat.', abura: 'Cooks between bouts. The floor gets greasy.', monk: 'A quiet panel. He bows first.', ace: 'He was already standing in the ring.' });
 const BOOK_PROLOGUE = ['The gate', 'First morning', 'The amateur hall', 'Going pro'];
-const BOOK_LINE = { mushi: 'Catches beetles for fun. You are a large beetle.', twins: 'Two of them. One mawashi budget.', bup: 'Small. Antlers. Hugs like a vice.', sato: 'Took a half day for this. Must be back by two.', kokko: 'Nobody knows why the chicken suit. Nobody asks twice.', ghost: 'Nobody has ever touched him. Nobody is sure they could.',
+let BOOK_LINE = { mushi: 'Catches beetles for fun. You are a large beetle.', twins: 'Two of them. One mawashi budget.', bup: 'Small. Antlers. Hugs like a vice.', sato: 'Took a half day for this. Must be back by two.', kokko: 'Nobody knows why the chicken suit. Nobody asks twice.', ghost: 'Nobody has ever touched him. Nobody is sure they could.',
   ume: 'She sets down her shopping and cracks her knuckles.', kota: 'He copies your stance. Then your frown. Then your sigh.', magic: 'He pulls your portrait out of his hat. It is a good likeness.' };
+Object.assign(BOOK_LINE, BOOK_LINE2);
 const BOOK_LOSS = ['Sand washes off. Get up.', 'You watched their hands. Watch their feet.', 'Again. Slower in the head, faster in the legs.', 'Good. Now you know what losing to that one feels like.'];
 const BOOK_LV = ['easy', 'normal', 'hard'];
 function bookState(){ const b = profile.book = profile.book || { st: 0, ph: 'open', i: 0, lv: 'easy', picks: {}, rec: {}, done: [], clean: [] };
   const S = BOOK[b.st]; if (S && S.pool && !b.picks[S.id]) { const pool = S.pool.slice(); if (!S.days) pool.sort(() => rand() - .5); b.picks[S.id] = pool.slice(0, S.n); b.rec[S.id] = b.rec[S.id] || []; saveProfile(); }
   return b; }
-const bookBouts = S => bookState().picks[S.id].concat(S.boss);
+const bookBouts = S => bookState().picks[S.id].concat(S.boss, S.final || []);
 const BOOK_MULT = { easy: 1, normal: 1.5, hard: 2 }, bookPay = S => Math.round(S.pay * (BOOK_MULT[bookState().lv] || 1));
 const bookWins = id => (bookState().rec[id] || []).filter(x => x).length;
 const bkMask = `<svg viewBox="0 0 100 100" aria-hidden="true"><ellipse cx="50" cy="52" rx="30" ry="38" fill="#fbf5e4" stroke="#1f1a17" stroke-width="4"/><path d="M28 46C34 40 42 42 45 48C40 52 32 52 28 46ZM72 46C66 40 58 42 55 48C60 52 68 52 72 46Z" fill="#1f1a17"/><path d="M42 72h16" stroke="#1f1a17" stroke-width="3"/></svg>`;
@@ -2967,6 +2990,14 @@ function bkScene(kind, txt){
   if (kind === 'board') return wrap('#efe3c8', `<rect x="92" y="14" width="116" height="122" fill="#fbf5e4" stroke="${I}" stroke-width="4"/><g transform="translate(112 28) scale(1.25)"><path d="${HAND_D}" fill="#c8402f"/></g><path d="M112 118h76" stroke="${I}" stroke-width="3"/>
       <rect x="18" y="0" width="30" height="150" fill="#cf9a3c" stroke="${I}" stroke-width="3"/><g transform="translate(20 52) scale(.42)" opacity=".5"><path d="${HAND_D}" fill="#1f1a17"/></g><path d="M22 60l22 30M24 86l18-22" stroke="#cf9a3c" stroke-width="3"/>
       <path d="M232 60c16-10 40-10 54 0v10c-14-8-38-8-54 0z" fill="#24375e" stroke="${I}" stroke-width="3" stroke-linejoin="round"/><path d="M250 70v26M258 70v30M266 70v26" stroke="#c8402f" stroke-width="3"/>`);
+  if (kind === 'summer') { let rows = ''; for (let i = 0; i < 7; i++) rows += `<path d="M214 ${30 + i * 13}h${62 - i * 7}" stroke="${I}" stroke-width="${[1, 3, 4].includes(i) ? 9 : 6 - i * .7}"/>`;
+    return wrap('#f2d3a8', `<circle cx="60" cy="40" r="24" fill="#c8402f" stroke="${I}" stroke-width="3"/><rect y="104" width="300" height="46" fill="#e2b866"/><path d="M0 104H300" stroke="${I}" stroke-width="3"/>${[30, 80, 130, 172].map((x, i) => `<g transform="translate(${x} ${112 + (i % 2) * 6})"><circle cx="0" cy="8" r="9" fill="${I}"/><path d="M-12 38c0-22 24-22 24 0z" fill="${I}"/><path d="M12 6l16-18a22 22 0 0 1 12 20z" fill="#fbf5e4" stroke="${I}" stroke-width="2.5" stroke-linejoin="round"/><path d="M12 6l22-8M12 6l26 0" stroke="${I}" stroke-width="1.5"/></g>`).join('')}
+      <rect x="204" y="16" width="84" height="112" fill="#fbf5e4" stroke="${I}" stroke-width="3"/>${rows}`); }
+  if (kind === 'train') return wrap('#3a3f52', `<rect x="26" y="14" width="248" height="104" rx="14" fill="#bfe0ff" stroke="${I}" stroke-width="5"/><circle cx="214" cy="46" r="15" fill="#fbf5e4" stroke="${I}" stroke-width="2.5"/><path d="M28 76H272V104a12 12 0 0 1-12 12H40a12 12 0 0 1-12-12z" fill="#24375e"/><path d="M40 88c14-8 26 8 40 0s26 8 40 0s26 8 40 0s26 8 40 0s26 8 40 0M60 104c14-8 26 8 40 0s26 8 40 0s26 8 40 0" fill="none" stroke="#fbf5e4" stroke-width="2.5"/><path d="M150 14V118" stroke="${I}" stroke-width="5"/><rect x="26" y="14" width="248" height="104" rx="14" fill="none" stroke="${I}" stroke-width="5"/><rect x="0" y="126" width="300" height="24" fill="#c8402f" stroke="${I}" stroke-width="3"/>`);
+  if (kind === 'onelight') return wrap('#0d1730', `<path d="M130 0h40l70 150H60z" fill="#fbf5e4" opacity=".16"/><ellipse cx="150" cy="124" rx="96" ry="20" fill="#e2b866" stroke="${I}" stroke-width="3"/><ellipse cx="150" cy="124" rx="80" ry="14" fill="none" stroke="#fbf5e4" stroke-width="3" stroke-dasharray="7 4"/><g transform="translate(150 60)"><path d="M-22 60c0-34 44-34 44 0z" fill="#e8bd94" stroke="${I}" stroke-width="3"/><path d="M-22 56h44v6h-44z" fill="${I}"/><ellipse cx="0" cy="10" rx="14" ry="18" fill="#fbf5e4" stroke="${I}" stroke-width="3"/><path d="M-10 7c3-3 7-2 8 1c-2 2-6 2-8-1zM10 7c-3-3-7-2-8 1c2 2 6 2 8-1z" fill="${I}"/><path d="M-5 -6c-2 10 1 20-2 32" fill="none" stroke="${I}" stroke-width="3" stroke-linecap="round"/></g>`);
+  if (kind === 'rope') return wrap('#efe3c8', `<path d="M10 40C70 96 230 96 290 40" fill="none" stroke="${I}" stroke-width="26" stroke-linecap="round"/><path d="M10 40C70 96 230 96 290 40" fill="none" stroke="#fbf5e4" stroke-width="20" stroke-linecap="round"/><path d="M10 40C70 96 230 96 290 40" fill="none" stroke="${I}" stroke-width="2" stroke-dasharray="2 12" stroke-linecap="round"/>
+      ${[60, 105, 150, 195, 240].map((x, i) => { const y = 40 + 42 * Math.sin(Math.PI * (x - 10) / 280) + 12; return `<path d="M${x} ${y}l-9 12h12l-9 12h12l-9 12h12l-6 10" fill="none" stroke="${I}" stroke-width="7" stroke-linejoin="round"/><path d="M${x} ${y}l-9 12h12l-9 12h12l-9 12h12l-6 10" fill="none" stroke="#fbf5e4" stroke-width="4" stroke-linejoin="round"/>`; }).join('')}`);
+  if (kind === 'goldhand') return wrap('#efe3c8', `<rect x="92" y="14" width="116" height="122" fill="#fbf5e4" stroke="${I}" stroke-width="4"/><g transform="translate(112 28) scale(1.25)"><path d="${HAND_D}" fill="#c8402f"/></g><g fill="#f2c230" stroke="${I}" stroke-width="1">${[[126, 52], [150, 44], [168, 60], [140, 78], [160, 92], [132, 100], [176, 84], [148, 110]].map(([x, y], i) => `<circle cx="${x}" cy="${y}" r="${2.5 + (i % 3)}"/>`).join('')}</g><path d="M112 118h76" stroke="${I}" stroke-width="3"/><path d="M40 40l4 10 10 4-10 4-4 10-4-10-10-4 10-4zM256 86l3 8 8 3-8 3-3 8-3-8-8-3 8-3z" fill="#f2c230" stroke="${I}" stroke-width="2" stroke-linejoin="round"/>`);
   if (kind === 'ambush') return wrap('#0d1730', `<path d="M0 150L90 60V0H0zM300 150L210 60V0h90z" fill="#141f3f" stroke="${I}" stroke-width="3"/><path d="M90 60H210" stroke="${I}" stroke-width="3"/><ellipse cx="226" cy="52" rx="9" ry="12" fill="#3a3f52" stroke="${I}" stroke-width="2.5"/><path d="M226 26v14" stroke="${I}" stroke-width="2"/>
       ${[[118, 74], [182, 80]].map(([x, y]) => `<g transform="translate(${x} ${y})"><path d="M-20 62c0-30 40-30 40 0v14h-40z" fill="#1f1a17" stroke="#3a3f52" stroke-width="2"/><ellipse cx="0" cy="12" rx="13" ry="17" fill="#fbf5e4" stroke="${I}" stroke-width="2.5"/><path d="M-9 9c3-3 6-2 7 1c-2 2-5 2-7-1zM9 9c-3-3-6-2-7 1c2 2 5 2 7-1z" fill="${I}"/></g>`).join('')}
       <g transform="translate(60 96)"><circle cx="0" cy="0" r="9" fill="#efc493" stroke="${I}" stroke-width="2.5"/><path d="M-14 40c0-30 28-30 28 0z" fill="#efc493" stroke="${I}" stroke-width="2.5"/></g><g transform="translate(34 106)"><circle cx="0" cy="0" r="8" fill="#d9a877" stroke="${I}" stroke-width="2.5"/><path d="M-12 36c0-26 24-26 24 0z" fill="#d9a877" stroke="${I}" stroke-width="2.5"/></g>`);
@@ -2980,7 +3011,7 @@ function bkScene(kind, txt){
 }
 const bkPor = (key, cls = '') => `<div class="bk-por ${cls}" style="background-image:${POR[key] && CHARS[key] ? patternCss(key) : 'none'}"><div class="wc-frame">${portraitSvg(key)}</div></div>`;
 const bkName = key => key === 'master' ? 'Stablemaster' : key === profile.starter && profile.name ? profile.name : CHARS[key].name;
-const bkRec = S => { if (!S.pool) return ''; const r = bookState().rec[S.id] || [], total = S.n + 1, wins = Math.min(total, r.filter(x => x).length), lost = r.length - r.filter(x => x).length; let h = ''; for (let k = 0; k < total; k++) h += `<i class="${k < wins ? 'w' : ''}"></i>`; if (lost) h += `<i class="l"></i>${lost > 1 ? `<em>\u00d7${lost}</em>` : ''}`; return `<span class="bk-rec" aria-label="${wins} wins, ${r.length - wins} losses">${h}</span>`; };
+const bkRec = S => { if (!S.pool) return ''; const r = bookState().rec[S.id] || [], total = S.n + 1 + (S.final ? 1 : 0), wins = Math.min(total, r.filter(x => x).length), lost = r.length - r.filter(x => x).length; let h = ''; for (let k = 0; k < total; k++) h += `<i class="${k < wins ? 'w' : ''}"></i>`; if (lost) h += `<i class="l"></i>${lost > 1 ? `<em>\u00d7${lost}</em>` : ''}`; return `<span class="bk-rec" aria-label="${wins} wins, ${r.length - wins} losses">${h}</span>`; };
 function bkPanel(p, S){
   const [t, a, cap] = p;
   if (t === 'scene') return `<figure class="bk-panel wide">${bkScene(a, p[3])}<figcaption>${cap}</figcaption></figure>`;
@@ -2988,7 +3019,8 @@ function bkPanel(p, S){
   if (t === 'say') return `<figure class="bk-panel say">${bkPor(a)}<div class="bk-bub"><b>${bkName(a)}</b><p>“${cap}”</p></div></figure>`;
   if (t === 'mask') return `<figure class="bk-panel dark"><div class="bk-mask">${bkMask}</div><figcaption>${a}</figcaption></figure>`;
   if (t === 'news') return `<figure class="bk-panel news"><div class="bk-mast">The Daily Dohyo</div><div class="bk-head">Local hope heads to Tokyo</div><div class="bk-cols">${bkPor(profile.starter)}<div><p><b>${esc(bkName(profile.starter))}</b> took the city title last night and leaves for the January tournament.</p><i></i><i></i><i></i></div></div><div class="bk-item"><svg viewBox="0 0 64 60" aria-hidden="true"><path d="${HAND_D}" fill="#1f1a17"/></svg><p><b>Regional champion found beaten.</b> A black handprint was left behind. Police have no leads.</p></div></figure>`;
-  if (t === 'join') { const k = S._join; return k ? `<figure class="bk-panel say">${bkPor(k)}<div class="bk-bub"><b>${CHARS[k].name}</b><p>${S.joins === 'boss' ? 'Beaten fair. The act joins your stable.' : 'asks to join your stable. You say yes before the stablemaster can say no.'}</p></div></figure>` : ''; }
+  if (t === 'count') { const n = (me ? me.owns : []).length; return `<figure class="bk-panel dark"><div class="bk-mask">${bkMask}</div><figcaption>The ace\u2019s mask lies on the clay. Inside it, a list in black ink:<br><b class="bk-list">Spain \u00b7 USA \u00b7 India \u00b7 Russia \u00b7 Mongolia</b></figcaption></figure><div class="bk-rule"><b>Chapter 2 opens at 15 wrestlers</b>Your stable: ${n} of 15${n >= 15 ? '. The road is open.' : `. ${15 - n} to go.`}</div><div class="bk-seal gold">Grand Champion of Japan</div>`; }
+  if (t === 'join') { const k = S._join; return k ? `<figure class="bk-panel say">${bkPor(k)}<div class="bk-bub"><b>${CHARS[k].name}</b><p>${S.joins === 'boss' ? (S.id === 'hatsu' ? 'Beaten fair. The act joins your stable.' : 'Beaten fair. He unties the black belt and follows you out.') : 'asks to join your stable. You say yes before the stablemaster can say no.'}</p></div></figure>` : ''; }
   return '';
 }
 function bkShow(html, btns){
@@ -3004,8 +3036,8 @@ function openBook(){   // the hub: a contents page
     + row('Prologue', BOOK_PROLOGUE.join(' · '), 'done', '<button class="homeBack bk-pro">Read</button>')
     + BOOK.map((S, i) => { const state = b.done.includes(S.id) ? 'done' : i === b.st ? 'now' : 'locked';
       if (S.type === 'ambush') return row(S.name, state === 'locked' ? '???' : `${S.place} \u00b7 one fight, no second try`, state, state === 'locked' ? '<span class="bk-tag">Locked</span>' : state === 'done' ? `<span class="bk-tag${b.amb === 'won' ? ' seal' : ''}">${b.amb === 'won' ? 'Won' : 'Lost'}</span>` : '<button class="start bk-go">Open</button>');
-      return row(S.name, `${S.place} · ${S.n + 1} bouts${state !== 'locked' && b.rec[S.id] ? '' : ''}`, state, state === 'locked' ? '<span class="bk-tag">Locked</span>' : `${state === 'done' ? `${(b.gold || []).includes(S.id) ? '<span class="bk-tag gold">Hard</span>' : ''}<span class="bk-tag${b.clean.includes(S.id) ? ' seal' : ''}">${b.clean.includes(S.id) ? 'Clean sweep' : 'Cleared'}</span>` : '<button class="start bk-go">Open</button>'}`, state === 'locked' ? '' : bkRec(S)); }).join('')
-    + row('Natsu basho', 'These pages are still being drawn', 'locked', '<span class="bk-tag">Soon</span>');
+      return row(S.name, `${S.place} · ${S.n + 1 + (S.final ? 1 : 0)} bouts${state !== 'locked' && b.rec[S.id] ? '' : ''}`, state, state === 'locked' ? '<span class="bk-tag">Locked</span>' : `${state === 'done' ? `${(b.gold || []).includes(S.id) ? '<span class="bk-tag gold">Hard</span>' : ''}<span class="bk-tag${b.clean.includes(S.id) ? ' seal' : ''}">${b.clean.includes(S.id) ? 'Clean sweep' : 'Cleared'}</span>` : '<button class="start bk-go">Open</button>'}`, state === 'locked' ? '' : bkRec(S)); }).join('')
+    + row('Chapter 2 \u00b7 Best in the world', `Opens at 15 wrestlers \u00b7 you have ${(me ? me.owns : []).length}`, 'locked', '<span class="bk-tag">Soon</span>');
   const go = body.querySelector('.bk-go'); if (go) go.onclick = () => bookPage();
   const pro = body.querySelector('.bk-pro'); if (pro) pro.onclick = () => bookPrologue(0);
   $('#book').hidden = true; $('#story').hidden = false; body.scrollTop = 0;
@@ -3026,12 +3058,16 @@ function bookPage(){   // wherever the reader is in the current stage
   if (b.ph === 'open') { const seg = BOOK_LV.map(l => `<button data-l="${l}" class="${l === b.lv ? 'on' : ''}">${LVL_NAME[l]}</button>`).join('');
     bkShow(`${bkHead(S, S.open.title)}${S.open.panels.map(p => bkPanel(p, S)).join('')}<div class="bk-lv"><small>How hard is this stage? You can change it at the next one.</small><div class="seg">${seg}</div></div>`, [['← Contents', openBook], ['Turn the page →', () => { b.ph = 'bout'; saveProfile(); bookPage(); }, true]]);
     $('#bookBody').querySelectorAll('.bk-lv button').forEach(x => x.onclick = () => { b.lv = x.dataset.l; saveProfile(); bookPage(); }); return; }
-  if (b.ph === 'bout') { const list = bookBouts(S), k = list[b.i], boss = b.i === S.n, lost = (b.rec[S.id] || []).some(x => !x);
+  if (b.ph === 'bout' && S.final && b.i === S.n + 1) { const k = S.final;
+    bkShow(`${bkHead(S, 'One light')}<figure class="bk-panel wide">${bkScene('onelight')}<figcaption>The hall is dark except for the ring. The masked ace is already standing in it.</figcaption></figure><figure class="bk-panel pre">${bkPor(k)}<div class="bk-bub"><b>${CHARS[k].name}</b><small>${ARCH[k] || ''} \u00b7 \u2605 ${CHARS[k].specialName}</small><p>${BOOK_LINE[k] || ''}</p></div></figure><p class="bk-note">Best of 3 \u00b7 ${LVL_NAME[b.lv]}</p>`, [['\u2190 Contents', openBook], ['Step into the ring', bookBout, true]]); return; }
+  if (b.ph === 'close2') { bkShow(`${bkHead(S, S.close2.title)}${S.close2.panels.map(p => bkPanel(p, S)).join('')}`, [['Close the book', () => bookAdvance(), true]]); return; }
+  if (b.ph === 'close' && b.pend) Object.assign(S, b.pend);
+  if (b.ph === 'bout') { const list = bookBouts(S), k = list[b.i], boss = b.i >= S.n, lost = (b.rec[S.id] || []).some(x => !x);
     bkShow(`${bkHead(S, boss ? 'The boss' : S.days ? `Day ${b.i + 1}` : `Bout ${b.i + 1} of ${S.n + 1}`)}<figure class="bk-panel pre">${bkPor(k)}<div class="bk-bub"><b>${CHARS[k].name}</b><small>${ARCH[k] || ''} · ★ ${CHARS[k].specialName}</small><p>${BOOK_LINE[k] || INTRO[k] || ''}</p></div></figure><p class="bk-note">${boss ? 'Best of 3' : 'One bout'} · ${LVL_NAME[b.lv]}${lost ? ' · <span class="bk-stamp">Clean sweep lost</span>' : ''}</p>`, [['← Contents', openBook], ['Step into the ring', bookBout, true]]); return; }
-  if (b.ph === 'close') { bkShow(`${bkHead(S, S.close.title)}${S.close.panels.map(p => bkPanel(p, S)).join('')}${S._clean ? '<div class="bk-seal">Clean sweep</div>' : ''}${b.lv === 'hard' ? '<div class="bk-seal gold">Cleared on Hard</div>' : ''}<p class="bk-note">+${bookPay(S)} tokens for clearing ${S.name} on ${LVL_NAME[b.lv]}</p>`, [['Close the book', () => bookAdvance(), true]]); }
+  if (b.ph === 'close') { bkShow(`${bkHead(S, S.close.title)}${S.close.panels.map(p => bkPanel(p, S)).join('')}${S._clean ? '<div class="bk-seal">Clean sweep</div>' : ''}${b.lv === 'hard' ? '<div class="bk-seal gold">Cleared on Hard</div>' : ''}<p class="bk-note">+${bookPay(S)} tokens for clearing ${S.name} on ${LVL_NAME[b.lv]}</p>`, [[S.close2 ? 'Turn the page \u2192' : 'Close the book', () => { if (S.close2) { b.ph = 'close2'; saveProfile(); bookPage(); } else bookAdvance(); }, true]]); }
 }
 function bookBout(){
-  const b = bookState(), S = BOOK[b.st], k = bookBouts(S)[b.i], boss = b.i === S.n;
+  const b = bookState(), S = BOOK[b.st], k = bookBouts(S)[b.i], boss = b.i >= S.n;
   storyMatch = { v2: true }; cfg.mode = 'cpu'; cfg.level = b.lv; cfg.bout = boss ? '3' : '1'; cfg.p1 = profile.starter; cfg.p2 = k; rankingMatch = false;
   ['#book', '#story', '#end', '#menuBtn', '#muteBtn', '#sel', '#onb', '#vs'].forEach(q => $(q).hidden = true); closeSheet();
   selFlow = { from: 'quick', steps: [{ p: 'p1' }], i: 0, rnd: false }; lastFrom = 'quick'; startMatch();
@@ -3069,12 +3105,12 @@ function ambushAdvance(){
 }
 function bookResult(won){   // called when a Story bout ends; the result card gives way to a comic panel
   if (storyMatch && storyMatch.amb) return ambushResult(won);
-  const b = bookState(), S = BOOK[b.st], k = cfg.p2, boss = b.i === S.n, move = lastResult; storyMatch = null;
+  const b = bookState(), S = BOOK[b.st], k = cfg.p2, fin = b.i === S.n + (S.final ? 1 : 0), move = lastResult; storyMatch = null;
   (b.rec[S.id] = b.rec[S.id] || []).push(won ? 1 : 0); let pay = 0;
   if (won) { pay = LVL_PAY[b.lv]; addTokens(pay, 'story_bout', { stage: S.id, i: b.i }); }
-  const last = won && boss; if (won && !boss) b.i++;
+  const last = won && fin; if (won && !fin) b.i++;
   saveProfile();
-  const html = won ? `${bkHead(S, 'Yours')}<figure class="bk-panel win">${bkPor(profile.starter)}<div class="bk-bub"><small>Winning move</small><b class="bk-move">${esc(String(move || 'Yorikiri'))}</b><div class="bk-env"><span>祝</span>+${pay} token${pay === 1 ? '' : 's'}</div></div></figure>`
+  const html = won ? `${bkHead(S, 'Yours')}<figure class="bk-panel win">${bkPor(profile.starter)}<div class="bk-bub"><small>Winning move</small><b class="bk-move">${esc(String(move || 'Yorikiri'))}</b><div class="bk-env"><span>祝</span>+${pay} token${pay === 1 ? '' : 's'}</div></div></figure>${BOOK_AFTER[k] ? `<figure class="bk-panel say">${bkPor(k)}<div class="bk-bub"><b>${CHARS[k].name}</b><p>\u201c${BOOK_AFTER[k]}\u201d</p></div></figure>` : ''}`
     : `${bkHead(S, 'In the sand')}<figure class="bk-panel wide">${bkScene('sand')}<figcaption>You sit in the sand outside the bales. ${CHARS[k].name} walks off.</figcaption></figure><figure class="bk-panel say">${bkPor('master')}<div class="bk-bub"><b>Stablemaster</b><p>“${BOOK_LOSS[Math.floor(rand() * BOOK_LOSS.length)]}”</p></div></figure><p class="bk-note"><span class="bk-stamp">Clean sweep lost</span></p>`;
   setTimeout(() => { bkShow(html, won ? [[last ? 'Turn the page →' : 'Next →', () => { if (last) bookClose(); else bookPage(); }, true]] : [['← Contents', openBook], ['Again', bookBout, true]]); }, 0);
 }
@@ -3083,10 +3119,12 @@ function bookClose(){   // the stage's closing page: tokens, who joins, the clea
   S._clean = clean; const fresh2 = picks.filter(k => !ownsKey(k));
   S._join = S.joins === 'boss' ? S.boss : S.joins === 'small' ? (fresh2.length ? fresh2 : picks)[Math.floor(rand() * (fresh2.length ? fresh2.length : picks.length))] : null;
   S._bonus = !clean ? null : S.joins === 'boss' ? (fresh2.length ? fresh2 : picks)[0] : S.boss;
-  b.ph = 'close'; saveProfile(); bookPage();
+  b.pend = { _join: S._join, _clean: S._clean, _bonus: S._bonus }; b.ph = 'close'; saveProfile(); bookPage();
 }
 function bookAdvance(){
-  const b = bookState(), S = BOOK[b.st]; if (b.ph !== 'close') return openBook();
+  const b = bookState(), S = BOOK[b.st]; if (b.ph !== 'close' && b.ph !== 'close2') return openBook();
+  if (b.pend) Object.assign(S, b.pend); delete b.pend;
+  if (S.id === 'kyushu') { b.ch1 = true; storyState().done = true; }
   b.done.push(S.id); if (S._clean) b.clean.push(S.id); (b.gold = b.gold || []); if (b.lv === 'hard') b.gold.push(S.id); addTokens(bookPay(S), 'story_payout', { stage: S.id, level: b.lv });
   const join = S._join, bonus = S._bonus; b.st++; b.i = 0; b.ph = 'open'; saveProfile(); $('#book').hidden = true; openBook();
   const chain = [join && [join, S.joins === 'boss' ? 'boss' : 'join'], bonus && [bonus, 'clean']].filter(Boolean), run = n => { if (n < chain.length) storyUnlock(chain[n][0], chain[n][1], () => run(n + 1)); };
@@ -3626,6 +3664,8 @@ function resolveHit(f, t, nx, ny, k){
   if (t.c.passive === 'wobbly' && rand() < .07) { tally(t.idx, 'dodges'); addFloat(t.x, t.y - t.rad - 8, 'Wobble!', '#9fd1ff', 16); t.meter = Math.min(100, t.meter + 12 * t.spiritK); SFX.wobble(); return false; }
   if (t.guard) { t.guard = 0; tally(t.idx, 'dodges'); addFloat(t.x, t.y - t.rad - 8, 'Shrugged!', '#fbf5e4', 16); SFX.whiff(); return false; }
   let imp = f.power * k * (f.boost > 0 ? 1.25 : 1);
+  if (f.weak > 0) imp *= .6;
+  if (f.markNext) { t.weak = 3; addFloat(t.x, t.y - t.rad - 22, 'Marked!', '#1f1a17', 15); }
   if (f.c.passive === 'grudge' && f.grudge > 0) { imp *= 1 + .12 * f.grudge; if (f.grudge >= 2) addFloat(f.x, f.y - f.rad - 22, `Grudge x${f.grudge}!`, '#ff6b4a', 14); f.grudge = 0; }
   if (f.c.passive === 'showtime') { const n = fightT - (f.lastLand || -9) < 3 ? Math.min(3, f.combo || 0) : 0; imp *= 1 + .08 * n; if (n >= 2) addFloat(f.x, f.y - f.rad - 22, `x${n + 1}!`, '#ff7ad1', 14 + n * 2); }
   if (f.c.passive === 'momentum') imp *= 1 + .15 * clamp(Math.hypot(f.vx, f.vy) / f.maxSpd, 0, 1);
@@ -3678,6 +3718,7 @@ function special(f){
   else if (sp === 'palm') { f.palmT = .35; }
   else if (sp === 'poke') { doPush(f, { rangeK: 2, cone: .45, powerK: .5, free: true }); }
   else if (sp === 'fade') { f.fade = 2; }
+  else if (sp === 'blackhand') { f.markNext = 1; doPush(f, { rangeK: 1.5, cone: .5, powerK: 1.1, free: true }); f.markNext = 0; }
   else if (sp === 'ambush') { f.guard = 1; f.vx = Math.cos(f.face) * 560; f.vy = Math.sin(f.face) * 560; f.boost = Math.max(f.boost || 0, 1); burst(f.x, f.y, 12, '#1f1a17', 150, 3); }
   else if (sp === 'shadow') { const o = F.filter(q => q !== f && !q.out && (q.team == null || q.team !== f.team)).sort((a, b) => Math.hypot(a.x - f.x, a.y - f.y) - Math.hypot(b.x - f.x, b.y - f.y))[0];
     if (o) { burst(f.x, f.y, 14, '#1f1a17', 150, 3); let nx = o.x - Math.cos(o.face) * (o.rad + f.rad + 8), ny = o.y - Math.sin(o.face) * (o.rad + f.rad + 8); const d = Math.hypot(nx, ny), lim = R - f.rad - 6; if (d > lim) { nx *= lim / d; ny *= lim / d; }
@@ -3858,6 +3899,7 @@ function decide(f, P){
     else if (sp === 'eyes' && dist < range * 1.15 && faceErr < .4) special(f);
     else if (sp === 'fade' && dist < range * 2.2) special(f);
     else if (sp === 'ambush' && faceErr < .3 && dist < 240) special(f);
+    else if (sp === 'blackhand' && dist < f.range * 1.5 + o.rad && faceErr < .4) special(f);
     else if (sp === 'shadow' && dist < range * 3) special(f);
     else if (sp === 'charge' && faceErr < .12 && dist > range * .7 && dist < 260) special(f);
     else if (sp === 'mirror' && dist < range * 2.5) special(f);
@@ -4032,7 +4074,7 @@ function stepFighter(f, dt, controlled){
   f.flopT = Math.max(0, (f.flopT || 0) - dt);
   if (f.palmT > 0) { f.palmT -= dt; f.vx *= .85; f.vy *= .85; if (f.palmT <= 0) doPush(f, { cone: .45, powerK: 1.6, free: true }); }
   if (f.held) { f.holdT += dt; if (!f.fired && f.holdT >= .32 && f.meter >= 100) { special(f); f.fired = true; } }
-  f.flip = Math.max(0, (f.flip || 0) - dt); f.fade = Math.max(0, (f.fade || 0) - dt); if (!(f.fade > 0)) { f.seenX = f.x; f.seenY = f.y; }
+  f.flip = Math.max(0, (f.flip || 0) - dt); f.fade = Math.max(0, (f.fade || 0) - dt); f.weak = Math.max(0, (f.weak || 0) - dt); if (!(f.fade > 0)) { f.seenX = f.x; f.seenY = f.y; }
   let ix = controlled ? f.inp.x : 0, iy = controlled ? f.inp.y : 0; let m = Math.hypot(ix, iy); if (m > 1) { ix /= m; iy /= m; m = 1; }
   f.frozen = Math.max(0, (f.frozen || 0) - dt); f.weak = Math.max(0, (f.weak || 0) - dt); f.flee = Math.max(0, (f.flee || 0) - dt); f.cryT = Math.max(0, (f.cryT || 0) - dt);
   if (f.mill > 0) { f.mill -= dt; f.spinT = Math.max(f.spinT, .1); const v = f.maxSpd * .75; if (m > .12) { f.face = turnToward(f.face, Math.atan2(iy, ix), f.turn * dt); f.vx += (ix * v - f.vx) * Math.min(1, 6 * dt); f.vy += (iy * v - f.vy) * Math.min(1, 6 * dt); } else { f.vx *= .9; f.vy *= .9; }   // breaking on the floor
@@ -4607,6 +4649,7 @@ const LOOK = {
   rina:  { suit: 'jersey', suitCol: '#ff8a1f', num: '1', belt: '#1b2042', hair: '#3a2416', band: '#ff8a1f', ponytail: true, vball: true, lashes: true },
   piero: { suit: 'clown', suitCol: '#f4f1ea', dots: ['#ff6b4a', '#3d7bf5', '#f2c230', '#2f8a52'], wig: '#ff6b4a', nose: true, ruff: true, belt: '#ff6b4a', skin: '#f6dcc6' },
   kenta: { suit: 'trunks', suitCol: '#c8352c', stripe: '#f4f1ea', gloves: '#c8352c', band: '#c8352c', belt: '#c8352c' },
+  tegata: { belt: '#1f1a17', mask: '#fbf5e4', maskTrim: '#1f1a17', skin: '#c98f62', kuro: true }, ace: { belt: '#1f1a17', mask: '#fbf5e4', maskTrim: '#1f1a17', skin: '#e8bd94', kuro: true },
   kage: { belt: '#1f1a17', mask: '#fbf5e4', maskTrim: '#1f1a17', skin: '#e2b48a', kuro: true }, kuro: { belt: '#1f1a17', mask: '#fbf5e4', maskTrim: '#1f1a17', skin: '#d39a6a', kuro: true },
   kamen: { suit: 'trunks', suitCol: '#3d7bf5', stripe: '#f2c230', mask: '#3d7bf5', maskTrim: '#f2c230', belt: '#3d7bf5' },
   yubin: { suit: 'uniform', suitCol: '#8fb8de', pants: '#1b2042', sleeves: '#8fb8de', cap: '#1b2042', mailbag: true, belt: '#1b2042' },
