@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta http-equiv="Content-Security-Policy" content="script-src 'sha256-amdT6ccpjt61zg87R4baWfEQtaR3emaFnV4nZuQUjSg='; object-src 'none'; base-uri 'self'">
+<meta http-equiv="Content-Security-Policy" content="script-src 'sha256-PsYGUUpRzweKgiFfPNCmHqcPYk90pNQ0A/0ZKDCUi68='; object-src 'none'; base-uri 'self'">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover,interactive-widget=resizes-content">
 <meta name="theme-color" content="#1b2042">
 <meta name="mobile-web-app-capable" content="yes">
@@ -1246,7 +1246,7 @@ function applyStarter(f){   // each player's wrestler uses that player's copy; y
    Any phone can bring a second player (split screen: their controls at the top, like the same-phone 1 v 1).
    1 v 1 = exactly 2 players on 2 phones; 2 v 2 = 2-4 players who pick Blue or Red (CPUs fill the gaps); Rumble = 2-8 players, 6-8 wrestlers. ---------- */
 const TEST_BUILD = true;   // the site build sets this for test uploads: accounts and online are off, so live profiles are never touched
-const BUILD = 'v2.0 test 24 · Nov 22 04:31';   // stamped with the date and time by the site build, so you can tell which version a phone is running
+const BUILD = 'v2.0 test 25 · Nov 22 10:54';   // stamped with the date and time by the site build, so you can tell which version a phone is running
 let NET = null, netBusy = false;   // netBusy: one Make / Join / Quick at a time (no double-tap rooms)
 // NET = { role, seat, code, ws, topic, me:{name,pick,side}, peers:{seat:{name,pick,roll,side,rx}}, match, slots, rins, ... }
 const RT_URL = () => (window.__WWRT || WW.url.replace(/^http/, 'ws') + '/realtime/v1/websocket') + `?apikey=${encodeURIComponent(WW.key)}&vsn=1.0.0`;
@@ -3539,7 +3539,7 @@ function drawHome(){
   // control band: joystick + PUSH, same spots as in a bout
   const y0 = H - L.band, cy = y0 + L.band / 2, c = ctrl[0], f = F[0];
   ctx.fillStyle = NIGHT; ctx.fillRect(-SAFE.l, y0, FW, L.band + SAFE.b);
-  const jx = c.joy !== null ? c.bx : W * .22, jy = c.joy !== null ? c.by : cy;
+  const jx = W * .22, jy = cy;   // v2.0: the stick is always drawn in its corner; the thumb can still land anywhere on that side
   ctx.beginPath(); ctx.arc(jx, jy, 46, 0, TAU); ctx.fillStyle = NIGHT; ctx.fill(); ctx.strokeStyle = INK.paper2; ctx.lineWidth = 3; ctx.stroke(); ctx.beginPath(); ctx.arc(jx, jy, 38, 0, TAU); ctx.lineWidth = 1.5; ctx.stroke();
   let kx = jx, ky = jy; if (c.joy !== null) { const dx = c.kx - c.bx, dy = c.ky - c.by, m = Math.hypot(dx, dy), k = m > 46 ? 46 / m : 1; kx = jx + dx * k; ky = jy + dy * k; }
   ctx.beginPath(); ctx.arc(kx + 3, ky + 3, 20, 0, TAU); ctx.fillStyle = NIGHT_INK; ctx.fill(); ctx.beginPath(); ctx.arc(kx, ky, 20, 0, TAU); ctx.fillStyle = INK.paper2; ctx.fill(); ctx.strokeStyle = NIGHT_INK; ctx.lineWidth = 3; ctx.stroke();
@@ -4989,7 +4989,7 @@ function drawBand(p){
   ctx.fillStyle = INK.ink; ctx.fillRect(-SAFE.l, p === 0 ? y0 : L.band - 4, FW, 4); ctx.fillStyle = f.tint; ctx.fillRect(-SAFE.l, p === 0 ? y0 + 4 : L.band - 7, FW, 3);
   const cy = y0 + L.band / 2, c = ctrl[p];
   const joyX = p === 0 ? W * .22 : W * .78, btnX = p === 0 ? W * .78 : W * .22;
-  const jx = c.joy !== null ? c.bx : joyX, jy = c.joy !== null ? c.by : cy;
+  const jx = joyX, jy = cy;   // v2.0: drawn fixed; steering is still measured from where the thumb landed
   ctx.beginPath(); ctx.arc(jx, jy, 46, 0, TAU); ctx.fillStyle = INK.paper; ctx.fill(); ctx.strokeStyle = INK.ink; ctx.lineWidth = 3; ctx.stroke(); ctx.beginPath(); ctx.arc(jx, jy, 39, 0, TAU); ctx.lineWidth = 1.5; ctx.stroke();
   let kx = jx, ky = jy; if (c.joy !== null) { const dx = c.kx - c.bx, dy = c.ky - c.by, m = Math.hypot(dx, dy), s = m > 46 ? 46 / m : 1; kx = jx + dx * s; ky = jy + dy * s; }
   ctx.beginPath(); ctx.arc(kx + 3, ky + 3, 20, 0, TAU); ctx.fillStyle = INK.ink; ctx.fill(); ctx.beginPath(); ctx.arc(kx, ky, 20, 0, TAU); ctx.fillStyle = INK.paper3; ctx.fill(); ctx.lineWidth = 3; ctx.strokeStyle = INK.ink; ctx.stroke();
