@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta http-equiv="Content-Security-Policy" content="script-src 'sha256-n7ohlxjuqdBSVZcvke7pEiJUd51MJEF0DcHUPx+nJHg='; object-src 'none'; base-uri 'self'">
+<meta http-equiv="Content-Security-Policy" content="script-src 'sha256-4X3fqmPJQVgpMibpK4rgairkXKU7GE+XsQmxTn7VKWA='; object-src 'none'; base-uri 'self'">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover,interactive-widget=resizes-content">
 <meta name="theme-color" content="#1b2042">
 <meta name="mobile-web-app-capable" content="yes">
@@ -1176,7 +1176,7 @@ function applyStarter(f){   // each player's wrestler uses that player's copy; y
    Any phone can bring a second player (split screen: their controls at the top, like the same-phone 1 v 1).
    1 v 1 = exactly 2 players on 2 phones; 2 v 2 = 2-4 players who pick Blue or Red (CPUs fill the gaps); Rumble = 2-8 players, 6-8 wrestlers. ---------- */
 const TEST_BUILD = true;   // the site build sets this for test uploads: accounts and online are off, so live profiles are never touched
-const BUILD = 'v2.0 test 15 · Nov 21 14:39';   // stamped with the date and time by the site build, so you can tell which version a phone is running
+const BUILD = 'v2.0 test 16 · Nov 21 16:07';   // stamped with the date and time by the site build, so you can tell which version a phone is running
 let NET = null, netBusy = false;   // netBusy: one Make / Join / Quick at a time (no double-tap rooms)
 // NET = { role, seat, code, ws, topic, me:{name,pick,side}, peers:{seat:{name,pick,roll,side,rx}}, match, slots, rins, ... }
 const RT_URL = () => (window.__WWRT || WW.url.replace(/^http/, 'ws') + '/realtime/v1/websocket') + `?apikey=${encodeURIComponent(WW.key)}&vsn=1.0.0`;
@@ -1945,7 +1945,7 @@ const CLAW_GRAB = .55, CLAW_SLIP = .25;   // claw: a dead-centre grab holds 55% 
 const SLOT_ODDS = { 1: .08, 2: .14, 3: .22 }, BADLUCK_STEP = .04, BADLUCK_CAP = .2, BUMPS_FOR_SECRET = 5;
 let M = null; const plushCache = {};
 const ownsKey = k => (me ? me.owns : [...STARTERS, ...guestWins]).includes(k);
-function plush(key){ if (!plushCache[key]) { const c = document.createElement('canvas'); drawPortrait(c, key, '#f2c230', 68, Math.PI); plushCache[key] = c; } return plushCache[key]; }
+function plush(key){ if (!plushCache[key]) { const c = document.createElement('canvas'); drawTopDown(c, key, '#f2c230', 68, Math.PI); plushCache[key] = c; } return plushCache[key]; }
 function misses(m){ const o = me || (window.__gm = window.__gm || {}); o.misses = o.misses || {}; return o.misses[m] || 0; }
 function setMisses(m, v){ const o = me || (window.__gm = window.__gm || {}); o.misses = o.misses || {}; o.misses[m] = v; if (me) saveMe(); }
 function openMachine(kind){
@@ -2486,7 +2486,17 @@ function drawModeArt(){
   drawScene($('[data-art="rumble"]'), six.map((key, i) => { const a = i / 6 * TAU - Math.PI / 2; return { key, x: 60 + Math.cos(a) * 23, y: 40 + Math.sin(a) * 23, face: a + Math.PI, tint: TINTS[i], k: .32 }; }));
 }
 const summary = c => [['STR', (c.p + c.r) / 2], ['SPD', (c.s + c.a + c.ag) / 3], ['TGH', (c.w + c.g) / 2]];
-function drawPortrait(cnv, key, tint, sz = 68, rot = Math.PI, ext = 0){
+const faceImg = {};
+function drawPortrait(cnv, key, tint, sz = 68, rot = Math.PI, ext = 0){   // v2.0: the round face from the portrait; falls back to the top-down figure
+  if (typeof POR === 'undefined' || !POR[key]) return drawTopDown(cnv, key, tint, sz, rot, ext);
+  const dpr = 2; cnv.width = cnv.height = sz * dpr; cnv._fk = key; const g = cnv.getContext('2d'), R = sz * .455;
+  const paint = im => { g.setTransform(dpr, 0, 0, dpr, 0, 0); g.clearRect(0, 0, sz, sz); g.save(); g.beginPath(); g.arc(sz / 2, sz / 2, R, 0, TAU); g.fillStyle = '#f4ead2'; g.fill(); g.clip(); if (im) g.drawImage(im, sz / 2 - R, sz / 2 - R, R * 2, R * 2); g.restore();
+    g.beginPath(); g.arc(sz / 2, sz / 2, R, 0, TAU); g.lineWidth = Math.max(3, sz * .05); g.strokeStyle = '#1f1a17'; g.stroke(); g.lineWidth = Math.max(1.5, sz * .025); g.strokeStyle = tint || '#c3974c'; g.stroke(); };
+  let im = faceImg[key];
+  if (!im) { im = faceImg[key] = new Image(); im.src = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(portraitSvg(key).replace('<svg ', '<svg xmlns="http://www.w3.org/2000/svg" width="456" height="456" ').replace('viewBox="0 16 300 236"', 'viewBox="36 6 228 228"')); }
+  if (im.complete && im.naturalWidth) paint(im); else { paint(null); im.addEventListener('load', () => { if (cnv._fk === key) paint(im); }, { once: true }); }
+}
+function drawTopDown(cnv, key, tint, sz = 68, rot = Math.PI, ext = 0){
   const c = CHARS[key], dpr = 2; cnv.width = cnv.height = sz * dpr;
   const g = cnv.getContext('2d'), prev = ctx; ctx = g;
   try {
@@ -2846,7 +2856,7 @@ function openFull(key){
     <span class="stats">${STAT_ROWS.map(([l, k]) => `<span>${l}</span><span class="dots">${[1, 2, 3, 4, 5].map(i => `<s class="${i <= c[k] ? 'on' : ''}"></s>`).join('')}</span>`).join('')}</span>
     <div class="abl"><div class="ab"><em>Passive</em>${c.passiveName}: ${c.passiveText}</div><div class="ab"><em>Special \u00b7 hold PUSH</em>${c.specialName}: ${c.specialText}</div></div>${(() => { const r = selFlow ? seatRoll(stSeat(selFlow.steps[selFlow.i]), key) : myRoll(key); return r ? `<div class="ab" style="margin-top:8px"><em>Your copy \u00b7 <span style="color:var(--gold);letter-spacing:2px">${'\u2605'.repeat(r.tier)}</span> ${TIER_WORD[r.tier]}</em>Pushes ${r.push} (${c.push[0]}\u2013${c.push[1]}) \u00b7 Recharge ${r.rech} (${c.rech[0]}\u2013${c.rech[1]}) \u00b7 Spirit ${r.spirit} (${c.spirit[0]}\u2013${c.spirit[1]}) \u00b7 Luck ${r.luck} (${c.luck[0]}\u2013${c.luck[1]})</div>` : ''; })()}</div>`,
     [['Back', closeSheet], [`Pick ${c.name}`, () => { const st = selFlow.steps[selFlow.i]; selFlow.rnd = false; cfg[st.p] = key; saveCfg(); closeSheet(); renderSelect(); }, true]]);
-  const pc = $('#wcPor'); if (pc) drawPortrait(pc, key, '#1f1a17', 104, Math.PI, 0);
+  const pc = $('#wcPor'); if (pc) drawTopDown(pc, key, '#1f1a17', 104, Math.PI, 0);
 }
 $('#selBack').addEventListener('click', () => {
   if (selFlow.i > 0) { selFlow.i--; selFlow.rnd = stepRnd(selFlow.steps[selFlow.i]) && selFlow.steps[selFlow.i].cpu; return renderSelect(); }
