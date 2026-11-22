@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta http-equiv="Content-Security-Policy" content="script-src 'sha256-gXkZ8PpeLLZ2aAu2IVzxIVUJiggx6GeX6n2xX/phMYA='; object-src 'none'; base-uri 'self'">
+<meta http-equiv="Content-Security-Policy" content="script-src 'sha256-MWR6VEmcfUrAOojzbwZc5LsMmJkmqWualBTq9RtWXn8='; object-src 'none'; base-uri 'self'">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover,interactive-widget=resizes-content">
 <meta name="theme-color" content="#1b2042">
 <meta name="mobile-web-app-capable" content="yes">
@@ -496,6 +496,42 @@ h1 span{color:var(--clay)}
 .wc-frame{border:3px solid #1f1a17;background:#f4ead2;aspect-ratio:300/236;overflow:hidden}
 .wc-portrait{display:block;width:100%;height:100%}
 .wc-top.por .wc-hand{right:2px;bottom:-16px}
+
+/* v2.0 Book of the Ring */
+.bk{background:#efe3c8;color:#1f1a17;display:flex;flex-direction:column}
+.bk-body{flex:1 1 auto;overflow-y:auto;padding:max(16px, env(safe-area-inset-top, 0px)) 16px 12px;max-width:520px;width:100%;box-sizing:border-box;margin:0 auto;display:flex;flex-direction:column;gap:10px}
+.bk-bar{display:flex;gap:10px;padding:10px 16px max(12px, env(safe-area-inset-bottom, 0px));max-width:520px;width:100%;box-sizing:border-box;margin:0 auto;border-top:3px solid #1f1a17;background:#fbf5e4}
+.bk-bar .start{flex:1}
+.bk-top{display:flex;flex-direction:column;gap:2px;border-bottom:3px solid #1f1a17;padding-bottom:8px}
+.bk-top small{font-size:10px;font-weight:900;letter-spacing:.14em;text-transform:uppercase;color:#8a2a1e}
+.bk-top h2{font-family:var(--display);font-weight:400;font-size:26px;line-height:1.05;margin:0}
+.bk-rec{display:flex;gap:5px;margin-top:4px}.bk-rec i{width:13px;height:13px;border-radius:50%;border:2px dotted #1f1a17;box-sizing:border-box;opacity:.35}.bk-rec i.w{background:#fff;border-style:solid;opacity:1;box-shadow:1.5px 1.5px 0 #1f1a17}.bk-rec i.l{border-style:solid}.bk-rec i.l{background:#1f1a17;opacity:1}
+.bk-panel{margin:0;border:3px solid #1f1a17;background:#fbf5e4;box-shadow:4px 4px 0 #1f1a17;display:flex;flex-direction:column}
+.bk-panel>svg{display:block;width:100%;height:auto;border-bottom:3px solid #1f1a17}
+.bk-panel figcaption{padding:8px 10px;font-weight:800;font-size:14px;line-height:1.35}
+.bk-panel.say,.bk-panel.pre,.bk-panel.win{flex-direction:row;align-items:stretch}
+.bk-por{flex:0 0 46%;padding:7px;border-right:3px solid #1f1a17;background-color:#f4ead2;box-sizing:border-box}
+.bk-duo{display:flex;border-bottom:3px solid #1f1a17}.bk-duo .bk-por{flex:1 1 50%}.bk-duo .bk-por:last-child{border-right:0}
+.bk-bub{flex:1;padding:10px;display:flex;flex-direction:column;gap:4px;justify-content:center;min-width:0}
+.bk-bub b{font-family:var(--display);font-weight:400;font-size:16px;line-height:1.1}
+.bk-bub small{font-size:10px;font-weight:900;letter-spacing:.08em;text-transform:uppercase;color:#8a2a1e}
+.bk-bub p{margin:0;font-weight:800;font-size:14px;line-height:1.35}
+.bk-move{font-size:24px!important;color:#c8402f}
+.bk-env{align-self:flex-start;margin-top:6px;border:2.5px solid #1f1a17;background:#fbf5e4;padding:5px 9px;font-weight:900;font-size:14px;display:flex;align-items:center;gap:7px;box-shadow:2px 2px 0 #1f1a17}.bk-env span{background:#c8402f;color:#fbf5e4;padding:1px 4px;font-size:13px}
+.bk-panel.dark{background:#1a2a4f;color:#fbf5e4}.bk-mask{display:flex;justify-content:center;padding:10px 0 0}.bk-mask svg{width:84px;height:84px}
+.bk-panel.news{padding:10px;gap:6px}.bk-mast{font-family:var(--display);font-size:20px;text-align:center;border-bottom:3px double #1f1a17;padding-bottom:4px}.bk-head{font-family:var(--display);font-size:22px;line-height:1.05}
+.bk-cols{display:flex;gap:10px}.bk-cols .bk-por{flex:0 0 42%;border:2.5px solid #1f1a17;padding:4px}.bk-cols p{margin:0 0 6px;font-weight:700;font-size:13px;line-height:1.3}.bk-cols i{display:block;height:5px;background:#1f1a17;opacity:.22;margin:5px 0}
+.bk-item{display:flex;gap:8px;align-items:center;border-top:2px solid #1f1a17;padding-top:6px}.bk-item svg{width:34px;height:32px;flex:0 0 auto}.bk-item p{margin:0;font-size:12px;font-weight:700;line-height:1.3}
+.bk-note{margin:0;font-weight:800;font-size:13px;color:#5c5148}
+.bk-stamp{display:inline-block;border:2px solid #c8402f;color:#c8402f;padding:0 5px;font-size:11px;font-weight:900;letter-spacing:.06em;text-transform:uppercase;transform:rotate(-3deg)}
+.bk-seal{align-self:flex-start;border:3px solid #c8402f;color:#c8402f;font-family:var(--display);font-size:18px;padding:4px 10px;transform:rotate(-4deg)}
+.bk-lv{display:flex;flex-direction:column;gap:6px}.bk-lv small{font-weight:800;font-size:12px;color:#5c5148}
+.bk-lv .seg{display:flex;border:3px solid #1f1a17;background:#fbf5e4}.bk-lv .seg button{flex:1;border:0;background:transparent;font-weight:900;font-size:15px;padding:10px 4px;color:#1f1a17;border-right:2px solid #1f1a17}.bk-lv .seg button:last-child{border-right:0}.bk-lv .seg button.on{background:#c8402f;color:#fbf5e4}
+.bk-cover{border:3px solid #1f1a17;background:#5a2d82;color:#fbf5e4;padding:14px;box-shadow:4px 4px 0 #1f1a17}.bk-cover small{font-size:10px;font-weight:900;letter-spacing:.14em;text-transform:uppercase;opacity:.85}.bk-cover h2{font-family:var(--display);font-weight:400;font-size:28px;margin:2px 0 0;line-height:1}.bk-cover p{margin:2px 0 0;font-weight:800}
+.bk-row{display:flex;align-items:center;justify-content:space-between;gap:10px;border:3px solid #1f1a17;background:#fbf5e4;padding:10px 12px}.bk-row b{font-family:var(--display);font-weight:400;font-size:17px;display:block}.bk-row small{font-weight:800;font-size:12px;color:#5c5148}
+.bk-row.locked{opacity:.5}.bk-row.now{box-shadow:4px 4px 0 #1f1a17}.bk-row .bk-rec{margin:0}
+.bk-tag{font-size:10px;font-weight:900;letter-spacing:.1em;text-transform:uppercase;border:2px solid #1f1a17;padding:2px 7px;white-space:nowrap}.bk-tag.seal{border-color:#c8402f;color:#c8402f}
+.bk-go{padding:8px 16px!important;font-size:15px!important;min-height:0!important}
 </style>
 </head>
 <body>
@@ -580,6 +616,7 @@ h1 span{color:var(--clay)}
   <div class="sel-head prz-head"><div class="sel-row"><button id="storyBack" class="homeBack">&larr; Home</button><span class="ribbon sm" style="--rib:#5d3c8a">Story</span></div></div>
   <div id="storyBody" class="prz-body"></div>
 </div>
+<div id="book" class="sel prz bk" hidden><div id="bookBody" class="bk-body"></div><div id="bookBar" class="bk-bar"></div></div>
 <div id="online" class="sel prz" hidden>
   <div class="sel-head prz-head"><div class="sel-row"><button id="onlineBack" class="homeBack">&larr; Home</button><span class="ribbon sm" style="--rib:#2f62c8">Online</span></div></div>
   <div id="onlineBody" class="prz-body"></div>
@@ -1185,7 +1222,7 @@ function applyStarter(f){   // each player's wrestler uses that player's copy; y
    Any phone can bring a second player (split screen: their controls at the top, like the same-phone 1 v 1).
    1 v 1 = exactly 2 players on 2 phones; 2 v 2 = 2-4 players who pick Blue or Red (CPUs fill the gaps); Rumble = 2-8 players, 6-8 wrestlers. ---------- */
 const TEST_BUILD = true;   // the site build sets this for test uploads: accounts and online are off, so live profiles are never touched
-const BUILD = 'v2.0 test 19 · Nov 21 16:27';   // stamped with the date and time by the site build, so you can tell which version a phone is running
+const BUILD = 'v2.0 test 20 · Nov 21 16:37';   // stamped with the date and time by the site build, so you can tell which version a phone is running
 let NET = null, netBusy = false;   // netBusy: one Make / Join / Quick at a time (no double-tap rooms)
 // NET = { role, seat, code, ws, topic, me:{name,pick,side}, peers:{seat:{name,pick,roll,side,rx}}, match, slots, rins, ... }
 const RT_URL = () => (window.__WWRT || WW.url.replace(/^http/, 'ws') + '/realtime/v1/websocket') + `?apikey=${encodeURIComponent(WW.key)}&vsn=1.0.0`;
@@ -1623,6 +1660,7 @@ function scoutLine(){
 }
 function miniInto(cv, key, sz, dim){ const d = Math.min(2, devicePixelRatio || 1); cv.width = sz * d; cv.height = sz * 1.17 * d; cv.style.width = sz + 'px'; cv.style.height = sz * 1.17 + 'px'; const g = cv.getContext('2d'); g.clearRect(0, 0, cv.width, cv.height); if (dim) g.filter = 'grayscale(1) brightness(.4)'; g.drawImage(mini(key), 0, 0, cv.width, cv.height); }
 function openStory(){
+  if (typeof openBook === 'function') return openBook();   // v2.0: the Book of the Ring replaces the basho list
   leaveHome(); phase = 'menu'; const s = storyState(), body = $('#storyBody');
   body.innerHTML = `<div class="scout"><span class="sc-who">Scout</span><p>${scoutLine()}</p><span class="sc-rank">Your rank <b>${myRank()}</b> · ${CHARS[profile.starter].name}${profile.name ? ` “${profile.name}”` : ''}</span></div>`
     + STORY.map((B, b) => {
@@ -2711,7 +2749,7 @@ const POR_BG = {   // one painted motif behind the head that says who he is; dra
   bubbles: [[48, 70, 26], [264, 56, 20], [272, 150, 13], [30, 160, 12], [96, 30, 8], [226, 110, 7]].map(([x, y, r]) => `<circle cx="${x}" cy="${y}" r="${r}" stroke-width="${r > 15 ? 5 : 3.5}"/><path d="M${x - r * .5} ${y - r * .2}A${r * .55} ${r * .55} 0 0 1 ${x - r * .1} ${y - r * .55}" stroke-width="2.5"/>`).join('') + '<path d="M220 30l3 8 8 3-8 3-3 8-3-8-8-3 8-3zM60 124l3 7 7 3-7 3-3 7-3-7-7-3 7-3zM286 196l2 6 6 2-6 2-2 6-2-6-6-2 6-2z" stroke-width="2.5" stroke-linejoin="round"/>'
 };
 function porBody(key){
-  const lk = LOOK[key] || {}, c = CHARS[key] || {}, shade = tone2, P = POR[key] || {}, I = lk.line || '#1f1a17', skin = lk.skin || c.skin || '#f0c493', hair = lk.hair || '#1f1a17', tint = (lk.suit && lk.suit !== 'trunks' && lk.suitCol) || lk.belt || '#24375e';
+  const P = POR[key] || {}, lk = P.look || LOOK[key] || {}, c = CHARS[key] || {}, shade = tone2, I = lk.line || '#1f1a17', skin = lk.skin || c.skin || '#f0c493', hair = lk.hair || '#1f1a17', tint = (lk.suit && lk.suit !== 'trunks' && lk.suitCol) || lk.belt || '#24375e';
   const bald = !!lk.bald, robe = lk.suit && lk.suit !== 'trunks', [face, ed] = POR_FACE[P.face || 'round'], long = P.face === 'long' || P.face === 'slim';
   const o = [];
   o.push(`<g stroke-linejoin="round" stroke-linecap="round">`);
@@ -2854,10 +2892,121 @@ function porBody(key){
   return o.join('');
 }
 function portraitSvg(key){
-  const P = POR[key] || {}, lk = LOOK[key] || {}, tint = P.bgCol || (lk.suit && lk.suit !== 'trunks' && lk.suitCol) || lk.belt || '#24375e';
+  const P = POR[key] || {}, lk = P.look || LOOK[key] || {}, tint = P.bgCol || (lk.suit && lk.suit !== 'trunks' && lk.suitCol) || lk.belt || '#24375e';
   const one = k => POR[k] && POR[k].small ? `<g transform="translate(150 262) scale(${POR[k].small === true ? .84 : POR[k].small}) translate(-150 -262)">${porBody(k)}</g>` : porBody(k);
   const body = P.duo ? P.duo.map((k, i) => `<g transform="translate(${i ? 104 : -2} 74) scale(.66)">${porBody(k)}</g>`).join('') : one(key);
-  return `<svg class="wc-portrait" role="img" aria-label="Portrait of ${CHARS[key].name}" viewBox="0 16 300 236" preserveAspectRatio="xMidYMid slice"><g fill="none" stroke="${tint}" stroke-linecap="round" opacity=".4">${POR_BG[P.bg || 'wave']}</g>${body}</svg>`;
+  return `<svg class="wc-portrait" role="img" aria-label="Portrait of ${(CHARS[key] || { name: key }).name}" viewBox="0 16 300 236" preserveAspectRatio="xMidYMid slice"><g fill="none" stroke="${tint}" stroke-linecap="round" opacity=".4">${POR_BG[P.bg || 'wave']}</g>${body}</svg>`;
+}
+/* ---------- v2.0 Story: the Book of the Ring (Chapter 1). Pages are comic pages; each bout is three small panels ---------- */
+POR.master = { look: { hair: '#a7a7b0', suit: 'kimono', suitCol: '#3a3f52', skin: '#dfae84' }, face: 'square', brow: 'heavy', eyes: 'narrow', nose: 'broad', mouth: 'frown', lines: true, chin: true, tache2: true, bg: 'smoke', bgCol: '#5c5148' };
+const BOOK = [
+  { id: 'festival', name: 'Shrine festival', place: 'Home town', pool: ['baby', 'mushi', 'twins'], n: 2, boss: 'ume', pay: 10, joins: 'small',
+    open: { title: 'Festival night', panels: [['scene', 'festival', 'Paper lanterns, food stalls, a ring roped off on the shrine grounds. Children on shoulders.'], ['duo', ['hime', 'musuko'], 'In the kids’ ring next door, two little ones flatten everyone without breaking a sweat.'], ['say', 'master', 'Your name is on the chalk board. Don’t look at the board. Look at the ring.']] },
+    close: { title: 'A new friend', panels: [['say', 'ume', 'You eat properly? Here. Rice ball. Don’t argue.'], ['join'], ['mask', 'At the edge of the crowd: a white mask, watching. Then gone.']] } },
+  { id: 'city', name: 'City championship', place: 'The city gym', pool: ['tsuri', 'shin', 'bup'], n: 2, boss: 'kota', pay: 15,
+    open: { title: 'The city gym', panels: [['scene', 'gym', 'A sports hall with a sponsor banner and one local TV camera.'], ['say', 'master', 'Bigger hall. Same ring. Fifteen feet across, wherever you go.']] },
+    close: { title: 'Front page', panels: [['news'], ['say', 'master', 'Tokyo next. Pack light. You only own one bag anyway.']] } },
+  { id: 'hatsu', name: 'Hatsu basho', place: 'Tokyo · January', pool: ['ghost', 'show', 'sato', 'kokko'], n: 4, days: true, boss: 'magic', pay: 20, joins: 'boss',
+    open: { title: 'Tokyo, January', panels: [['scene', 'tokyo', 'The great hall under snow. The ranking sheet fills the wall, top names huge. Yours is tiny, at the very bottom.'], ['say', 'master', 'Four days, then whoever is left standing at the top of your side. Sleep.']] },
+    close: { title: 'Moving up', panels: [['scene', 'sheet', 'Your name climbs the ranking sheet.'], ['join'], ['scene', 'alley', 'You walk home late, down an alley behind the hall.']] } }
+];
+const BOOK_PROLOGUE = ['The gate', 'First morning', 'The amateur hall', 'Going pro'];
+const BOOK_LINE = { mushi: 'Catches beetles for fun. You are a large beetle.', twins: 'Two of them. One mawashi budget.', bup: 'Small. Antlers. Hugs like a vice.', sato: 'Took a half day for this. Must be back by two.', kokko: 'Nobody knows why the chicken suit. Nobody asks twice.', ghost: 'Nobody has ever touched him. Nobody is sure they could.',
+  ume: 'She sets down her shopping and cracks her knuckles.', kota: 'He copies your stance. Then your frown. Then your sigh.', magic: 'He pulls your portrait out of his hat. It is a good likeness.' };
+const BOOK_LOSS = ['Sand washes off. Get up.', 'You watched their hands. Watch their feet.', 'Again. Slower in the head, faster in the legs.', 'Good. Now you know what losing to that one feels like.'];
+const BOOK_LV = ['easy', 'normal', 'hard'];
+function bookState(){ const b = profile.book = profile.book || { st: 0, ph: 'open', i: 0, lv: 'easy', picks: {}, rec: {}, done: [], clean: [] };
+  const S = BOOK[b.st]; if (S && !b.picks[S.id]) { const pool = S.pool.slice(); if (!S.days) pool.sort(() => rand() - .5); b.picks[S.id] = pool.slice(0, S.n); b.rec[S.id] = b.rec[S.id] || []; saveProfile(); }
+  return b; }
+const bookBouts = S => bookState().picks[S.id].concat(S.boss);
+const bookWins = id => (bookState().rec[id] || []).filter(x => x).length;
+const bkMask = `<svg viewBox="0 0 100 100" aria-hidden="true"><ellipse cx="50" cy="52" rx="30" ry="38" fill="#fbf5e4" stroke="#1f1a17" stroke-width="4"/><path d="M28 46C34 40 42 42 45 48C40 52 32 52 28 46ZM72 46C66 40 58 42 55 48C60 52 68 52 72 46Z" fill="#1f1a17"/><path d="M42 72h16" stroke="#1f1a17" stroke-width="3"/></svg>`;
+function bkScene(kind){
+  const I = '#1f1a17', wrap = (bg, body) => `<svg viewBox="0 0 300 150" preserveAspectRatio="xMidYMid slice" aria-hidden="true"><rect width="300" height="150" fill="${bg}"/>${body}</svg>`;
+  const ring = y => `<ellipse cx="150" cy="${y}" rx="78" ry="17" fill="#e2b866" stroke="${I}" stroke-width="3"/><ellipse cx="150" cy="${y}" rx="64" ry="12" fill="none" stroke="#fbf5e4" stroke-width="3" stroke-dasharray="7 4"/>`;
+  if (kind === 'festival') { let l = ''; for (let i = 0; i < 9; i++) { const x = 18 + i * 33, y = 26 + 16 * Math.abs(Math.sin(Math.PI * (x / 150))); l += `<ellipse cx="${x}" cy="${y + 10}" rx="8" ry="10" fill="${i % 2 ? '#d9a441' : '#c8402f'}" stroke="${I}" stroke-width="2"/><path d="M${x - 4} ${y}h8M${x - 4} ${y + 20}h8" stroke="${I}" stroke-width="2"/>`; }
+    return wrap('#1a2a4f', `<path d="M104 62h92l-5 9h-82zM112 76h76v6h-76zM122 82h8v52h-8zM170 82h8v52h-8z" fill="#0d1730"/><path d="M0 22C50 48 100 48 150 26C200 48 250 48 300 22" fill="none" stroke="${I}" stroke-width="2"/>${l}
+      <path d="M4 92h76l-7 14H11z" fill="#c8402f" stroke="${I}" stroke-width="2.5"/><path d="M24 92l-3 14M44 92v14M64 92l3 14" stroke="#fbf5e4" stroke-width="5"/><rect x="12" y="106" width="60" height="30" fill="#efe3c8" stroke="${I}" stroke-width="2.5"/>
+      <path d="M220 92h76l-7 14h-62z" fill="#d9a441" stroke="${I}" stroke-width="2.5"/><path d="M240 92l-3 14M260 92v14M280 92l3 14" stroke="#fbf5e4" stroke-width="5"/><rect x="228" y="106" width="60" height="30" fill="#efe3c8" stroke="${I}" stroke-width="2.5"/>${ring(134)}`); }
+  if (kind === 'gym') return wrap('#efe3c8', `<rect y="0" width="300" height="96" fill="#e3d5b3"/><path d="M0 96H300" stroke="${I}" stroke-width="3"/><rect x="62" y="16" width="176" height="34" fill="#24375e" stroke="${I}" stroke-width="3"/><text x="150" y="39" text-anchor="middle" font-family="Dela Gothic One, sans-serif" font-size="14" fill="#fbf5e4">CITY CHAMPIONSHIP</text>
+      <path d="M22 70h22v14H22zM10 96l22-12 22 12M32 84v12" fill="#1f1a17" stroke="${I}" stroke-width="3" stroke-linejoin="round"/><circle cx="46" cy="77" r="4" fill="#c8402f"/>
+      <g fill="#8d8378" stroke="${I}" stroke-width="2">${[236, 256, 276].map(x => `<path d="M${x} 78h14v10h-14zM${x} 88v10M${x + 14} 88v10"/>`).join('')}</g>${ring(122)}`);
+  if (kind === 'tokyo') { let s = ''; for (let i = 0; i < 26; i++) s += `<circle cx="${(i * 47) % 300}" cy="${(i * 31) % 120}" r="${1.5 + (i % 3) * .6}" fill="#fbf5e4"/>`; let rows = ''; for (let i = 0; i < 7; i++) rows += `<path d="M214 ${30 + i * 13}h${62 - i * 7}" stroke="${I}" stroke-width="${6 - i * .7}"/>`;
+    return wrap('#9fb2c8', `${s}<path d="M10 78L100 34L190 78Z" fill="#3f6b52" stroke="${I}" stroke-width="3" stroke-linejoin="round"/><rect x="26" y="78" width="148" height="52" fill="#efe3c8" stroke="${I}" stroke-width="3"/><path d="M80 130V96h40v34" fill="#24375e" stroke="${I}" stroke-width="3"/><path d="M44 78V52M156 78V52" stroke="${I}" stroke-width="2"/><path d="M44 52h14v20H44zM142 52h14v20h-14z" fill="#c8402f" stroke="${I}" stroke-width="2"/><rect x="0" y="130" width="300" height="20" fill="#fbf5e4"/>
+      <rect x="204" y="16" width="84" height="112" fill="#fbf5e4" stroke="${I}" stroke-width="3"/>${rows}<path d="M214 121h10" stroke="#c8402f" stroke-width="2.5"/>`); }
+  if (kind === 'sheet') { let rows = ''; for (let i = 0; i < 8; i++) rows += `<path d="M96 ${24 + i * 14}h${108 - i * 9}" stroke="${i === 4 ? '#c8402f' : I}" stroke-width="${7 - i * .7}"/>`;
+    return wrap('#efe3c8', `<rect x="80" y="8" width="140" height="134" fill="#fbf5e4" stroke="${I}" stroke-width="3"/>${rows}<path d="M232 100V70M222 80l10-12 10 12" fill="none" stroke="#c8402f" stroke-width="5" stroke-linejoin="round"/>`); }
+  if (kind === 'alley') return wrap('#0d1730', `<path d="M0 150L90 60V0H0zM300 150L210 60V0h90z" fill="#1a2a4f" stroke="${I}" stroke-width="3"/><path d="M90 60H210" stroke="${I}" stroke-width="3"/><ellipse cx="226" cy="52" rx="9" ry="12" fill="#d9a441" stroke="${I}" stroke-width="2.5"/><path d="M226 26v14" stroke="${I}" stroke-width="2"/><path d="M150 150V96" stroke="#fbf5e4" stroke-width="2" stroke-dasharray="6 6" opacity=".4"/><circle cx="150" cy="86" r="7" fill="#efe3c8" stroke="${I}" stroke-width="2.5"/><path d="M140 118c0-18 20-18 20 0v14h-20z" fill="#efe3c8" stroke="${I}" stroke-width="2.5"/>`);
+  return wrap('#efe3c8', '');
+}
+const bkPor = (key, cls = '') => `<div class="bk-por ${cls}" style="background-image:${POR[key] && CHARS[key] ? patternCss(key) : 'none'}"><div class="wc-frame">${portraitSvg(key)}</div></div>`;
+const bkName = key => key === 'master' ? 'Stablemaster' : key === profile.starter && profile.name ? profile.name : CHARS[key].name;
+const bkRec = S => { const r = bookState().rec[S.id] || [], total = S.n + 1, wins = r.filter(x => x).length; let h = ''; r.forEach(x => h += `<i class="${x ? 'w' : 'l'}"></i>`); for (let k = wins; k < total; k++) h += '<i></i>'; return `<span class="bk-rec" aria-label="${wins} wins, ${r.length - wins} losses">${h}</span>`; };
+function bkPanel(p, S){
+  const [t, a, cap] = p;
+  if (t === 'scene') return `<figure class="bk-panel wide">${bkScene(a)}<figcaption>${cap}</figcaption></figure>`;
+  if (t === 'duo') return `<figure class="bk-panel"><div class="bk-duo">${a.map(k => bkPor(k)).join('')}</div><figcaption>${cap}</figcaption></figure>`;
+  if (t === 'say') return `<figure class="bk-panel say">${bkPor(a)}<div class="bk-bub"><b>${bkName(a)}</b><p>“${cap}”</p></div></figure>`;
+  if (t === 'mask') return `<figure class="bk-panel dark"><div class="bk-mask">${bkMask}</div><figcaption>${a}</figcaption></figure>`;
+  if (t === 'news') return `<figure class="bk-panel news"><div class="bk-mast">The Daily Dohyo</div><div class="bk-head">Local hope heads to Tokyo</div><div class="bk-cols">${bkPor(profile.starter)}<div><p><b>${esc(bkName(profile.starter))}</b> took the city title last night and leaves for the January tournament.</p><i></i><i></i><i></i></div></div><div class="bk-item"><svg viewBox="0 0 64 60" aria-hidden="true"><path d="${HAND_D}" fill="#1f1a17"/></svg><p><b>Regional champion found beaten.</b> A black handprint was left behind. Police have no leads.</p></div></figure>`;
+  if (t === 'join') { const k = S._join; return k ? `<figure class="bk-panel say">${bkPor(k)}<div class="bk-bub"><b>${CHARS[k].name}</b><p>${S.joins === 'boss' ? 'Beaten fair. The act joins your stable.' : 'asks to join your stable. You say yes before the stablemaster can say no.'}</p></div></figure>` : ''; }
+  return '';
+}
+function bkShow(html, btns){
+  const el = $('#book'); $('#bookBody').innerHTML = html; const bar = $('#bookBar'); bar.innerHTML = '';
+  btns.forEach(([label, fn, main]) => { const b = document.createElement('button'); b.className = main ? 'start' : 'homeBack'; b.textContent = label; b.onclick = fn; bar.appendChild(b); });
+  ['#story', '#end', '#menuBtn', '#muteBtn', '#vs', '#sel'].forEach(q => $(q).hidden = true); el.hidden = false; $('#bookBody').scrollTop = 0;
+}
+const bkHead = (S, title, n) => `<header class="bk-top"><small>Book of the Ring · ${S.name}</small><h2>${title}</h2>${bkRec(S)}</header>`;
+function openBook(){   // the hub: a contents page
+  leaveHome(); phase = 'menu'; const b = bookState(), body = $('#storyBody');
+  const row = (title, sub, state, extra = '') => `<div class="bk-row ${state}"><div><b>${title}</b><small>${sub}</small></div>${extra}</div>`;
+  body.innerHTML = `<div class="bk-cover"><small>Book of the Ring</small><h2>Chapter 1</h2><p>Best in Japan</p></div>`
+    + row('Prologue', BOOK_PROLOGUE.join(' · '), 'done', '<span class="bk-tag">Read</span>')
+    + BOOK.map((S, i) => { const state = b.done.includes(S.id) ? 'done' : i === b.st ? 'now' : 'locked';
+      return row(S.name, `${S.place} · ${S.n + 1} bouts${state !== 'locked' && b.rec[S.id] ? '' : ''}`, state, state === 'locked' ? '<span class="bk-tag">Locked</span>' : `${bkRec(S)}${state === 'done' ? `<span class="bk-tag${b.clean.includes(S.id) ? ' seal' : ''}">${b.clean.includes(S.id) ? 'Clean sweep' : 'Cleared'}</span>` : '<button class="start bk-go">Open</button>'}`); }).join('')
+    + row('The lantern goes out', 'These pages are still being drawn', 'locked', '<span class="bk-tag">Soon</span>');
+  const go = body.querySelector('.bk-go'); if (go) go.onclick = () => bookPage();
+  $('#book').hidden = true; $('#story').hidden = false; body.scrollTop = 0;
+}
+function bookPage(){   // wherever the reader is in the current stage
+  const b = bookState(), S = BOOK[b.st]; if (!S) return openBook();
+  if (b.ph === 'open') { const seg = BOOK_LV.map(l => `<button data-l="${l}" class="${l === b.lv ? 'on' : ''}">${LVL_NAME[l]}</button>`).join('');
+    bkShow(`${bkHead(S, S.open.title)}${S.open.panels.map(p => bkPanel(p, S)).join('')}<div class="bk-lv"><small>How hard is this stage? You can change it at the next one.</small><div class="seg">${seg}</div></div>`, [['← Contents', openBook], ['Turn the page →', () => { b.ph = 'bout'; saveProfile(); bookPage(); }, true]]);
+    $('#bookBody').querySelectorAll('.bk-lv button').forEach(x => x.onclick = () => { b.lv = x.dataset.l; saveProfile(); bookPage(); }); return; }
+  if (b.ph === 'bout') { const list = bookBouts(S), k = list[b.i], boss = b.i === S.n, lost = (b.rec[S.id] || []).some(x => !x);
+    bkShow(`${bkHead(S, boss ? 'The boss' : S.days ? `Day ${b.i + 1}` : `Bout ${b.i + 1} of ${S.n + 1}`)}<figure class="bk-panel pre">${bkPor(k)}<div class="bk-bub"><b>${CHARS[k].name}</b><small>${ARCH[k] || ''} · ★ ${CHARS[k].specialName}</small><p>${BOOK_LINE[k] || INTRO[k] || ''}</p></div></figure><p class="bk-note">${boss ? 'Best of 3' : 'One bout'} · ${LVL_NAME[b.lv]}${lost ? ' · <span class="bk-stamp">Clean sweep lost</span>' : ''}</p>`, [['← Contents', openBook], ['Step into the ring', bookBout, true]]); return; }
+  if (b.ph === 'close') { bkShow(`${bkHead(S, S.close.title)}${S.close.panels.map(p => bkPanel(p, S)).join('')}${S._clean ? '<div class="bk-seal">Clean sweep</div>' : ''}<p class="bk-note">+${S.pay} tokens for clearing ${S.name}</p>`, [['Close the book', () => bookAdvance(), true]]); }
+}
+function bookBout(){
+  const b = bookState(), S = BOOK[b.st], k = bookBouts(S)[b.i], boss = b.i === S.n;
+  storyMatch = { v2: true }; cfg.mode = 'cpu'; cfg.level = b.lv; cfg.bout = boss ? '3' : '1'; cfg.p1 = profile.starter; cfg.p2 = k; rankingMatch = false;
+  ['#book', '#story', '#end', '#menuBtn', '#muteBtn', '#sel', '#onb', '#vs'].forEach(q => $(q).hidden = true); closeSheet();
+  selFlow = { from: 'quick', steps: [{ p: 'p1' }], i: 0, rnd: false }; lastFrom = 'quick'; startMatch();
+}
+function bookResult(won){   // called when a Story bout ends; the result card gives way to a comic panel
+  const b = bookState(), S = BOOK[b.st], k = cfg.p2, boss = b.i === S.n, move = lastResult; storyMatch = null;
+  (b.rec[S.id] = b.rec[S.id] || []).push(won ? 1 : 0); let pay = 0;
+  if (won) { pay = LVL_PAY[b.lv]; addTokens(pay, 'story_bout', { stage: S.id, i: b.i }); }
+  const last = won && boss; if (won && !boss) b.i++;
+  saveProfile();
+  const html = won ? `${bkHead(S, 'Yours')}<figure class="bk-panel win">${bkPor(profile.starter)}<div class="bk-bub"><small>Winning move</small><b class="bk-move">${esc(String(move || 'Yorikiri'))}</b><div class="bk-env"><span>祝</span>+${pay} token${pay === 1 ? '' : 's'}</div></div></figure>`
+    : `${bkHead(S, 'In the sand')}<figure class="bk-panel say">${bkPor('master')}<div class="bk-bub"><b>Stablemaster</b><p>“${BOOK_LOSS[Math.floor(rand() * BOOK_LOSS.length)]}”</p></div></figure><p class="bk-note">${CHARS[k].name} walks off. <span class="bk-stamp">Clean sweep lost</span></p>`;
+  setTimeout(() => { bkShow(html, won ? [[last ? 'Turn the page →' : 'Next →', () => { if (last) bookClose(); else bookPage(); }, true]] : [['← Contents', openBook], ['Again', bookBout, true]]); }, 0);
+}
+function bookClose(){   // the stage's closing page: tokens, who joins, the clean-sweep seal
+  const b = bookState(), S = BOOK[b.st], clean = !(b.rec[S.id] || []).some(x => !x), picks = b.picks[S.id];
+  S._clean = clean; const fresh2 = picks.filter(k => !ownsKey(k));
+  S._join = S.joins === 'boss' ? S.boss : S.joins === 'small' ? (fresh2.length ? fresh2 : picks)[Math.floor(rand() * (fresh2.length ? fresh2.length : picks.length))] : null;
+  S._bonus = !clean ? null : S.joins === 'boss' ? (fresh2.length ? fresh2 : picks)[0] : S.boss;
+  b.ph = 'close'; saveProfile(); bookPage();
+}
+function bookAdvance(){
+  const b = bookState(), S = BOOK[b.st]; if (b.ph !== 'close') return openBook();
+  b.done.push(S.id); if (S._clean) b.clean.push(S.id); addTokens(S.pay, 'story_payout', { stage: S.id });
+  const join = S._join, bonus = S._bonus; b.st++; b.i = 0; b.ph = 'open'; saveProfile(); $('#book').hidden = true; openBook();
+  const chain = [join && [join, S.joins === 'boss' ? 'boss' : 'join'], bonus && [bonus, 'clean']].filter(Boolean), run = n => { if (n < chain.length) storyUnlock(chain[n][0], chain[n][1], () => run(n + 1)); };
+  if (chain.length) setTimeout(() => run(0), 300);
 }
 const porChip = key => `<span class="pface">${portraitSvg(key).replace('viewBox="0 16 300 236"', 'viewBox="36 6 228 228"').replace('role="img"', 'aria-hidden="true"')}</span>`;   // round face crop of the portrait for lists
 function openFull(key){
@@ -4125,6 +4274,7 @@ function showEnd(){
   if (!storyOpen) $('#resStory').innerHTML = rankFinal ? `Ranking complete: ${rk.w}\u2013${rk.l} on ${rk.level}. Your title is ready.`
     : rankNext ? `Ranking ${rk.w}\u2013${rk.l} on ${rk.level} \u00b7 bout ${rk.w + rk.l + 1} of ${STORY_AT} next<div class="pb"><i style="width:${(rk.w + rk.l) / STORY_AT * 100}%"></i></div>`
     : !me ? 'Create a WW account to name your starter and unlock Story' : 'Get your ranking from Me to unlock Story';
+  if (storyMatch && storyMatch.v2) { bookResult(won); return; }
   if (storyMatch) storyResult(won);
   if (tourMatch) tourResult(score[0] > score[1] ? 0 : 1);
   $('#end').classList.toggle('won', !!won && cfg.mode !== 'h2h'); $('#end').hidden = false; $('#menuBtn').hidden = true;
