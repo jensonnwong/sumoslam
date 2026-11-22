@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta http-equiv="Content-Security-Policy" content="script-src 'sha256-xdqregjMfjSEtTHDhE4Q+HAzaD0nIEA8IEIi7v0I9sY='; object-src 'none'; base-uri 'self'">
+<meta http-equiv="Content-Security-Policy" content="script-src 'sha256-amdT6ccpjt61zg87R4baWfEQtaR3emaFnV4nZuQUjSg='; object-src 'none'; base-uri 'self'">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover,interactive-widget=resizes-content">
 <meta name="theme-color" content="#1b2042">
 <meta name="mobile-web-app-capable" content="yes">
@@ -1246,7 +1246,7 @@ function applyStarter(f){   // each player's wrestler uses that player's copy; y
    Any phone can bring a second player (split screen: their controls at the top, like the same-phone 1 v 1).
    1 v 1 = exactly 2 players on 2 phones; 2 v 2 = 2-4 players who pick Blue or Red (CPUs fill the gaps); Rumble = 2-8 players, 6-8 wrestlers. ---------- */
 const TEST_BUILD = true;   // the site build sets this for test uploads: accounts and online are off, so live profiles are never touched
-const BUILD = 'v2.0 test 23 · Nov 21 17:15';   // stamped with the date and time by the site build, so you can tell which version a phone is running
+const BUILD = 'v2.0 test 24 · Nov 22 04:31';   // stamped with the date and time by the site build, so you can tell which version a phone is running
 let NET = null, netBusy = false;   // netBusy: one Make / Join / Quick at a time (no double-tap rooms)
 // NET = { role, seat, code, ws, topic, me:{name,pick,side}, peers:{seat:{name,pick,roll,side,rx}}, match, slots, rins, ... }
 const RT_URL = () => (window.__WWRT || WW.url.replace(/^http/, 'ws') + '/realtime/v1/websocket') + `?apikey=${encodeURIComponent(WW.key)}&vsn=1.0.0`;
@@ -3339,6 +3339,9 @@ function openStation(id){
   audio(); wwEvent('hub_flag_used', { flag: id }); homeFlash = { id, t: .35 }; SFX.go();
   sheetColor = id === 'settings' ? '#3a4277' : (STATIONS.find(q => q.id === id) || {}).cloth || SHEET_CLOTH[id] || null;
   const s = STATIONS.find(q => q.id === id);
+  if (s && locked(s) && TEST_BUILD && !me) {   // accounts are off in the test build: Story runs on a tester profile kept on this device
+    return sheet('Test build', 'Story mode', '<p>Accounts are switched off in this test build, so Story uses a tester profile saved on this phone only. Pick who you start as.</p>',
+      STARTERS.map(k => [CHARS[k].name, () => { me = { name: 'Tester', tokens: 20, owns: [k], profile: { name: 'Tester', starter: k, roll: { push: 5, rech: 5, spirit: 5, luck: 5 }, tier: 2, rank: { level: 'easy', w: 3, l: 0, done: true, title: 'Amateur' } } }; try { localStorage.setItem('v2t_sumoProtoMe', JSON.stringify(me)); } catch (e) {} location.reload(); }, true])); }
   if (s && locked(s)) { SFX.bump(); const ok = (v, t) => `<li style="list-style:none;margin-left:-18px"><b style="color:${v ? '#2f8a52' : '#c8352c'}">${v ? '\u2713' : '\u2717'}</b> ${t}</li>`;
     const needAcct = !me, r = profile && profile.rank, n = r ? r.w + r.l : 0;
     return sheet('Locked', 'Story mode', `<p>Story keeps your progress, so it needs two things.</p><ul style="margin-top:8px">${ok(!needAcct, 'Create a WW account (name and pick your starter)')}${ok(rankDone(), `Get your ranking (${n} / ${STORY_AT} bouts)`)}</ul>`,
